@@ -44,6 +44,12 @@
 
     <h4 class="mb-4 fw-bold">📊 Kelola Pendapatan Shopee</h4>
 
+    @if (session('success'))
+    <div class="alert alert-success">
+        <strong>Berhasil,</strong> {{ session('success') }}
+    </div>
+    @endif
+
     @foreach ($kelola as $i => $row)
         <div class="card income-card mb-3">
             <div class="card-body">

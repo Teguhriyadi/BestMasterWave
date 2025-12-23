@@ -593,7 +593,7 @@ class PendapatanController extends Controller
             $firstChunk = $file->chunks->first();
 
             $dbColumns = collect(Schema::getColumnListing('shopee_pendapatan'))
-                ->reject(fn($c) => in_array($c, ['id', 'uuid', 'created_at', 'updated_at']))
+                ->reject(fn($c) => in_array($c, ['id', 'nama_seller', 'uuid', 'created_at', 'updated_at']))
                 ->values();
 
             DB::commit();
@@ -667,7 +667,7 @@ class PendapatanController extends Controller
 
             DB::commit();
 
-            return redirect()->to("/admin-panel/shopee/pendapatan/kelola-data");
+            return redirect()->to("/admin-panel/shopee/pendapatan/kelola-data")->with("success", "Data Berhasil di Proses");
 
         } catch (\Throwable $e) {
             DB::rollBack();
