@@ -3,7 +3,7 @@
 @push('title_module', 'Seller')
 
 @push('css_style')
-    <link href="{{ url('/templating') }}/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -124,8 +124,8 @@
 @endpush
 
 @push('js_style')
-    <script src="{{ url('/templating') }}/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="{{ url('/templating') }}/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
-    <script src="{{ url('/templating') }}/js/demo/datatables-demo.js"></script>
+    <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
 @endpush
