@@ -36,205 +36,208 @@
             animation: bounce 1.4s infinite ease-in-out both;
         }
 
-        .loader-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .loader-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loader-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
 
         @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); opacity: .3; }
-            40% { transform: scale(1); opacity: 1; }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+                opacity: .3;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body class="bg-light">
 
-<div class="container py-5">
-    <div class="card shadow">
-        <div class="card-body">
+    <div class="container py-5">
+        <div class="card shadow">
+            <div class="card-body">
 
-            <h4 class="mb-4">Upload Excel Pesanan</h4>
+                <h4 class="mb-4">Upload Excel Pesanan</h4>
 
-            <input type="file" id="file" class="form-control mb-3">
+                <input type="file" id="file" class="form-control mb-3">
 
-            <div class="form-group d-none mb-3" id="seller-wrapper">
-                <label class="form-label">Nama Seller</label>
-                <select id="seller_id" class="form-control">
-                    <option value="">- Pilih Seller -</option>
-                    @foreach ($seller as $item)
-                        <option value="{{ $item->id }}">
-                            {{ $item->nama }} - {{ $item->platform->nama }}
-                        </option>
-                    @endforeach
-                </select>
+                <div class="form-group d-none mb-3" id="seller-wrapper">
+                    <label class="form-label">Nama Seller</label>
+                    <select id="seller_id" class="form-control">
+                        <option value="">- Pilih Seller -</option>
+                        @foreach ($seller as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->nama }} - {{ $item->platform->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div id="headers" class="mt-4"></div>
+
+                <button id="process" class="btn btn-success mt-4 d-none">
+                    Proses Data
+                </button>
+
+                <div id="loading" class="d-none text-center my-3">
+                    <div class="spinner-border text-primary mb-2"></div>
+                    <div class="fw-semibold">Membaca file Excel...</div>
+                </div>
+
             </div>
-
-            <div id="headers"></div>
-
-            <button id="process" class="btn btn-success mt-4 d-none">
-                Proses Data
-            </button>
-
-            <div id="loading" class="d-none text-center my-3">
-                <div class="spinner-border text-primary mb-2"></div>
-                <div class="fw-semibold">Membaca file Excel...</div>
-            </div>
-
         </div>
     </div>
-</div>
 
-<div id="process-loading" class="d-none">
-    <div class="process-box">
-        <div class="loader-dots">
-            <span></span><span></span><span></span>
+    <div id="process-loading" class="d-none">
+        <div class="process-box">
+            <div class="loader-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="mt-2 fw-semibold">Memproses data, mohon tunggu…</div>
         </div>
-        <div class="mt-2 fw-semibold">Memproses data, mohon tunggu…</div>
     </div>
-</div>
 
-<script>
-let uploadedFile = null;
-let schemaId = null;
-let headerHash = null;
+    <script>
+        let uploadedFile = null;
+        let schemaId = null;
+        let headerHash = null;
+        let allHeaders = {};
 
-/* =============================
- * 1️⃣ UPLOAD FILE → AMBIL HEADER
- * ============================= */
-document.getElementById('file').addEventListener('change', function () {
+        document.getElementById('file').addEventListener('change', function() {
 
-    uploadedFile = this.files[0];
-    if (!uploadedFile) return;
+            uploadedFile = this.files[0];
+            if (!uploadedFile) return;
 
-    const loading = document.getElementById('loading');
-    const headersDiv = document.getElementById('headers');
+            const loading = document.getElementById('loading');
+            const headersDiv = document.getElementById('headers');
 
-    loading.classList.remove('d-none');
-    headersDiv.innerHTML = '';
-    this.disabled = true;
+            loading.classList.remove('d-none');
+            headersDiv.innerHTML = '';
+            this.disabled = true;
 
-    const fd = new FormData();
-    fd.append('file', uploadedFile);
+            const fd = new FormData();
+            fd.append('file', uploadedFile);
 
-    fetch('/admin-panel/pesanan', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: fd
-    })
-    .then(res => res.json())
-    .then(res => {
-        loading.classList.add('d-none');
-        document.getElementById('file').disabled = false;
+            fetch('/admin-panel/shopee/pesanan', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: fd
+                })
+                .then(res => res.json())
+                .then(res => {
 
-        if (!res.status) {
-            alert(res.message);
-            return;
-        }
+                    loading.classList.add('d-none');
+                    document.getElementById('file').disabled = false;
 
-        schemaId   = res.schema_id;
-        headerHash = res.header_hash;
+                    if (!res.status) {
+                        alert(res.message);
+                        return;
+                    }
 
-        let html = `<h5 class="mt-3">Pilih Kolom</h5>`;
+                    schemaId = res.schema_id;
+                    headerHash = res.header_hash;
+                    allHeaders = res.headers;
 
-        for (const col in res.headers) {
-            html += `
-            <div class="row align-items-center mb-2">
-                <div class="col-6">
-                    <div class="form-check">
-                        <input class="form-check-input column"
-                               type="checkbox"
-                               data-col="${col}"
-                               value="${res.headers[col]}">
-                        <label class="form-check-label">
-                            ${res.headers[col]} (${col})
-                        </label>
-                    </div>
+                    let html = `
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                Kolom Excel Terdeteksi (${Object.keys(allHeaders).length})
+            </div>
+            <div class="card-body">
+                <div class="row">
+        `;
+
+                    let i = 1;
+                    for (const col in allHeaders) {
+                        html += `
+                <div class="col-md-6 mb-1">
+                    <span class="badge bg-secondary me-2">${i}</span>
+                    <strong>${allHeaders[col]}</strong>
+                    <span class="text-muted">(${col})</span>
                 </div>
-                <div class="col-6">
-                    <div class="form-check text-secondary">
-                        <input class="form-check-input convert-number"
-                               type="checkbox"
-                               data-col="${col}">
-                        <label class="form-check-label">Convert ke Angka</label>
+            `;
+                        i++;
+                    }
+
+                    html += `
+                            </div>
+                            <div class="alert alert-info mt-3 mb-0">
+                                Semua kolom akan diproses otomatis.
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>`;
-        }
+                    `;
+                    headersDiv.innerHTML = html;
 
-        headersDiv.innerHTML = html;
-        document.getElementById('process').classList.remove('d-none');
-        document.getElementById('seller-wrapper').classList.remove('d-none');
-    })
-    .catch(() => {
-        loading.classList.add('d-none');
-        document.getElementById('file').disabled = false;
-        alert('Gagal membaca file');
-    });
-});
+                    document.getElementById('seller-wrapper').classList.remove('d-none');
+                    document.getElementById('process').classList.remove('d-none');
+                })
+                .catch(() => {
+                    loading.classList.add('d-none');
+                    document.getElementById('file').disabled = false;
+                    alert('Gagal membaca file');
+                });
+        });
 
-/* =============================
- * 2️⃣ PROSES DATA
- * ============================= */
-document.getElementById('process').addEventListener('click', function () {
+        document.getElementById('process').addEventListener('click', function() {
 
-    const sellerId = document.getElementById('seller_id').value;
-    if (!sellerId) {
-        alert('Silakan pilih Seller terlebih dahulu');
-        return;
-    }
+            const sellerId = document.getElementById('seller_id').value;
+            if (!sellerId) {
+                alert('Silakan pilih Seller terlebih dahulu');
+                return;
+            }
 
-    // 🔒 KOLOM WAJIB
-    const required = ['No. Pesanan', 'Nomor Referensi SKU'];
-    const selected = [];
+            const overlay = document.getElementById('process-loading');
+            overlay.classList.remove('d-none');
+            this.disabled = true;
+            this.innerText = 'Processing...';
 
-    document.querySelectorAll('.column:checked').forEach(el => {
-        selected.push(el.value);
-    });
+            const fd = new FormData();
+            fd.append('file', uploadedFile);
+            fd.append('seller_id', sellerId);
+            fd.append('schema_id', schemaId);
+            fd.append('header_hash', headerHash);
 
-    for (const r of required) {
-        if (!selected.includes(r)) {
-            alert(`Kolom wajib dipilih: ${r}`);
-            return;
-        }
-    }
+            // kirim SEMUA kolom
+            for (const col in allHeaders) {
+                fd.append(`columns[${col}]`, allHeaders[col]);
+            }
 
-    const overlay = document.getElementById('process-loading');
-    overlay.classList.remove('d-none');
-    this.disabled = true;
-
-    const fd = new FormData();
-    fd.append('file', uploadedFile);
-    fd.append('schema_id', schemaId);
-    fd.append('seller_id', sellerId);
-    fd.append('header_hash', headerHash);
-
-    document.querySelectorAll('.column:checked').forEach(el => {
-        fd.append(`columns[${el.dataset.col}]`, el.value);
-    });
-
-    document.querySelectorAll('.convert-number:checked').forEach(el => {
-        fd.append(`convert[${el.dataset.col}]`, 1);
-    });
-
-    fetch('/admin-panel/pesanan/process', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: fd
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status && res.redirect) {
-            window.location.href = res.redirect;
-        } else {
-            alert('Gagal memproses data');
-            overlay.classList.add('d-none');
-        }
-    })
-    .catch(() => {
-        overlay.classList.add('d-none');
-        alert('Terjadi kesalahan');
-    });
-});
-</script>
+            fetch('/admin-panel/shopee/pesanan/process', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: fd
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status && res.redirect) {
+                        window.location.href = res.redirect;
+                    } else {
+                        overlay.classList.add('d-none');
+                        alert(res.message || 'Gagal memproses data');
+                    }
+                })
+                .catch(() => {
+                    overlay.classList.add('d-none');
+                    alert('Terjadi kesalahan');
+                });
+        });
+    </script>
 
 </body>
+
 </html>

@@ -415,7 +415,7 @@ class PendapatanController extends Controller
     {
         $request->validate([
             'file'        => 'required|mimes:xlsx,xls',
-            'columns'     => 'required|array',   // semua kolom otomatis
+            'columns'     => 'required|array',
             'seller_id'   => 'required',
             'date_column' => 'required|string',
             'from_date'   => 'required|date',
@@ -568,14 +568,13 @@ class PendapatanController extends Controller
 
             return response()->json([
                 'status'   => true,
-                'redirect' => url('/admin-panel/pendapatan/' . $upload->id),
+                'redirect' => url('/admin-panel/shopee/pendapatan/' . $upload->id . '/show'),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
     }
-
 
     public function show(string $id)
     {
@@ -668,7 +667,8 @@ class PendapatanController extends Controller
 
             DB::commit();
 
-            dd("Success");
+            return redirect()->to("/admin-panel/shopee/pendapatan/kelola-data");
+
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -682,9 +682,11 @@ class PendapatanController extends Controller
 
             DB::beginTransaction();
 
+            $data["kelola"] = ShopeePendapatan::get();
+
             DB::commit();
 
-            return view("pages.pendapatan.kelola");
+            return view("pages.pendapatan.kelola", $data);
         } catch (\Exception $e) {
 
             DB::rollBack();

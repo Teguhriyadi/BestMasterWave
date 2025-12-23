@@ -103,14 +103,14 @@
                             {{-- EXCEL --}}
                             <div class="col-md-6">
                                 <h6>Kolom Excel</h6>
-                                <ul class="list-group mapping-list">
+                                <input type="text" class="form-control form-control-sm mb-2"
+                                    placeholder="🔍 Cari kolom Excel..." id="searchExcel">
+                                <ul class="list-group mapping-list" id="excelList">
                                     @foreach (array_keys($rows->first() ?? []) as $key)
-                                        @if ($key !== '_date')
-                                            <li class="list-group-item draggable" draggable="true"
-                                                data-excel="{{ $key }}">
-                                                {{ $key }}
-                                            </li>
-                                        @endif
+                                        <li class="list-group-item draggable" draggable="true"
+                                            data-excel="{{ $key }}">
+                                            {{ $key }}
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -118,7 +118,10 @@
                             {{-- DB --}}
                             <div class="col-md-6">
                                 <h6>Kolom Database</h6>
-                                <ul class="list-group mapping-list">
+                                <input type="text" class="form-control form-control-sm mb-2"
+                                    placeholder="🔍 Cari kolom Database..." id="searchDb">
+
+                                <ul class="list-group mapping-list" id="dbList">
                                     @foreach ($dbColumns as $col)
                                         <li class="list-group-item dropzone" data-db="{{ $col }}">
                                             {{ $col }}
@@ -143,6 +146,26 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('searchExcel').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+
+            document.querySelectorAll('#excelList .draggable').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(keyword) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('searchDb').addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+
+            document.querySelectorAll('#dbList .dropzone').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(keyword) ? '' : 'none';
+            });
+        });
+    </script>
 
     <script>
         let dragged = null;
