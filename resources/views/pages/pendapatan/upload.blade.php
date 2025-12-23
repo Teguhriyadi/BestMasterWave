@@ -132,7 +132,7 @@
             let fd = new FormData();
             fd.append('file', uploadedFile);
 
-            fetch('/admin-panel/shopee/pendapatan', {
+            fetch("{{ url('admin-panel/shopee/pendapatan') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -277,7 +277,7 @@
             fd.append('to_date', toDate);
             fd.append('date_column', dateColumn.value);
 
-            fetch('/admin-panel/shopee/pendapatan/process', {
+            fetch("{{ url('admin-panel/shopee/pendapatan/process') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'

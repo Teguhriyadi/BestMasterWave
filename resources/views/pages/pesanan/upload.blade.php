@@ -128,7 +128,7 @@
             const fd = new FormData();
             fd.append('file', uploadedFile);
 
-            fetch('/admin-panel/shopee/pesanan', {
+            fetch("{{ url('admin-panel/shopee/pesanan') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -215,7 +215,7 @@
                 fd.append(`columns[${col}]`, allHeaders[col]);
             }
 
-            fetch('/admin-panel/shopee/pesanan/process', {
+            fetch("{{ url('admin-panel/shopee/pesanan/process') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
