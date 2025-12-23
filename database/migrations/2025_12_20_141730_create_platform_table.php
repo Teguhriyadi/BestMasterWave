@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('platform', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string("nama", 50);
-            $table->string("slug", 50);
+            $table->string("nama", 50)->index();
+            $table->string("slug", 50)->index();
             $table->enum("status", ["1", "0"])->default("1");
             $table->timestamps();
         });

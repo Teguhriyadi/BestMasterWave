@@ -6,8 +6,8 @@
     <title>Import Income Excel</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Overlay */
         #process-loading {
             position: fixed;
             inset: 0;
@@ -18,7 +18,6 @@
             align-items: center;
         }
 
-        /* Box */
         .process-box {
             text-align: center;
             padding: 24px 32px;
@@ -27,7 +26,6 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dot animation */
         .loader-dots span {
             display: inline-block;
             width: 10px;
@@ -61,7 +59,6 @@
             }
         }
     </style>
-
 </head>
 
 <body class="bg-light">
@@ -88,14 +85,14 @@
 
                 <div id="date-filter" class="mt-4 d-none"></div>
 
-                <div id="headers"></div>
+                <div id="headers" class="mt-4"></div>
 
                 <button id="process" class="btn btn-success mt-4 d-none">
                     Proses Data
                 </button>
 
                 <div id="loading" class="d-none text-center my-3">
-                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                    <div class="spinner-border text-primary mb-2"></div>
                     <div class="fw-semibold">Membaca file Excel...</div>
                 </div>
 
@@ -114,12 +111,11 @@
 
     <script>
         let uploadedFile = null;
-        let selectedColumns = {};
-        let headerHash = null;
         let schemaId = null;
-
+        let headerHash = null;
+        let allHeaders = {};
         let fromDate = null;
-        let toDate   = null;
+        let toDate = null;
 
         document.getElementById('file').addEventListener('change', function() {
 
@@ -131,13 +127,12 @@
 
             loading.classList.remove('d-none');
             headersDiv.innerHTML = '';
-
             this.disabled = true;
 
             let fd = new FormData();
             fd.append('file', uploadedFile);
 
-            fetch('/admin-panel/pendapatan', {
+            fetch('/admin-panel/shopee/pendapatan', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -155,78 +150,85 @@
                         return;
                     }
 
-                    schemaId   = res.schema_id;
+                    schemaId = res.schema_id;
                     headerHash = res.header_hash;
+                    allHeaders = res.headers;
+                    fromDate = res.from_date;
+                    toDate = res.to_date;
 
-                    let html = '<h5 class="mt-3">Pilih Kolom</h5>';
+                    /* =============================
+                       TAMPILKAN SEMUA KOLOM (READ ONLY)
+                       ============================= */
+                    let html = `
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        Kolom Excel Terdeteksi (${Object.keys(allHeaders).length})
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+            `;
 
-                    for (const col in res.headers) {
+                    let i = 1;
+                    for (const col in allHeaders) {
                         html += `
-                        <div class="row align-items-center mb-2">
-                            <div class="col-6">
-                                <div class="form-check">
-                                    <input class="form-check-input column"
-                                        type="checkbox"
-                                        data-col="${col}"
-                                        value="${res.headers[col]}">
-                                    <label class="form-check-label">
-                                        ${res.headers[col]} (${col})
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-6">
-                                <div class="form-check text-secondary">
-                                    <input class="form-check-input convert-number"
-                                        type="checkbox"
-                                        data-col="${col}">
-                                    <label class="form-check-label">
-                                        Convert ke Angka
-                                    </label>
-                                </div>
-                            </div>
-                        </div>`;
+                    <div class="col-md-6 mb-1">
+                        <span class="badge bg-secondary me-2">${i}</span>
+                        <strong>${allHeaders[col]}</strong>
+                        <span class="text-muted">(${col})</span>
+                    </div>
+                `;
+                        i++;
                     }
 
+                    html += `
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0">
+                            Semua kolom di atas akan diproses otomatis.
+                        </div>
+                    </div>
+                </div>
+            `;
+
                     headersDiv.innerHTML = html;
+
                     document.getElementById('process').classList.remove('d-none');
                     document.getElementById('seller-wrapper').classList.remove('d-none');
 
+                    /* =============================
+                       FILTER TANGGAL
+                       ============================= */
                     const dateWrapper = document.getElementById('date-filter');
                     dateWrapper.innerHTML = '';
-
-                    fromDate = res.from_date;
-                    toDate   = res.to_date;
 
                     if (res.date_columns && Object.keys(res.date_columns).length > 0) {
 
                         let dateHtml = `
-                            <div class="card border-primary">
-                                <div class="card-body">
-                                    <h6 class="text-primary mb-2">Filter Periode</h6>
-                                    <div class="text-muted mb-2">
-                                        Periode: <strong>${res.from_date}</strong> s/d <strong>${res.to_date}</strong>
-                                    </div>
-                        `;
+                    <div class="card border-primary mt-4">
+                        <div class="card-body">
+                            <h6 class="text-primary mb-2">Filter Periode</h6>
+                            <div class="text-muted mb-2">
+                                Periode: <strong>${fromDate}</strong> s/d <strong>${toDate}</strong>
+                            </div>
+                `;
 
                         for (const col in res.date_columns) {
                             dateHtml += `
-                                <div class="form-check">
-                                    <input class="form-check-input date-column"
-                                        type="radio"
-                                        name="date_column"
-                                        value="${col}">
-                                    <label class="form-check-label">
-                                        ${res.date_columns[col]} (${col})
-                                    </label>
-                                </div>
-                            `;
+                        <div class="form-check">
+                            <input class="form-check-input date-column"
+                                   type="radio"
+                                   name="date_column"
+                                   value="${col}">
+                            <label class="form-check-label">
+                                ${res.date_columns[col]} (${col})
+                            </label>
+                        </div>
+                    `;
                         }
 
                         dateHtml += `
-                                </div>
-                            </div>
-                        `;
+                        </div>
+                    </div>
+                `;
 
                         dateWrapper.innerHTML = dateHtml;
                         dateWrapper.classList.remove('d-none');
@@ -247,9 +249,12 @@
 
             if (!sellerId) {
                 alert('Silakan pilih Seller terlebih dahulu');
-                overlay.classList.add('d-none');
-                btn.disabled = false;
-                btn.innerText = 'Proses Data';
+                return;
+            }
+
+            const dateColumn = document.querySelector('input[name="date_column"]:checked');
+            if (!dateColumn) {
+                alert('Silakan pilih kolom tanggal');
                 return;
             }
 
@@ -260,33 +265,19 @@
             let fd = new FormData();
             fd.append('file', uploadedFile);
 
-            document.querySelectorAll('.column:checked').forEach(el => {
-                fd.append(`columns[${el.dataset.col}]`, el.value);
-            });
-
-            document.querySelectorAll('.convert-number:checked').forEach(el => {
-                fd.append(`convert[${el.dataset.col}]`, 1);
-            });
+            // kirim SEMUA kolom
+            for (const col in allHeaders) {
+                fd.append(`columns[${col}]`, allHeaders[col]);
+            }
 
             fd.append('schema_id', schemaId);
             fd.append('seller_id', sellerId);
             fd.append('header_hash', headerHash);
-
-            const dateColumn = document.querySelector('input[name="date_column"]:checked');
-
-            if (!dateColumn) {
-                alert('Silakan pilih kolom tanggal untuk filter');
-                overlay.classList.add('d-none');
-                btn.disabled = false;
-                btn.innerText = 'Proses Data';
-                return;
-            }
-
             fd.append('from_date', fromDate);
             fd.append('to_date', toDate);
             fd.append('date_column', dateColumn.value);
 
-            fetch('/admin-panel/pendapatan/process', {
+            fetch('/admin-panel/shopee/pendapatan/process', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -297,6 +288,11 @@
                 .then(res => {
                     if (res.status && res.redirect) {
                         window.location.href = res.redirect;
+                    } else {
+                        overlay.classList.add('d-none');
+                        btn.disabled = false;
+                        btn.innerText = 'Proses Data';
+                        alert(res.message || 'Gagal memproses data');
                     }
                 })
                 .catch(() => {

@@ -12,8 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 require __DIR__ . '/../routes/app/dashboard.php';
                 require __DIR__ . '/../routes/master/platform.php';
                 require __DIR__ . '/../routes/master/seller.php';
-                require __DIR__ . '/../routes/transaction/pendapatan.php';
-                require __DIR__ . '/../routes/transaction/pesanan.php';
+                require __DIR__ . '/../routes/transaction/shopee/pendapatan.php';
+                require __DIR__ . '/../routes/transaction/shopee/pesanan.php';
             });
         },
         commands: __DIR__.'/../routes/console.php',

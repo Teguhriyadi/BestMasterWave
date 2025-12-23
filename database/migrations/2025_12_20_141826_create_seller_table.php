@@ -18,8 +18,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('platform')
                 ->cascadeOnDelete();
-            $table->string("nama", 100);
-            $table->string("slug", 150);
+            $table->string("nama", 100)->index();
+            $table->string("slug", 150)->index();
             $table->enum("status", ["1", "0"])->default("1");
             $table->timestamps();
         });
