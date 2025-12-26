@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('pages.layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Preview Import Income</title>
+@push('title_module', 'Detail Shopee Pesanan')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+@push('css_style')
     <style>
         .modal-body {
             max-height: calc(100vh - 200px);
@@ -39,63 +35,65 @@
             color: #198754;
         }
     </style>
-</head>
+@endpush
 
-<body class="bg-light">
+@push('content_app')
 
-    <div class="container py-5">
+    <h1 class="h3 mb-4 text-gray-800">
+        Detail Shopee Pesanan
+    </h1>
 
-        {{-- INFO FILE --}}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Informasi File</h5>
-                <table class="table table-sm">
-                    <tr>
-                        <th>Seller</th>
-                        <td>{{ $file->seller->nama }}</td>
-                    </tr>
-                    <tr>
-                        <th>Platform</th>
-                        <td>{{ $file->seller->platform->nama }}</td>
-                    </tr>
-                    <tr>
-                        <th>Periode</th>
-                        <td>{{ $file->from_date }} s/d {{ $file->to_date }}</td>
-                    </tr>
-                    <tr>
-                        <th>Total Baris</th>
-                        <td>{{ number_format($file->total_rows) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Jumlah Chunk</th>
-                        <td>{{ $chunkCount }}</td>
-                    </tr>
-                </table>
-
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mappingModal">
-                    🔀 Process & Mapping
-                </button>
-            </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
         </div>
+    @elseif(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
-        {{-- PREVIEW --}}
-        <h5>Preview (20 baris pertama)</h5>
-        <pre class="bg-white p-3 small">{{ json_encode($rows->first(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Informasi File</h5>
+            <table class="table table-sm">
+                <tr>
+                    <th>Seller</th>
+                    <td>{{ $file->seller->nama }}</td>
+                </tr>
+                <tr>
+                    <th>Platform</th>
+                    <td>{{ $file->seller->platform->nama }}</td>
+                </tr>
+                <tr>
+                    <th>Periode</th>
+                    <td>{{ $file->from_date }} s/d {{ $file->to_date }}</td>
+                </tr>
+                <tr>
+                    <th>Total Baris</th>
+                    <td>{{ number_format($file->total_rows) }}</td>
+                </tr>
+                <tr>
+                    <th>Jumlah Chunk</th>
+                    <td>{{ $chunkCount }}</td>
+                </tr>
+            </table>
 
+            <button class="btn btn-primary" data-toggle="modal" data-target="#mappingModal">
+                🔀 Process & Mapping
+            </button>
+        </div>
     </div>
 
-    {{-- MODAL MAPPING --}}
-    <div class="modal fade" id="mappingModal" tabindex="-1">
+    <div class="modal fade" id="mappingModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
 
-                <form method="POST"
-                    action="{{ url('/admin-panel/shopee/pesanan/' . $file->id . '/process-database') }}">
+                <form method="POST" action="{{ url('/admin-panel/shopee/pesanan/' . $file->id . '/process-database') }}">
                     @csrf
 
                     <div class="modal-header">
                         <h5 class="modal-title">Mapping Kolom Excel → Database</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
@@ -135,9 +133,13 @@
                         </div>
                     </div>
 
-
                     <div class="modal-footer">
-                        <button class="btn btn-success">✔ Proses Data</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times"></i> Batal
+                        </button>
+                        <button class="btn btn-success btn-sm">
+                            <i class="fa fa-edit"></i> Proses Data
+                        </button>
                     </div>
 
                 </form>
@@ -146,8 +148,9 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@endpush
 
+@push('js_style')
     <script>
         document.getElementById('searchExcel').addEventListener('input', function() {
             const keyword = this.value.toLowerCase();
@@ -202,17 +205,12 @@
                 const excel = dragged.dataset.excel;
                 const db = zone.dataset.db;
 
-                /**
-                 * Jika zone sudah punya mapping sebelumnya,
-                 * kembalikan excel lama ke state aktif
-                 */
                 const oldExcel = zone.dataset.excel;
                 if (oldExcel) {
                     const oldEl = document.querySelector(`.draggable[data-excel="${oldExcel}"]`);
                     if (oldEl) oldEl.classList.remove('used');
                 }
 
-                // set mapping baru
                 zone.dataset.excel = excel;
 
                 zone.innerHTML = `
@@ -221,13 +219,9 @@
             <input type="hidden" name="mapping[${db}]" value="${excel}">
         `;
 
-                // tandai excel sudah dipakai
                 dragged.classList.add('used');
                 dragged = null;
             });
         });
     </script>
-
-</body>
-
-</html>
+@endpush

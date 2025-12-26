@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('pages.layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Kelola Pendapatan</title>
+@push('title_module', 'List Data Shopee Pendapatan')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+@push('css_style')
     <style>
         .income-card {
             border-radius: 12px;
@@ -36,18 +32,18 @@
             font-weight: 600;
         }
     </style>
-</head>
+@endpush
 
-<body class="bg-light">
+@push('content_app')
 
-<div class="container py-5">
-
-    <h4 class="mb-4 fw-bold">📊 Kelola Pendapatan Shopee</h4>
+    <h1 class="h3 mb-4 text-gray-800">
+        Kelola Pendapatan Shopee
+    </h1>
 
     @if (session('success'))
-    <div class="alert alert-success">
-        <strong>Berhasil,</strong> {{ session('success') }}
-    </div>
+        <div class="alert alert-success">
+            <strong>Berhasil,</strong> {{ session('success') }}
+        </div>
     @endif
 
     @foreach ($kelola as $i => $row)
@@ -55,10 +51,8 @@
             <div class="card-body">
 
                 {{-- HEADER CARD --}}
-                <div class="d-flex justify-content-between align-items-center"
-                     data-bs-toggle="collapse"
-                     data-bs-target="#detail-{{ $i }}"
-                     role="button">
+                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+                    data-bs-target="#detail-{{ $i }}" role="button">
 
                     <div>
                         <div class="fw-bold">
@@ -164,18 +158,15 @@
         </div>
     @endforeach
 
-</div>
+@endpush
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((el, index) => {
-        el.addEventListener('click', () => {
-            const icon = document.getElementById('icon-' + index);
-            icon.classList.toggle('rotate');
+@push('js_style')
+    <script>
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((el, index) => {
+            el.addEventListener('click', () => {
+                const icon = document.getElementById('icon-' + index);
+                icon.classList.toggle('rotate');
+            });
         });
-    });
-</script>
-
-</body>
-</html>
+    </script>
+@endpush

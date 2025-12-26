@@ -17,9 +17,15 @@ class InvoiceSchemaPendapatan extends Model
 
     public $primaryKey = "id";
 
-    public $timestamps = false;
-
     protected $casts = [
         'headers' => 'array'
     ];
+
+    public function files()
+    {
+        return $this->hasMany(
+            InvoiceFilePendapatan::class,
+            'schema_id'
+        );
+    }
 }

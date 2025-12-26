@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('hash', 64)->index();
             $table->json('headers');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

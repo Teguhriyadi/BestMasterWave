@@ -44,6 +44,26 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    <div class="sidebar-heading">
+        Master Transaksi
+    </div>
+
+    <li class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseShopee"
+            aria-expanded="true" aria-controls="collapseShopee">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Shopee</span>
+        </a>
+        <div id="collapseShopee" class="collapse {{ Request::is('admin-panel/shopee/pendapatan*') || Request::is('admin-panel/shopee/pesanan*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pendapatan*') ? 'active' : '' }}" href="{{ url('/admin-panel/shopee/pendapatan') }}">Pendapatan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pesanan*') ? 'active' : '' }}" href="{{ url('/admin-panel/shopee/pesanan') }}">Pesanan</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+
     <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>

@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('pages.layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Import Pesanan Excel</title>
+@push('title_module', 'Upload Excel Shopee Pesanan')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+@push('css_style')
     <style>
         #process-loading {
             position: fixed;
@@ -59,42 +55,57 @@
             }
         }
     </style>
-</head>
+@endpush
 
-<body class="bg-light">
+@push('content_app')
 
-    <div class="container py-5">
-        <div class="card shadow">
-            <div class="card-body">
+    <h1 class="h3 mb-4 text-gray-800">
+        Data Shopee Pesanan
+    </h1>
 
-                <h4 class="mb-4">Upload Excel Pesanan</h4>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @elseif(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
-                <input type="file" id="file" class="form-control mb-3">
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fa fa-upload"></i> Upload Excel Shopee Pesanan
+            </h6>
+        </div>
+        <div class="card-body">
 
-                <div class="form-group d-none mb-3" id="seller-wrapper">
-                    <label class="form-label">Nama Seller</label>
-                    <select id="seller_id" class="form-control">
-                        <option value="">- Pilih Seller -</option>
-                        @foreach ($seller as $item)
-                            <option value="{{ $item->id }}">
-                                {{ $item->nama }} - {{ $item->platform->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            <input type="file" id="file" class="form-control mb-3">
 
-                <div id="headers" class="mt-4"></div>
-
-                <button id="process" class="btn btn-success mt-4 d-none">
-                    Proses Data
-                </button>
-
-                <div id="loading" class="d-none text-center my-3">
-                    <div class="spinner-border text-primary mb-2"></div>
-                    <div class="fw-semibold">Membaca file Excel...</div>
-                </div>
-
+            <div class="form-group d-none mb-3" id="seller-wrapper">
+                <label class="form-label">Nama Seller</label>
+                <select id="seller_id" class="form-control">
+                    <option value="">- Pilih Seller -</option>
+                    @foreach ($seller as $item)
+                        <option value="{{ $item->id }}">
+                            {{ $item->nama }} - {{ $item->platform->nama }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
+            <div id="headers" class="mt-4"></div>
+
+            <button id="process" class="btn btn-success mt-4 d-none">
+                Proses Data
+            </button>
+
+            <div id="loading" class="d-none text-center my-3">
+                <div class="spinner-border text-primary mb-2"></div>
+                <div class="fw-semibold">Membaca file Excel...</div>
+            </div>
+
         </div>
     </div>
 
@@ -107,6 +118,9 @@
         </div>
     </div>
 
+@endpush
+
+@push('js_style')
     <script>
         let uploadedFile = null;
         let schemaId = null;
@@ -210,7 +224,6 @@
             fd.append('schema_id', schemaId);
             fd.append('header_hash', headerHash);
 
-            // kirim SEMUA kolom
             for (const col in allHeaders) {
                 fd.append(`columns[${col}]`, allHeaders[col]);
             }
@@ -237,7 +250,4 @@
                 });
         });
     </script>
-
-</body>
-
-</html>
+@endpush
