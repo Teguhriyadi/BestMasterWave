@@ -130,6 +130,7 @@
         let allHeaders = {};
         let fromDate = null;
         let toDate = null;
+        let defaultChecked = null;
 
         document.getElementById('file').addEventListener('change', function() {
 
@@ -226,17 +227,31 @@
                 `;
 
                         for (const col in res.date_columns) {
+                            if (
+                                res.date_columns[col]
+                                    .toLowerCase()
+                                    .includes('tanggal dana dilepaskan')
+                            ) {
+                                defaultChecked = col;
+                                break;
+                            }
+                        }
+
+                        for (const col in res.date_columns) {
+                            const checked = col === defaultChecked ? 'checked' : '';
+
                             dateHtml += `
-                        <div class="form-check">
-                            <input class="form-check-input date-column"
-                                   type="radio"
-                                   name="date_column"
-                                   value="${col}">
-                            <label class="form-check-label">
-                                ${res.date_columns[col]} (${col})
-                            </label>
-                        </div>
-                    `;
+                                <div class="form-check">
+                                    <input class="form-check-input date-column"
+                                        type="radio"
+                                        name="date_column"
+                                        value="${col}"
+                                        ${checked}>
+                                    <label class="form-check-label">
+                                        ${res.date_columns[col]} (${col})
+                                    </label>
+                                </div>
+                            `;
                         }
 
                         dateHtml += `

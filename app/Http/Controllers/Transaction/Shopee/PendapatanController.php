@@ -96,7 +96,7 @@ class PendapatanController extends Controller
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($path);
 
-        $headers = [];
+        $headers    = [];
         $sheetName = null;
         $headerRow = 6;
         $dataStart = 7;
@@ -124,7 +124,10 @@ class PendapatanController extends Controller
             ], 422);
         }
 
-        $sheet = IOFactory::createReaderForFile($path)->load($path)->getSheetByName($sheetName);
+        $sheet = IOFactory::createReaderForFile($path)
+            ->load($path)
+            ->getSheetByName($sheetName);
+
         $dateColumns = $this->detectDateColumns($sheet, $headers, $dataStart);
 
         $fromRaw = $sheet->getCell('B2')->getValue();
@@ -156,7 +159,6 @@ class PendapatanController extends Controller
             'to_date'      => $toDate,
         ]);
     }
-
 
     public function detectCellType($cell): string
     {
@@ -399,8 +401,13 @@ class PendapatanController extends Controller
         $path = $request->file('file')->getPathname();
         $spreadsheet = IOFactory::createReaderForFile($path)->load($path);
 
-        /* ===== ambil kolom No. Pesanan ===== */
+        /**
+         * ===============================
+         * VALIDASI DUPLICATE (WAJIB)
+         * ===============================
+         */
         $noPesananCol = array_search('No. Pesanan', $request->columns);
+
         if (!$noPesananCol) {
             return response()->json([
                 'status' => false,
@@ -408,7 +415,6 @@ class PendapatanController extends Controller
             ], 422);
         }
 
-        /* ===== ambil semua no pesanan dari excel ===== */
         $excelOrders = [];
 
         foreach ($spreadsheet->getWorksheetIterator() as $sheet) {
@@ -416,7 +422,9 @@ class PendapatanController extends Controller
 
             for ($row = 7; $row <= $sheet->getHighestRow(); $row++) {
                 $val = $sheet->getCell($noPesananCol . $row)->getValue();
-                if ($val) $excelOrders[] = (string) $val;
+                if ($val) {
+                    $excelOrders[] = (string) $val;
+                }
             }
             break;
         }
@@ -430,7 +438,6 @@ class PendapatanController extends Controller
             ], 422);
         }
 
-        /* ===== cek data yang sudah ada ===== */
         $existingOrders = ShopeePendapatan::whereIn('no_pesanan', $excelOrders)
             ->pluck('no_pesanan')
             ->toArray();
@@ -439,31 +446,27 @@ class PendapatanController extends Controller
 
         if (count($newOrders) === 0) {
             return response()->json([
-                'status' => false,
-                'message' => 'Data sudah pernah di-upload. Tidak ada data baru.'
+                'status'  => false,
+                'message' => 'Data tidak ada perubahan. File ini sudah pernah diproses.'
             ], 422);
         }
 
-        /* ===== AUTO SCHEMA ===== */
-        $excelHeaders = array_values($request->columns);
-        sort($excelHeaders);
-        $hash = hash('sha256', json_encode($excelHeaders));
-
-        $schema = InvoiceSchemaPendapatan::firstOrCreate(
-            ['hash' => $hash],
-            ['headers' => $this->normalizeSchemaHeaders($request->columns)]
-        );
-
+        /**
+         * ===============================
+         * SIMPAN FILE + CHUNK (HANYA DATA BARU)
+         * ===============================
+         */
         DB::beginTransaction();
 
         try {
             $file = InvoiceFilePendapatan::create([
-                'seller_id'   => $request->seller_id,
-                'uploaded_at' => now(),
-                'from_date'   => $request->from_date,
-                'to_date'     => $request->to_date,
-                'total_rows'  => 0,
-                'schema_id'   => $schema->id,
+                'seller_id'    => $request->seller_id,
+                'uploaded_at'  => now(),
+                'from_date'    => $request->from_date,
+                'to_date'      => $request->to_date,
+                'total_rows'   => 0,
+                'schema_id'    => null,
+                'processed_at' => null,
             ]);
 
             $buffer = [];
@@ -490,6 +493,7 @@ class PendapatanController extends Controller
                     }
 
                     $noPesanan = $item['No. Pesanan'] ?? null;
+
                     if (!$noPesanan || !in_array($noPesanan, $newOrders)) continue;
 
                     $buffer[] = $item;
@@ -539,22 +543,37 @@ class PendapatanController extends Controller
 
         $firstChunk = $file->chunks->first();
 
-        // WAJIB ADA
+        /**
+         * ===============================
+         * SATU-SATUNYA PENENTU
+         * ===============================
+         */
+        $needMapping = is_null($file->processed_at);
+
+        /**
+         * ===============================
+         * HITUNG DATA BARU (HANYA JIKA SUDAH PROCESSED)
+         * ===============================
+         */
         $newRowsCount = 0;
 
-        if ($firstChunk && $file->schema) {
+        if (!$needMapping && $file->schema && $firstChunk) {
 
             $mapping = $file->schema->headers;
             $excelKeyNoPesanan = $mapping['no_pesanan'] ?? null;
 
             if ($excelKeyNoPesanan) {
+
                 $existingOrders = ShopeePendapatan::pluck('no_pesanan')->flip();
 
                 foreach ($file->chunks as $chunk) {
                     foreach ($chunk->payload['rows'] as $row) {
+
                         if (!isset($row[$excelKeyNoPesanan])) continue;
 
-                        if (!isset($existingOrders[(string)$row[$excelKeyNoPesanan]])) {
+                        $noPesanan = (string) $row[$excelKeyNoPesanan];
+
+                        if (!isset($existingOrders[$noPesanan])) {
                             $newRowsCount++;
                         }
                     }
@@ -566,7 +585,7 @@ class PendapatanController extends Controller
             Schema::getColumnListing('shopee_pendapatan')
         )->reject(
             fn($c) =>
-            in_array($c, ['id', 'uuid', 'created_at', 'updated_at', 'harga_modal', 'nama_seller'])
+            in_array($c, ['id', 'uuid', 'created_at', 'updated_at', 'nama_seller', 'harga_modal'])
         )->values();
 
         return view('pages.pendapatan.show', [
@@ -574,11 +593,12 @@ class PendapatanController extends Controller
             'rows'           => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
             'chunkCount'     => $file->chunks->count(),
             'dbColumns'      => $dbColumns,
-            'needMapping'    => false,
+            'needMapping'    => $needMapping,
             'prefillMapping' => $file->schema?->headers ?? [],
             'newRowsCount'   => $newRowsCount,
         ]);
     }
+
 
     public function normalizeSchemaHeaders(array $columns): array
     {
@@ -640,24 +660,23 @@ class PendapatanController extends Controller
         return $result;
     }
 
-    public function processDatabase(Request $request, $id)
+    public function processDatabase(Request $request, string $id)
     {
         DB::beginTransaction();
 
         try {
-            $file = InvoiceFilePendapatan::with(['chunks', 'schema'])
-                ->findOrFail($id);
+            $file = InvoiceFilePendapatan::with(['chunks', 'schema'])->findOrFail($id);
 
             /**
-             * =================================================
-             * 🔑 AMBIL SCHEMA (AUTO / MANUAL)
-             * =================================================
+             * ===============================
+             * AMBIL MAPPING
+             * ===============================
              */
             if ($file->schema_id) {
-                // AUTO → schema sudah ada
+                // AUTO (schema sudah ada)
                 $mapping = $file->schema->headers;
             } else {
-                // MANUAL → pertama kali
+                // MANUAL (pertama kali)
                 $request->validate([
                     'mapping' => 'required|array'
                 ]);
@@ -681,50 +700,32 @@ class PendapatanController extends Controller
             }
 
             /**
-             * =================================================
-             * 🔥 AMBIL no_pesanan EXCEL DARI SCHEMA
-             * =================================================
+             * ===============================
+             * INSERT KE DB (HANYA DATA BARU)
+             * ===============================
              */
-            $excelKeyNoPesanan = $mapping['no_pesanan'] ?? null;
-
-            if (!$excelKeyNoPesanan) {
-                throw new \Exception('Mapping kolom No. Pesanan tidak ditemukan');
-            }
-
-            // lookup data existing (biar O(1))
             $existingOrders = ShopeePendapatan::pluck('no_pesanan')->flip();
-
-            /**
-             * =================================================
-             * INSERT KE shopee_pendapatan (HANYA DATA BARU)
-             * =================================================
-             */
-            $inserted = 0;
 
             foreach ($file->chunks as $chunk) {
                 foreach ($chunk->payload['rows'] as $row) {
 
-                    if (!isset($row[$excelKeyNoPesanan])) {
-                        continue;
-                    }
+                    $excelNoPesananKey = $mapping['no_pesanan'] ?? null;
+                    if (!$excelNoPesananKey) continue;
+                    if (!isset($row[$excelNoPesananKey])) continue;
 
-                    $noPesanan = (string) $row[$excelKeyNoPesanan];
+                    $noPesanan = (string) $row[$excelNoPesananKey];
 
-                    // ⛔ skip jika sudah ada
+                    // ⛔ SUDAH ADA → SKIP
                     if (isset($existingOrders[$noPesanan])) {
                         continue;
                     }
 
                     $data = [
-                        'uuid'       => Str::uuid(),
-                        'no_pesanan' => $noPesanan,
+                        'uuid' => Str::uuid(),
                     ];
 
                     foreach ($mapping as $dbColumn => $excelHeader) {
-
-                        if (!array_key_exists($excelHeader, $row)) {
-                            continue;
-                        }
+                        if (!array_key_exists($excelHeader, $row)) continue;
 
                         $value = $row[$excelHeader];
 
@@ -741,26 +742,30 @@ class PendapatanController extends Controller
                         $data[$dbColumn] = $this->smartValue($value);
                     }
 
-                    if (count($data) <= 2) {
-                        continue;
-                    }
-
                     ShopeePendapatan::create($data);
-                    $existingOrders[$noPesanan] = true;
-                    $inserted++;
                 }
             }
+
+            /**
+             * ===============================
+             * 🔥 INI KUNCI UTAMA
+             * ===============================
+             */
+            $file->update([
+                'processed_at' => now()
+            ]);
 
             DB::commit();
 
             return redirect()
                 ->to('/admin-panel/shopee/pendapatan/kelola-data')
-                ->with('success', "Berhasil memproses {$inserted} data baru");
+                ->with('success', 'Data berhasil diproses');
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
     }
+
 
     public function kelola()
     {

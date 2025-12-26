@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date("from_date");
             $table->date("to_date");
             $table->unsignedInteger("total_rows")->default(0);
+            $table->timestamp('processed_at')->nullable();
         });
     }
 
