@@ -30,7 +30,7 @@ class PendapatanController extends Controller
 
             DB::commit();
 
-            return view("pages.pendapatan.upload", $data);
+            return view("pages.modules.transaction.shopee.pendapatan.upload", $data);
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -267,7 +267,7 @@ class PendapatanController extends Controller
             ]))
             ->values();
 
-        return view('pages.pendapatan.show', [
+        return view('pages.modules.transaction.shopee.pendapatan.show', [
             'file'           => $file,
             'rows'           => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
             'chunkCount'     => $file->chunks->count(),
@@ -281,10 +281,8 @@ class PendapatanController extends Controller
     {
         $file = InvoiceFilePendapatan::findOrFail($fileId);
 
-        // 1. TENTUKAN MAPPING (DARI UI ATAU DARI SCHEMA LAMA)
         $mapping = $request->input('mapping');
 
-        // Jika user klik tombol konfirmasi langsung (tanpa modal), ambil mapping dari schema_id
         if (!$mapping && $file->schema_id) {
             $mapping = $file->schema->columns_mapping;
         }
@@ -302,10 +300,8 @@ class PendapatanController extends Controller
                 ]
             );
 
-            // Update file induk agar terhubung ke schema
             $file->update(['schema_id' => $schema->id]);
 
-            // 3. PROSES PEMINDAHAN DATA
             $chunks = InvoiceDataPendapatan::where('invoice_file_pendapatan_id', $fileId)
                 ->orderBy('chunk_index', 'asc')
                 ->get();
@@ -313,7 +309,6 @@ class PendapatanController extends Controller
             foreach ($chunks as $chunk) {
                 $rows = $chunk->payload['rows'] ?? [];
                 foreach ($rows as $row) {
-                    // Ambil header No. Pesanan dari hasil mapping draggable
                     $headerNoPesanan = $mapping['no_pesanan'] ?? 'No. Pesanan';
                     $noPesanan = trim((string)($row[$headerNoPesanan] ?? ''));
 
@@ -324,13 +319,11 @@ class PendapatanController extends Controller
                         'invoice_file_id' => $file->id,
                     ];
 
-                    // Mapping secara dinamis dari Draggable UI
                     foreach ($mapping as $dbColumn => $excelHeader) {
                         if (empty($excelHeader)) continue;
 
                         $value = $row[$excelHeader] ?? null;
 
-                        // Casting angka untuk kolom uang
                         if (in_array($dbColumn, ['total_penghasilan', 'biaya_admin', 'biaya_layanan', 'biaya_proses'])) {
                             $saveData[$dbColumn] = $this->parseNumber($value);
                         } else {
@@ -369,7 +362,7 @@ class PendapatanController extends Controller
 
             DB::commit();
 
-            return view("pages.pendapatan.kelola", $data);
+            return view("pages.modules.transaction.shopee.pendapatan.kelola", $data);
         } catch (\Exception $e) {
 
             DB::rollBack();

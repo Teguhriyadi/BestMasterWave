@@ -62,10 +62,6 @@
         </div>
         <div class="card-body">
 
-            <div class="alert alert-info">
-                Pastikan file Excel memiliki header di <strong>Baris 6</strong> dan data dimulai dari <strong>Baris 7</strong>.
-            </div>
-
             <input type="file" id="file" class="form-control mb-3" accept=".xlsx, .xls">
 
             <div class="form-group d-none" id="seller-wrapper">
