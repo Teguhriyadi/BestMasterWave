@@ -18,7 +18,7 @@ class InvoiceSchemaPendapatan extends Model
     public $primaryKey = "id";
 
     protected $casts = [
-        'headers' => 'array'
+        'columns_mapping' => 'array'
     ];
 
     public function files()

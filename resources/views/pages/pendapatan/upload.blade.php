@@ -32,27 +32,12 @@
             animation: bounce 1.4s infinite ease-in-out both;
         }
 
-        .loader-dots span:nth-child(1) {
-            animation-delay: -0.32s;
-        }
-
-        .loader-dots span:nth-child(2) {
-            animation-delay: -0.16s;
-        }
+        .loader-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
 
         @keyframes bounce {
-
-            0%,
-            80%,
-            100% {
-                transform: scale(0);
-                opacity: .3;
-            }
-
-            40% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0%, 80%, 100% { transform: scale(0); opacity: .3; }
+            40% { transform: scale(1); opacity: 1; }
         }
     </style>
 @endpush
@@ -64,13 +49,9 @@
     </h1>
 
     @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+        <div class="alert alert-success">{{ session('success') }}</div>
     @elseif(session("error"))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
+        <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
     <div class="card shadow">
@@ -81,16 +62,18 @@
         </div>
         <div class="card-body">
 
-            <input type="file" id="file" class="form-control mb-3">
+            <div class="alert alert-info">
+                Pastikan file Excel memiliki header di <strong>Baris 6</strong> dan data dimulai dari <strong>Baris 7</strong>.
+            </div>
+
+            <input type="file" id="file" class="form-control mb-3" accept=".xlsx, .xls">
 
             <div class="form-group d-none" id="seller-wrapper">
-                <label for="seller_id" class="form-label">Nama Seller</label>
+                <label for="seller_id" class="form-label font-weight-bold">Nama Seller</label>
                 <select name="seller_id" id="seller_id" class="form-control">
                     <option value="">- Pilih Seller -</option>
                     @foreach ($seller as $item)
-                        <option value="{{ $item->id }}">
-                            {{ $item->nama }}
-                        </option>
+                        <option value="{{ $item->id }}">{{ $item->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -100,7 +83,7 @@
             <div id="headers" class="mt-4"></div>
 
             <button id="process" class="btn btn-success mt-4 d-none">
-                Proses Data
+                <i class="fa fa-cogs"></i> Proses Data
             </button>
 
             <div id="loading" class="d-none text-center my-3">
@@ -116,7 +99,7 @@
             <div class="loader-dots">
                 <span></span><span></span><span></span>
             </div>
-            <div class="mt-2 fw-semibold">Memproses data, mohon tunggu</div>
+            <div class="mt-2 fw-semibold" id="process-text">Memproses data, mohon tunggu...</div>
         </div>
     </div>
 
@@ -130,206 +113,159 @@
         let allHeaders = {};
         let fromDate = null;
         let toDate = null;
-        let defaultChecked = null;
 
         document.getElementById('file').addEventListener('change', function() {
-
             uploadedFile = this.files[0];
             if (!uploadedFile) return;
 
+            // Reset state & UI
             const loading = document.getElementById('loading');
             const headersDiv = document.getElementById('headers');
+            const dateWrapper = document.getElementById('date-filter');
+            const processBtn = document.getElementById('process');
+            const sellerWrapper = document.getElementById('seller-wrapper');
 
             loading.classList.remove('d-none');
             headersDiv.innerHTML = '';
+            dateWrapper.innerHTML = '';
+            dateWrapper.classList.add('d-none');
+            processBtn.classList.add('d-none');
+            sellerWrapper.classList.add('d-none');
             this.disabled = true;
 
             let fd = new FormData();
             fd.append('file', uploadedFile);
 
             fetch("{{ url('admin-panel/shopee/pendapatan') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: fd
-                })
-                .then(res => res.json())
-                .then(res => {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: fd
+            })
+            .then(res => res.json())
+            .then(res => {
+                loading.classList.add('d-none');
+                document.getElementById('file').disabled = false;
 
-                    loading.classList.add('d-none');
-                    document.getElementById('file').disabled = false;
+                if (!res.status) {
+                    alert(res.message);
+                    this.value = ''; // Reset input file
+                    return;
+                }
 
-                    if (!res.status) {
-                        alert(res.message);
-                        return;
-                    }
+                // Simpan data ke variabel global
+                schemaId = res.schema_id;
+                headerHash = res.header_hash;
+                allHeaders = res.headers;
+                fromDate = res.from_date;
+                toDate = res.to_date;
 
-                    schemaId = res.schema_id;
-                    headerHash = res.header_hash;
-                    allHeaders = res.headers;
-                    fromDate = res.from_date;
-                    toDate = res.to_date;
-
-                    /* =============================
-                       TAMPILKAN SEMUA KOLOM (READ ONLY)
-                       ============================= */
-                    let html = `
-                <div class="card border-success">
-                    <div class="card-header bg-success text-white">
-                        Kolom Excel Terdeteksi (${Object.keys(allHeaders).length})
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-            `;
-
-                    let i = 1;
-                    for (const col in allHeaders) {
-                        html += `
-                    <div class="col-md-6 mb-1">
-                        <span class="badge bg-secondary me-2">${i}</span>
-                        <strong>${allHeaders[col]}</strong>
-                        <span class="text-muted">(${col})</span>
-                    </div>
-                `;
-                        i++;
-                    }
-
-                    html += `
+                // 1. Tampilkan Preview Header
+                let html = `
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white py-2">
+                            Kolom Excel Terdeteksi (${Object.keys(allHeaders).length})
                         </div>
-                        <div class="alert alert-info mt-3 mb-0">
-                            Semua kolom di atas akan diproses otomatis.
-                        </div>
-                    </div>
-                </div>
-            `;
-
-                    headersDiv.innerHTML = html;
-
-                    document.getElementById('process').classList.remove('d-none');
-                    document.getElementById('seller-wrapper').classList.remove('d-none');
-
-                    /* =============================
-                       FILTER TANGGAL
-                       ============================= */
-                    const dateWrapper = document.getElementById('date-filter');
-                    dateWrapper.innerHTML = '';
-
-                    if (res.date_columns && Object.keys(res.date_columns).length > 0) {
-
-                        let dateHtml = `
-                    <div class="card border-primary mt-4">
                         <div class="card-body">
-                            <h6 class="text-primary mb-2">Filter Periode</h6>
-                            <div class="text-muted mb-2">
-                                Periode: <strong>${fromDate}</strong> s/d <strong>${toDate}</strong>
-                            </div>
-                `;
+                            <div class="row">`;
 
-                        for (const col in res.date_columns) {
-                            if (
-                                res.date_columns[col]
-                                    .toLowerCase()
-                                    .includes('tanggal dana dilepaskan')
-                            ) {
-                                defaultChecked = col;
-                                break;
-                            }
-                        }
+                let i = 1;
+                for (const col in allHeaders) {
+                    html += `
+                        <div class="col-md-6 mb-1">
+                            <span class="badge badge-secondary mr-2">${i}</span>
+                            <strong>${allHeaders[col]}</strong>
+                            <small class="text-muted">(${col})</small>
+                        </div>`;
+                    i++;
+                }
+                html += `</div></div></div>`;
+                headersDiv.innerHTML = html;
 
-                        for (const col in res.date_columns) {
-                            const checked = col === defaultChecked ? 'checked' : '';
+                // 2. Tampilkan Filter Tanggal
+                if (res.date_columns && Object.keys(res.date_columns).length > 0) {
+                    let dateHtml = `
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h6 class="text-primary font-weight-bold mb-2">Pilih Kolom Tanggal Acuan</h6>
+                                <p class="small text-muted mb-3">Data akan difilter berdasarkan periode: <strong>${fromDate}</strong> s/d <strong>${toDate}</strong></p>`;
 
-                            dateHtml += `
-                                <div class="form-check">
-                                    <input class="form-check-input date-column"
-                                        type="radio"
-                                        name="date_column"
-                                        value="${col}"
-                                        ${checked}>
-                                    <label class="form-check-label">
-                                        ${res.date_columns[col]} (${col})
-                                    </label>
-                                </div>
-                            `;
-                        }
-
+                    for (const col in res.date_columns) {
+                        const isDefault = res.date_columns[col].toLowerCase().includes('tanggal dana dilepaskan');
                         dateHtml += `
-                        </div>
-                    </div>
-                `;
-
-                        dateWrapper.innerHTML = dateHtml;
-                        dateWrapper.classList.remove('d-none');
+                            <div class="custom-control custom-radio mb-1">
+                                <input type="radio" id="date_${col}" name="date_column" value="${col}" class="custom-control-input" ${isDefault ? 'checked' : ''}>
+                                <label class="custom-control-label" for="date_${col}">${res.date_columns[col]} (${col})</label>
+                            </div>`;
                     }
-                })
-                .catch(() => {
-                    loading.classList.add('d-none');
-                    document.getElementById('file').disabled = false;
-                    alert('Gagal membaca file');
-                });
+                    dateHtml += `</div></div>`;
+                    dateWrapper.innerHTML = dateHtml;
+                    dateWrapper.classList.remove('d-none');
+                }
+
+                // 3. Munculkan tombol proses & seller
+                processBtn.classList.remove('d-none');
+                sellerWrapper.classList.remove('d-none');
+            })
+            .catch(() => {
+                loading.classList.add('d-none');
+                document.getElementById('file').disabled = false;
+                alert('Gagal membaca file Excel. Pastikan format benar.');
+            });
         });
 
         document.getElementById('process').addEventListener('click', function() {
-
             const btn = this;
             const overlay = document.getElementById('process-loading');
             const sellerId = document.getElementById('seller_id').value;
+            const dateColumn = document.querySelector('input[name="date_column"]:checked');
 
             if (!sellerId) {
-                alert('Silakan pilih Seller terlebih dahulu');
+                alert('Silakan pilih Nama Seller terlebih dahulu');
                 return;
             }
 
-            const dateColumn = document.querySelector('input[name="date_column"]:checked');
             if (!dateColumn) {
-                alert('Silakan pilih kolom tanggal');
+                alert('Silakan pilih kolom tanggal sebagai acuan filter');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = 'Processing...';
             overlay.classList.remove('d-none');
 
             let fd = new FormData();
             fd.append('file', uploadedFile);
-
-            // kirim SEMUA kolom
-            for (const col in allHeaders) {
-                fd.append(`columns[${col}]`, allHeaders[col]);
-            }
-
-            fd.append('schema_id', schemaId);
             fd.append('seller_id', sellerId);
+            fd.append('schema_id', schemaId || ''); // schemaId bisa null jika file baru
             fd.append('header_hash', headerHash);
             fd.append('from_date', fromDate);
             fd.append('to_date', toDate);
             fd.append('date_column', dateColumn.value);
 
+            // Kirim semua mapping header mentah
+            for (const col in allHeaders) {
+                fd.append(`columns[${col}]`, allHeaders[col]);
+            }
+
             fetch("{{ url('admin-panel/shopee/pendapatan/process') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: fd
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status && res.redirect) {
-                        window.location.href = res.redirect;
-                    } else {
-                        overlay.classList.add('d-none');
-                        btn.disabled = false;
-                        btn.innerText = 'Proses Data';
-                        alert(res.message || 'Gagal memproses data');
-                    }
-                })
-                .catch(() => {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: fd
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status && res.redirect) {
+                    window.location.href = res.redirect;
+                } else {
                     overlay.classList.add('d-none');
                     btn.disabled = false;
-                    btn.innerText = 'Proses Data';
-                    alert('Gagal memproses data');
-                });
+                    alert(res.message || 'Gagal memproses data');
+                }
+            })
+            .catch(() => {
+                overlay.classList.add('d-none');
+                btn.disabled = false;
+                alert('Terjadi kesalahan sistem saat memproses data.');
+            });
         });
     </script>
 @endpush

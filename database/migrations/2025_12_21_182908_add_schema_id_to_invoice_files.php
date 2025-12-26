@@ -18,6 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('invoice_schema_pendapatan')
                 ->nullOnDelete();
+            $table->string('header_hash', 64)->nullable()->after('schema_id');
         });
 
         Schema::table('invoice_file_pesanan', function (Blueprint $table) {
