@@ -17,9 +17,15 @@ class InvoiceSchemaPesanan extends Model
 
     public $primaryKey = "id";
 
-    public $timestamps = false;
-
     protected $casts = [
-        'headers' => 'array'
+        'columns_mapping' => 'array'
     ];
+
+    public function files()
+    {
+        return $this->hasMany(
+            InvoiceFilePendapatan::class,
+            'schema_id'
+        );
+    }
 }

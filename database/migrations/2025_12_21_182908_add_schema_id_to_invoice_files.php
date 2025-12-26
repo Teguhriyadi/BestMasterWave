@@ -28,6 +28,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('invoice_schema_pesanan')
                 ->nullOnDelete();
+
+            $table->string('header_hash', 64)->nullable()->after('schema_id');
         });
     }
 

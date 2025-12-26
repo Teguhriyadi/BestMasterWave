@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('invoice_schema_pesanan', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('hash', 64)->index();
-            $table->json('headers');
+            $table->string('header_hash', 64)->unique();
+            $table->json('columns_mapping');
             $table->timestamps();
         });
     }

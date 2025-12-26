@@ -89,7 +89,7 @@
                     <option value="">- Pilih Seller -</option>
                     @foreach ($seller as $item)
                         <option value="{{ $item->id }}">
-                            {{ $item->nama }} - {{ $item->platform->nama }}
+                            {{ $item->nama }}
                         </option>
                     @endforeach
                 </select>
@@ -177,7 +177,7 @@
                     for (const col in allHeaders) {
                         html += `
                 <div class="col-md-6 mb-1">
-                    <span class="badge bg-secondary me-2">${i}</span>
+                    <span class="badge badge-secondary mr-2">${i}</span>
                     <strong>${allHeaders[col]}</strong>
                     <span class="text-muted">(${col})</span>
                 </div>

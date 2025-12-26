@@ -20,6 +20,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->timestamp("uploaded_at")->useCurrent();
             $table->unsignedInteger("total_rows")->default(0);
+            $table->timestamp('processed_at')->nullable();
         });
     }
 

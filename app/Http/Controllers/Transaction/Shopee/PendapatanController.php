@@ -254,7 +254,7 @@ class PendapatanController extends Controller
         $needMapping = is_null($file->processed_at) &&
             (is_null($file->schema_id) || empty($file->schema?->columns_mapping));
 
-        $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatans'))
+        $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatan'))
             ->reject(fn($c) => in_array($c, [
                 'id',
                 'uuid',
