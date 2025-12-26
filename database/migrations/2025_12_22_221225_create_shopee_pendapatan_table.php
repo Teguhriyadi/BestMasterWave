@@ -54,6 +54,7 @@ return new class extends Migration
             $table->bigInteger("pro_rata_voucher")->default(0);
             $table->bigInteger("pro_rated_bank")->default(0);
             $table->bigInteger("pro_rated_payment_channel")->default(0);
+            $table->bigInteger("harga_modal")->nullable()->default(0);
             $table->timestamps();
         });
     }

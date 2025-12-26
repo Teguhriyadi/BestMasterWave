@@ -530,56 +530,55 @@ class PendapatanController extends Controller
     }
 
     public function show(string $id)
-{
-    $file = InvoiceFilePendapatan::with([
-        'seller.platform',
-        'schema',
-        'chunks'
-    ])->findOrFail($id);
+    {
+        $file = InvoiceFilePendapatan::with([
+            'seller.platform',
+            'schema',
+            'chunks'
+        ])->findOrFail($id);
 
-    $firstChunk = $file->chunks->first();
+        $firstChunk = $file->chunks->first();
 
-    // WAJIB ADA
-    $newRowsCount = 0;
+        // WAJIB ADA
+        $newRowsCount = 0;
 
-    if ($firstChunk && $file->schema) {
+        if ($firstChunk && $file->schema) {
 
-        $mapping = $file->schema->headers;
-        $excelKeyNoPesanan = $mapping['no_pesanan'] ?? null;
+            $mapping = $file->schema->headers;
+            $excelKeyNoPesanan = $mapping['no_pesanan'] ?? null;
 
-        if ($excelKeyNoPesanan) {
-            $existingOrders = ShopeePendapatan::pluck('no_pesanan')->flip();
+            if ($excelKeyNoPesanan) {
+                $existingOrders = ShopeePendapatan::pluck('no_pesanan')->flip();
 
-            foreach ($file->chunks as $chunk) {
-                foreach ($chunk->payload['rows'] as $row) {
-                    if (!isset($row[$excelKeyNoPesanan])) continue;
+                foreach ($file->chunks as $chunk) {
+                    foreach ($chunk->payload['rows'] as $row) {
+                        if (!isset($row[$excelKeyNoPesanan])) continue;
 
-                    if (!isset($existingOrders[(string)$row[$excelKeyNoPesanan]])) {
-                        $newRowsCount++;
+                        if (!isset($existingOrders[(string)$row[$excelKeyNoPesanan]])) {
+                            $newRowsCount++;
+                        }
                     }
                 }
             }
         }
+
+        $dbColumns = collect(
+            Schema::getColumnListing('shopee_pendapatan')
+        )->reject(
+            fn($c) =>
+            in_array($c, ['id', 'uuid', 'created_at', 'updated_at', 'harga_modal', 'nama_seller'])
+        )->values();
+
+        return view('pages.pendapatan.show', [
+            'file'           => $file,
+            'rows'           => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
+            'chunkCount'     => $file->chunks->count(),
+            'dbColumns'      => $dbColumns,
+            'needMapping'    => false,
+            'prefillMapping' => $file->schema?->headers ?? [],
+            'newRowsCount'   => $newRowsCount,
+        ]);
     }
-
-    $dbColumns = collect(
-        Schema::getColumnListing('shopee_pendapatan')
-    )->reject(fn ($c) =>
-        in_array($c, ['id', 'uuid', 'created_at', 'updated_at'])
-    )->values();
-
-    return view('pages.pendapatan.show', [
-        'file'           => $file,
-        'rows'           => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
-        'chunkCount'     => $file->chunks->count(),
-        'dbColumns'      => $dbColumns,
-
-        // 🔥 INI KUNCI
-        'needMapping'    => false, // schema sudah ada → jangan paksa mapping
-        'prefillMapping' => $file->schema?->headers ?? [],
-        'newRowsCount'   => $newRowsCount,
-    ]);
-}
 
     public function normalizeSchemaHeaders(array $columns): array
     {
