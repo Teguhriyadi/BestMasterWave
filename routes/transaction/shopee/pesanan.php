@@ -11,4 +11,8 @@ Route::prefix("shopee/pesanan")->group(function() {
     Route::get("/preview", [PesananController::class, "preview"]);
     Route::get("/preview/{upload}", [PesananController::class, "previewData"]);
     Route::post("/{id}/process-database", [PesananController::class, "processDatabase"]);
+    Route::prefix("data")->group(function() {
+        Route::get("/", [PesananController::class, "kelola"]);
+        Route::get("/{uuid}/detail", [PesananController::class, "detail"]);
+    });
 });

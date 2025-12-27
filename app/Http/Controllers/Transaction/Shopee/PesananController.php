@@ -260,7 +260,6 @@ class PesananController extends Controller
             $path = $request->file('file')->getPathname();
             $spreadsheet = IOFactory::createReaderForFile($path)->load($path);
 
-            // Cari letak kolom kunci
             $noPesananColLetter = array_search('No. Pesanan', $request->columns);
             $skuColLetter       = array_search('Nomor Referensi SKU', $request->columns);
 
@@ -287,25 +286,16 @@ class PesananController extends Controller
             $total = 0;
 
             foreach ($spreadsheet->getWorksheetIterator() as $sheet) {
-                // Rules: Cari sheet orders/order
                 if (stripos($sheet->getTitle(), 'orders') === false && stripos($sheet->getTitle(), 'order') === false) continue;
 
                 $highestRow = $sheet->getHighestRow();
 
-                // Rules: Data mulai dari baris 2
                 for ($row = 2; $row <= $highestRow; $row++) {
                     $noPesanan = strtoupper(trim((string)$sheet->getCell($noPesananColLetter . $row)->getFormattedValue()));
                     $sku       = trim((string)$sheet->getCell($skuColLetter . $row)->getFormattedValue());
 
-                    // Lewati jika No. Pesanan kosong
                     if ($noPesanan === '') continue;
 
-                    /**
-                     * LOGIKA UPDATE:
-                     * Kita tidak lagi mem-filter menggunakan $allExisting di sini.
-                     * Semua data di Excel kita masukkan ke dalam Payload (Antrian).
-                     * Penentuan apakah dia Update atau Insert dilakukan nanti di 'processDatabase'.
-                     */
                     $item = [];
                     foreach ($request->columns as $colLetter => $headerLabel) {
                         $item[$headerLabel] = (string)$sheet->getCell($colLetter . $row)->getFormattedValue();
@@ -398,6 +388,7 @@ class PesananController extends Controller
             return back()->with('error', 'Mapping kolom tidak tersedia.');
         }
 
+        $nama_seller = $request->nama_seller;
         DB::beginTransaction();
         try {
             $schema = InvoiceSchemaPesanan::updateOrCreate(
@@ -428,6 +419,7 @@ class PesananController extends Controller
                     $saveData = [
                         'seller_id'       => $file->seller_id,
                         'invoice_file_id' => $file->id,
+                        'nama_seller'     => $nama_seller
                     ];
 
                     foreach ($mapping as $dbColumn => $excelHeader) {
@@ -457,10 +449,52 @@ class PesananController extends Controller
             $file->update(['processed_at' => now()]);
             DB::commit();
 
-            return redirect('/admin-panel/shopee/pesanan')->with('success', 'Data pesanan berhasil di-import/update.');
+            return redirect()
+                ->to("/admin-panel/shopee/pesanan")
+                ->with('success', 'Data pesanan berhasil di-import/update.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal memproses database: ' . $e->getMessage());
+        }
+    }
+
+    public function kelola()
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $data["kelola"] = ShopeePesanan::get();
+
+            DB::commit();
+
+            return view("pages.modules.transaction.shopee.pesanan.kelola", $data);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            dd($e->getMessage());
+        }
+    }
+
+    public function detail($uuid)
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $data["detail"] = ShopeePesanan::where("uuid", $uuid)->first();
+
+            if (empty($data["detail"])) return redirect()->to("/admin-panel/shopee/pesanan/data")->with("error", "Data Tidak Ditemukan");
+
+            DB::commit();
+
+            return view("pages.modules.transaction.shopee.pesanan.detail", $data);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->to("/admin-panel/shopee/pesanan/data")->with("error", $e->getMessage());
         }
     }
 }

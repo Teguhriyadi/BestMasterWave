@@ -112,35 +112,32 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        {{-- PREVIEW DATA --}}
-        <div class="col-md-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Preview 20 Baris Pertama</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm" style="font-size: 10px;">
-                            <thead>
-                                <tr>
-                                    @foreach (array_keys($rows->first() ?? []) as $h)
-                                        <th class="bg-light">{{ $h }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($rows as $row)
-                                    <tr>
-                                        @foreach ($row as $v)
-                                            <td>{{ Str::limit($v, 20) }}</td>
-                                        @endforeach
-                                    </tr>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Preview 20 Baris Pertama</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" style="font-size: 10px;">
+                    <thead>
+                        <tr>
+                            @foreach (array_keys($rows->first() ?? []) as $h)
+                                <th class="bg-light">{{ $h }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($rows as $row)
+                            <tr>
+                                @foreach ($row as $v)
+                                    <td>{{ Str::limit($v, 20) }}</td>
                                 @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -151,6 +148,7 @@
             <div class="modal-content">
                 <form method="POST" action="{{ url('/admin-panel/shopee/pesanan/' . $file->id . '/process-database') }}">
                     @csrf
+                    <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title">Mapping Kolom Excel ke Database</h5>
                         <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>

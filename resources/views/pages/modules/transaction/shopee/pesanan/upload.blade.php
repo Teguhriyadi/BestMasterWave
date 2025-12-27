@@ -73,6 +73,9 @@
         </div>
     @endif
 
+    <a href="{{ url('/admin-panel/shopee/pesanan/data') }}" class="btn btn-primary btn-sm mb-4">
+        <i class="fa fa-book"></i> Kelola Data Pesanan
+    </a>
     <div class="card shadow">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
@@ -98,7 +101,7 @@
             <div id="headers" class="mt-4"></div>
 
             <button id="process" class="btn btn-success mt-4 d-none">
-                Proses Data
+                <i class="fa fa-cogs"></i> Proses Data
             </button>
 
             <div id="loading" class="d-none text-center my-3">
