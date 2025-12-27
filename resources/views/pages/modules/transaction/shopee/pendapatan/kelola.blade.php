@@ -3,170 +3,86 @@
 @push('title_module', 'List Data Shopee Pendapatan')
 
 @push('css_style')
-    <style>
-        .income-card {
-            border-radius: 12px;
-            transition: box-shadow .2s;
-        }
-
-        .income-card:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
-        }
-
-        .toggle-btn {
-            cursor: pointer;
-            font-size: 18px;
-            transition: transform .2s;
-        }
-
-        .toggle-btn.rotate {
-            transform: rotate(180deg);
-        }
-
-        .label {
-            font-size: 13px;
-            color: #6c757d;
-        }
-
-        .value {
-            font-weight: 600;
-        }
-    </style>
+    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 @endpush
 
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
-        Kelola Pendapatan Shopee
+        Data Pendapatan Shopee
     </h1>
+
+    <a href="{{ url('/admin-panel/shopee/pendapatan') }}" class="btn btn-danger btn-sm mb-4">
+        <i class="fa fa-sign-out-alt"></i> Kembali
+    </a>
 
     @if (session('success'))
         <div class="alert alert-success">
             <strong>Berhasil,</strong> {{ session('success') }}
         </div>
+    @elseif(session("error"))
+        <div class="alert alert-danger">
+            <strong>Gagal,</strong> {{ session('error') }}
+        </div>
     @endif
 
-    @foreach ($kelola as $i => $row)
-        <div class="card income-card mb-3">
-            <div class="card-body">
-
-                {{-- HEADER CARD --}}
-                <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
-                    data-bs-target="#detail-{{ $i }}" role="button">
-
-                    <div>
-                        <div class="fw-bold">
-                            No Pesanan: {{ $row->no_pesanan }}
-                        </div>
-                        <div class="text-muted small">
-                            {{ $row->username }} • {{ $row->nama_seller ?? '-' }}
-                        </div>
-                    </div>
-
-                    <div class="text-end">
-                        <div class="fw-bold text-success">
-                            Rp {{ number_format($row->total_penghasilan) }}
-                        </div>
-                        <div class="toggle-btn" id="icon-{{ $i }}">▼</div>
-                    </div>
-                </div>
-
-                {{-- DETAIL --}}
-                <div class="collapse mt-4" id="detail-{{ $i }}">
-                    <div class="row g-3">
-
-                        <div class="col-md-3">
-                            <div class="label">Tanggal Pesanan</div>
-                            <div class="value">{{ $row->waktu_pesanan }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Tanggal Dana</div>
-                            <div class="value">{{ $row->tanggal_dana_dilepaskan }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Metode Pembayaran</div>
-                            <div class="value">{{ $row->metode_pembayaran }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Jasa Kirim</div>
-                            <div class="value">{{ $row->jasa_kirim }} - {{ $row->nama_kurir }}</div>
-                        </div>
-
-                        <hr>
-
-                        <div class="col-md-3">
-                            <div class="label">Harga Asli</div>
-                            <div class="value">Rp {{ number_format($row->harga_asli) }}</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Total Diskon</div>
-                            <div class="value text-danger">
-                                Rp {{ number_format($row->total_diskon) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Gratis Ongkir</div>
-                            <div class="value">
-                                Rp {{ number_format($row->gratis_ongkir) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Biaya Layanan</div>
-                            <div class="value text-danger">
-                                Rp {{ number_format($row->biaya_layanan) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Biaya Administrasi</div>
-                            <div class="value text-danger">
-                                Rp {{ number_format($row->biaya_administrasi) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Komisi AMS</div>
-                            <div class="value text-danger">
-                                Rp {{ number_format($row->biaya_komisi_ams) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Cashback Koin</div>
-                            <div class="value">
-                                Rp {{ number_format($row->cashback_koin) }}
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="label">Total Penghasilan</div>
-                            <div class="value text-success fs-5">
-                                Rp {{ number_format($row->total_penghasilan) }}
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">List Data Pendapatan</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No.</th>
+                            <th>No. Pesanan</th>
+                            <th>Nama Seller</th>
+                            <th>Username</th>
+                            <th class="text-center">Waktu Pesanan</th>
+                            <th class="text-center">Tanggal Dana Dilepaskan</th>
+                            <th class="text-center">Harga Asli</th>
+                            <th class="text-center">Metode Pembayaran</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $nomer = 0
+                        @endphp
+                        @foreach ($kelola as $item)
+                            <tr>
+                                <td class="text-center">{{ ++$nomer }}.</td>
+                                <td>{{ $item->no_pesanan }}</td>
+                                <td>{{ $item->nama_seller }}</td>
+                                <td>{{ $item->username }}</td>
+                                <td class="text-center">
+                                    {{ \Carbon\Carbon::parse($item->waktu_pesanan)->translatedFormat('d F Y') }}
+                                </td>
+                                <td class="text-center">
+                                    {{ \Carbon\Carbon::parse($item->tanggal_dana_dilepaskan)->translatedFormat('d F Y') }}
+                                </td>
+                                <td class="text-center">
+                                    {{ number_format($item->harga_asli, 0, ',', '.') }}
+                                </td>
+                                <td class="text-center">{{ $item->metode_pembayaran }}</td>
+                                <td class="text-center">
+                                    <a href="{{ url('/admin-panel/shopee/pendapatan/data/' . $item->uuid . '/detail') }}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-search"></i> Detail
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
-    @endforeach
+    </div>
 
 @endpush
 
 @push('js_style')
-    <script>
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((el, index) => {
-            el.addEventListener('click', () => {
-                const icon = document.getElementById('icon-' + index);
-                icon.classList.toggle('rotate');
-            });
-        });
-    </script>
+    <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
 @endpush

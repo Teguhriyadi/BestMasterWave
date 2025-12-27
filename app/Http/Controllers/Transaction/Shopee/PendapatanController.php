@@ -291,6 +291,8 @@ class PendapatanController extends Controller
             return back()->with('error', 'Mapping kolom tidak tersedia. Silakan lakukan mapping manual.');
         }
 
+        $nama_seller = $request->nama_seller;
+
         DB::beginTransaction();
         try {
             $schema = InvoiceSchemaPendapatan::updateOrCreate(
@@ -317,6 +319,7 @@ class PendapatanController extends Controller
                     $saveData = [
                         'seller_id'       => $file->seller_id,
                         'invoice_file_id' => $file->id,
+                        'nama_seller'     => $nama_seller
                     ];
 
                     foreach ($mapping as $dbColumn => $excelHeader) {
@@ -368,6 +371,27 @@ class PendapatanController extends Controller
             DB::rollBack();
 
             dd($e->getMessage());
+        }
+    }
+
+    public function detail($uuid)
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $data["detail"] = ShopeePendapatan::where("uuid", $uuid)->first();
+
+            if (empty($data["detail"])) return redirect()->to("/admin-panel/shopee/pendapatan/data")->with("error", "Data Tidak Ditemukan");
+
+            DB::commit();
+
+            return view("pages.modules.transaction.shopee.pendapatan.detail", $data);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return redirect()->to("/admin-panel/shopee/pendapatan/data")->with("error", $e->getMessage());
         }
     }
 }

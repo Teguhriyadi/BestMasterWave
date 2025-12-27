@@ -54,6 +54,9 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    <a href="{{ url('/admin-panel/shopee/pendapatan/data') }}" class="btn btn-primary btn-sm mb-4">
+        <i class="fa fa-book"></i> Kelola Data Pendapatan
+    </a>
     <div class="card shadow">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">

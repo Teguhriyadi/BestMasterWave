@@ -10,5 +10,8 @@ Route::prefix("shopee/pendapatan")->group(function() {
     Route::get("/{id}/show", [PendapatanController::class, "show"]);
     Route::get("/preview/{upload}", [PendapatanController::class, "previewData"]);
     Route::post("/{id}/process-database", [PendapatanController::class, "processDatabase"]);
-    Route::get("/kelola-data", [PendapatanController::class, "kelola"]);
+    Route::prefix("data")->group(function() {
+        Route::get("/", [PendapatanController::class, "kelola"]);
+        Route::get("/{uuid}/detail", [PendapatanController::class, "detail"]);
+    });
 });

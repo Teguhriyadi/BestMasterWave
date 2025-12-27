@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Platform;
+use App\Models\ShopeePendapatan;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
@@ -16,6 +17,7 @@ class AppController extends Controller
 
             $data["platform"] = Platform::where("status", "1")->count();
             $data["seller"] = Platform::where("status", "1")->count();
+            $data["shopee_pendapatan"] = ShopeePendapatan::count();
 
             DB::commit();
 
