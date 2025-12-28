@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\IsAutentikasiMiddleware;
+use App\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -8,7 +10,10 @@ use Illuminate\Support\Facades\Route;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         using: function() {
-            Route::middleware("web")->group(function() {
+            Route::middleware(["web", "guest"])->group(function() {
+                require __DIR__ . '/../routes/authentication/login.php';
+            });
+            Route::middleware(["web", "autentikasi"])->group(function() {
                 Route::get("/", function() {
                     return redirect()->to("/admin-panel/dashboard");
                 });
@@ -25,7 +30,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            "autentikasi" => IsAutentikasiMiddleware::class,
+            "guest" => RedirectIfAuthenticatedMiddleware::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -7,6 +7,16 @@
         Dashboard Admin Panel
     </h1>
 
+    @if (session('success'))
+        <div class="alert alert-success">
+            <strong>Berhasil,</strong> {{ session('success') }}
+        </div>
+    @elseif(session('error'))
+        <div class="alert alert-danger">
+            <strong>Gagal,</strong> {{ session('error') }}
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
