@@ -64,6 +64,25 @@
 
     <hr class="sidebar-divider">
 
+    <div class="sidebar-heading">
+        Master User
+    </div>
+
+    <li class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengaturan"
+            aria-expanded="true" aria-controls="collapsePengaturan">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Pengaturan</span>
+        </a>
+        <div id="collapsePengaturan" class="collapse {{ Request::is('admin-panel/role*') || Request::is('admin-panel/role*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/role*') ? 'active' : '' }}" href="{{ url('/admin-panel/role') }}">Role</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+
     <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>

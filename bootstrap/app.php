@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/master/seller.php';
                     require __DIR__ . '/../routes/transaction/shopee/pendapatan.php';
                     require __DIR__ . '/../routes/transaction/shopee/pesanan.php';
+                    require __DIR__ . '/../routes/master/role.php';
                 });
             });
         },
