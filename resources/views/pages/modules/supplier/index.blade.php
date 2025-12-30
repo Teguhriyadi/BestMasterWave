@@ -157,9 +157,15 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="bank" class="form-label">Nama Bank</label>
-                                    <input type="text" class="form-control" name="bank" id="bank"
-                                        placeholder="Masukkan Nama Bank">
+                                    <label for="bank_id" class="form-label">Nama Bank</label>
+                                    <select name="bank_id" class="form-control" id="bank_id">
+                                        <option value="">- Pilih -</option>
+                                        @foreach ($bank as $item)
+                                            <option value="{{ $item['id'] }}">
+                                                {{ $item['alias'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>

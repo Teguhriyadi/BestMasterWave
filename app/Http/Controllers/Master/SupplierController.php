@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Services\BankService;
 use App\Http\Services\SupplierService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -10,12 +11,14 @@ use Illuminate\Http\Request;
 class SupplierController extends Controller
 {
     public function __construct(
-        protected SupplierService $supplier_service
+        protected SupplierService $supplier_service,
+        protected BankService $bank_service
     ) {}
 
     public function index()
     {
         $data["supplier"] = $this->supplier_service->list();
+        $data["bank"] = $this->bank_service->list();
 
         return view("pages.modules.supplier.index", $data);
     }
@@ -40,6 +43,7 @@ class SupplierController extends Controller
     public function edit($id)
     {
         try {
+            $data["bank"] = $this->bank_service->list();
             $data["edit"] = $this->supplier_service->edit($id);
 
             return view("pages.modules.supplier.edit", $data);

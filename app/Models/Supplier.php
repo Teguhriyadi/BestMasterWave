@@ -16,4 +16,9 @@ class Supplier extends Model
     protected $keyType = "string";
 
     public $primaryKey = "id";
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class, "bank_id");
+    }
 }
