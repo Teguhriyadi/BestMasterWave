@@ -18,13 +18,13 @@ return new class extends Migration
             $table->text("alamat")->nullable();
             $table->string("kontak_hubungi", 30)->nullable(); // Email // Whatsapp
             $table->string("nomor_kontak", 30)->nullable();
-            $table->text("ketentuan_tempo_pembayaran")->nullable();
+            $table->integer("ketentuan_tempo_pembayaran")->default(0);
             $table->string("no_rekening", 30)->nullable();
             $table->string("bank", 30)->nullable();
             $table->string("nama_rekening", 100)->nullable();
             $table->string("pkp", 100)->nullable();
             $table->string("no_npwp", 30)->nullable();
-
+            $table->integer("rate_ppn")->default(0);
             $table->uuid('created_by')->nullable()->index();
             $table->foreign('created_by')
                 ->references('id')
