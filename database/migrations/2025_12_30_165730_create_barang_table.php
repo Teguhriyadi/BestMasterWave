@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('harga_modal', function (Blueprint $table) {
+        Schema::create('barang', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->string('sku_barang', 50)->index();
             $table->unsignedBigInteger('harga_modal');
@@ -45,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('harga_modal');
+        Schema::dropIfExists('barang');
     }
 };
