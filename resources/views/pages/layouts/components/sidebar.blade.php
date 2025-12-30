@@ -27,16 +27,17 @@
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') ? 'active' : '' }}">
+    <li class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
             aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-book"></i>
             <span>Master</span>
         </a>
-        <div id="collapseTwo" class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapseTwo" class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}" href="{{ url('/admin-panel/platform') }}">Platform</a>
                 <a class="collapse-item {{ Request::is('admin-panel/seller') ? 'active' : '' }}" href="{{ url('/admin-panel/seller') }}">Seller</a>
+                <a class="collapse-item {{ Request::is('admin-panel/bank') ? 'active' : '' }}" href="{{ url('/admin-panel/bank') }}">Bank</a>
                 <a class="collapse-item {{ Request::is('admin-panel/supplier') ? 'active' : '' }}" href="{{ url('/admin-panel/supplier') }}">Supplier</a>
             </div>
         </div>

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("nomor_kontak", 30)->nullable();
             $table->integer("ketentuan_tempo_pembayaran")->default(0);
             $table->string("no_rekening", 30)->nullable();
-            $table->string("bank", 30)->nullable();
+            $table->uuid("bank_id")->nullable()->index();
             $table->string("nama_rekening", 100)->nullable();
             $table->string("pkp", 100)->nullable();
             $table->string("no_npwp", 30)->nullable();
