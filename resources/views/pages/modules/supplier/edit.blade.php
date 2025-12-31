@@ -25,7 +25,6 @@
                     <select name="kontak_hubungi" class="form-control" id="kontak_hubungi">
                         <option value="">- Pilih -</option>
                         <option value="WA_HP">WhatsApp + Nomor Handphone</option>
-                        <option value="SMS">SMS</option>
                         <option value="WA">WhatApp</option>
                         <option value="NO_HP">Nomor Handphone</option>
                         <option value="GMAIL">Email</option>

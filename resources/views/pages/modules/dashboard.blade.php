@@ -9,7 +9,8 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            <strong>Berhasil,</strong> {{ session('success') }}
+            <strong>Berhasil,</strong> Selamat Datang <strong>{{ Auth::user()->nama }} </strong>.
+            {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">

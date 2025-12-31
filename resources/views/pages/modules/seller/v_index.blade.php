@@ -59,7 +59,7 @@
                                 <td class="text-center">
                                     <button onclick="editSeller('{{ $item['id'] }}')" type="button"
                                         class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                        <i class="fa fa-edit"></i> edit
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
                                     <form action="{{ url('/admin-panel/seller/' . $item['id']) }}" method="POST"
                                         style="display: inline">
