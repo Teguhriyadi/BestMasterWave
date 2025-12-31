@@ -11,17 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembelian', function (Blueprint $table) {
+        Schema::create('detail_pembelian', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string("sku_barang", 100)->index();
+            $table->uuid('pembelian_id')->nullable()->index();
+            $table->foreign('pembelian_id')
+                ->references('id')
+                ->on('pembelian')
+                ->nullOnDelete();
+            $table->string("sku_barang", 50)->index();
             $table->unsignedBigInteger("qty")->default(0);
+            $table->string("satuan", 50)->index();
             $table->unsignedBigInteger("harga_satuan")->default(0);
             $table->unsignedBigInteger("diskon")->default(0);
             $table->unsignedBigInteger("ppn")->default(0);
             $table->unsignedBigInteger("total")->default(0);
-            $table->string("no_invoice", 100)->index();
-            $table->dateTime("tanggal_invoice");
-            $table->dateTime("tanggal_jatuh_tempo");
+            $table->text("keterangan");
             $table->timestamps();
         });
     }
@@ -31,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembelian');
+        Schema::dropIfExists('detail_pembelian');
     }
 };

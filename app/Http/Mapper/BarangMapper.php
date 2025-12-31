@@ -23,4 +23,15 @@ class BarangMapper
             ];
         });
     }
+
+    public static function toSkuTable(Collection $supplier): Collection
+    {
+        return $supplier->map(function(Barang $supplier) {
+            return [
+                'id'                            => $supplier->id,
+                'sku_barang'                    => $supplier->sku_barang,
+                'harga_modal'                   => $supplier->harga_modal,
+            ];
+        });
+    }
 }

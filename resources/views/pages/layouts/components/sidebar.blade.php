@@ -51,6 +51,19 @@
         Master Transaksi
     </div>
 
+    <li class="nav-item {{ Request::is('admin-panel/pembelian') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePembelian"
+            aria-expanded="true" aria-controls="collapsePembelian">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Transaksi</span>
+        </a>
+        <div id="collapsePembelian" class="collapse {{ Request::is('admin-panel/pembelian*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/pembelian*') ? 'active' : '' }}" href="{{ url('/admin-panel/pembelian') }}">Pembelian</a>
+            </div>
+        </div>
+    </li>
+
     <li class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseShopee"
             aria-expanded="true" aria-controls="collapseShopee">

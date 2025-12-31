@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Http\Repositories;
+
+use App\Models\DetailPembelian;
+use App\Models\Pembelian;
+use App\Models\Supplier;
+use Illuminate\Support\Facades\Auth;
+
+class PembelianRepository
+{
+    public function get_all_data()
+    {
+        return Pembelian::orderBy("created_at", "DESC")->get();
+    }
+
+    public function insert_data(array $data)
+    {
+        $pembelian = Pembelian::create([
+            "no_invoice" => $data['no_invoice'],
+            "tanggal_invoice" => $data['tanggal_invoice'],
+            "tanggal_jatuh_tempo" => $data["tanggal_jatuh_tempo"] ?? null,
+            "total_harga" => $data["total_harga"],
+            "total_ppn" => $data["total_ppn"],
+            "total_qty" => $data["total_qty"],
+            "supplier_id" => $data["supplier_id"],
+            "created_by" => Auth::user()->id,
+        ]);
+
+        foreach ($data["items"] as $item) {
+            DetailPembelian::create([
+                "pembelian_id" => $pembelian->id,
+                "sku_barang" => $item["barang_id"],
+                "qty" => $item["qty"],
+                "satuan" => $item["satuan"],
+                "harga_satuan" => $item["harga_satuan"],
+                "diskon" => $item["diskon"] ?? 0,
+                "ppn" => $item["ppn"] ?? 0,
+                "total_harga" => $item["total_harga"],
+                "keterangan" => $item["keterangan"] ?? null,
+            ]);
+        }
+
+        return $pembelian;
+    }
+
+    public function get_data_by_id(string $id)
+    {
+        return Pembelian::where("id", $id)
+            ->with("details")
+            ->first();
+    }
+
+    public function update_by_id(string $id, array $header, array $items)
+    {
+        $pembelian = Pembelian::findOrFail($id);
+
+        $pembelian->update($header);
+
+        $existingDetailIds = [];
+
+        foreach ($items as $item) {
+            if (!empty($item['id'])) {
+
+                DetailPembelian::where('id', $item['id'])
+                    ->where('pembelian_id', $id)
+                    ->update([
+                        'sku_barang'    => $item['barang_id'],
+                        'qty'          => $item['qty'],
+                        'satuan'       => $item['satuan'],
+                        'harga_satuan' => $item['harga_satuan'],
+                        'diskon'       => $item['diskon'] ?? 0,
+                        'ppn'          => $item['ppn'] ?? 0,
+                        'total'        => $item['total_harga'],
+                        'keterangan'   => $item['keterangan'] ?? null,
+                    ]);
+
+                $existingDetailIds[] = $item['id'];
+            }
+            else {
+                $detail = DetailPembelian::create([
+                    'pembelian_id' => $id,
+                    'sku_barang'   => $item['barang_id'],
+                    'qty'          => $item['qty'],
+                    'satuan'       => $item['satuan'],
+                    'harga_satuan' => $item['harga_satuan'],
+                    'diskon'       => $item['diskon'] ?? 0,
+                    'ppn'          => $item['ppn'] ?? 0,
+                    'total'        => $item['total_harga'],
+                    'keterangan'   => $item['keterangan'] ?? null,
+                ]);
+
+                $existingDetailIds[] = $detail->id;
+            }
+        }
+
+        DetailPembelian::where('pembelian_id', $id)
+            ->whereNotIn('id', $existingDetailIds)
+            ->delete();
+
+        return $pembelian;
+    }
+
+    public function delete_by_id(string $id): void
+    {
+        $pembelian = Pembelian::findOrFail($id);
+        DetailPembelian::where("pembelian_id", $id)->delete();
+        $pembelian->delete();
+    }
+}

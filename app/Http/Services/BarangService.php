@@ -18,9 +18,16 @@ class BarangService
 
     public function list()
     {
-        $supplier = $this->barang_repository->get_all_data();
+        $barang = $this->barang_repository->get_all_data();
 
-        return BarangMapper::toTable($supplier);
+        return BarangMapper::toTable($barang);
+    }
+
+    public function list_barang_sku()
+    {
+        $barang = $this->barang_repository->get_all_data();
+
+        return BarangMapper::toSkuTable($barang);
     }
 
     public function create(array $data)
