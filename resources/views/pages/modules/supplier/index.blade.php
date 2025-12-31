@@ -58,6 +58,12 @@
                                 <span class="badge bg-success text-white">
                                     @if ($item['kontak_hubungi'] == 'WA_HP')
                                         WhatsApp & Nomor Handphone
+                                    @elseif($item['kontak_hubungi'] == "WA")
+                                        WhatsApp
+                                    @elseif($item['kontak_hubungi'] == "NO_HP")
+                                        Nomor Handphone
+                                    @elseif($item['kontak_hubungi'] == "GMAIL")
+                                        Email
                                     @endif
                                 </span>
                             </td>
