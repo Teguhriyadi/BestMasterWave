@@ -3,8 +3,8 @@
 namespace App\Http\Services;
 
 use App\Http\Mapper\SellerMapper;
-use App\Http\Mapper\SupplierMapper;
 use App\Http\Repositories\SellerRepository;
+use Illuminate\Support\Facades\DB;
 
 class SellerService
 {
@@ -14,8 +14,36 @@ class SellerService
 
     public function list()
     {
-        $supplier = $this->seller_repository->get_list_data();
+        $supplier = $this->seller_repository->get_all_data();
 
-        return SellerMapper::toListSelectOption($supplier);
+        return SellerMapper::toTable($supplier);
+    }
+
+    public function create(array $data)
+    {
+        return DB::transaction(function () use ($data) {
+            return $this->seller_repository->insert_data($data);
+        });
+    }
+
+    public function edit(string $id)
+    {
+        return DB::transaction(function() use ($id) {
+            return $this->seller_repository->get_data_by_id($id);
+        });
+    }
+
+    public function update(string $id, array $data)
+    {
+        return DB::transaction(function () use ($id, $data) {
+            return $this->seller_repository->update_by_id($id, $data);
+        });
+    }
+
+    public function delete(string $id)
+    {
+        return DB::transaction(function () use ($id) {
+            $this->seller_repository->delete_by_id($id);
+        });
     }
 }

@@ -16,7 +16,7 @@
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
-    @elseif(session("error"))
+    @elseif(session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
         </div>
@@ -43,35 +43,35 @@
                     </thead>
                     <tbody>
                         @php
-                            $nomer = 0
+                            $nomer = 0;
                         @endphp
                         @foreach ($seller as $item)
-                        <tr>
-                            <td class="text-center">{{ ++$nomer }}.</td>
-                            <td>{{ $item->platform->nama }}</td>
-                            <td>{{ $item->nama }}</td>
-                            <td>{{ $item->slug }}</td>
-                            <td class="text-center">
-                                @if ($item->status == "1")
-                                <span class="badge bg-success text-white">
-                                    Aktif
-                                </span>
-                                @elseif ($item->status == "0")
-                                <span class="badge bg-danger text-white">
-                                    Non - Aktif
-                                </span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <form action="" method="POST" style="display: inline">
-                                    @csrf
-                                    @method("DELETE")
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                            <tr>
+                                <td class="text-center">{{ ++$nomer }}.</td>
+                                <td>{{ $item["platform"] }}</td>
+                                <td>{{ $item["nama"] }}</td>
+                                <td>{{ $item["slug"] }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-success text-white">
+                                        {{ $item["status"] }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button onclick="editSeller('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> edit
                                     </button>
-                                </form>
-                            </td>
-                        </tr>
+                                    <form action="{{ url('/admin-panel/seller/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -79,6 +79,7 @@
         </div>
     </div>
 
+    <!-- Modal Tambah -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -105,8 +106,9 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="seller" class="form-label"> Nama Seller </label>
-                            <input type="text" class="form-control" name="seller" id="seller" placeholder="Masukkan Nama Seller">
+                            <label for="nama" class="form-label"> Nama Seller </label>
+                            <input type="text" class="form-control" name="nama" id="nama"
+                                placeholder="Masukkan Nama Seller">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -121,6 +123,27 @@
             </div>
         </div>
     </div>
+    <!-- Modal End -->
+
+    <!-- Modal Tambah -->
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-edit"></i> Edit Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-edit">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal End -->
 @endpush
 
 @push('js_style')
@@ -128,4 +151,19 @@
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
     <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
+
+    <script type="text/javascript">
+        function editSeller(id) {
+            $.ajax({
+                url: "{{ url('/admin-panel/seller') }}" + "/" + id + "/edit",
+                type: "GET",
+                success: function(response) {
+                    $("#modal-content-edit").html(response)
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
 @endpush

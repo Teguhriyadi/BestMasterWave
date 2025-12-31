@@ -19,6 +19,6 @@ class Seller extends Model
 
     public function platform()
     {
-        return $this->belongsTo(Platform::class, "platform_id", "id");
+        return $this->belongsTo(Platform::class, "platform_id");
     }
 }
