@@ -27,9 +27,9 @@ return new class extends Migration
             $table->dateTime("waktu_pembayaran_dilakukan");
             $table->string("metode_pembayaran", 50)->index();
             $table->string("sku_induk", 30)->nullable()->index();
-            $table->string("nama_produk", 150)->index();
-            $table->string("nomor_referensi_sku", 50)->index();
-            $table->string("nama_variasi", 50)->nullable()->index();
+            $table->string("nama_produk")->index();
+            $table->string("nomor_referensi_sku")->index();
+            $table->string("nama_variasi")->nullable()->index();
             $table->bigInteger("harga_awal")->default(0);
             $table->bigInteger("harga_setelah_diskon")->default(0);
             $table->bigInteger("jumlah")->default(0);
@@ -55,10 +55,11 @@ return new class extends Migration
             $table->bigInteger("total_pembayaran")->default(0);
             $table->bigInteger("perkiraan_ongkos_kirim")->default(0);
             $table->text("catatan_pembeli")->nullable();
+            $table->text("catatan")->nullable();
             $table->string("username", 100)->index();
             $table->string("nama_penerima", 150)->index();
             $table->string("no_telepon", 30)->index();
-            $table->text("alamat")->nullable();
+            $table->text("alamat_pengiriman")->nullable();
             $table->string("kota_kabupaten", 100)->nullable();
             $table->string("provinsi", 50)->nullable();
             $table->dateTime("waktu_pesanan_selesai")->nullable();

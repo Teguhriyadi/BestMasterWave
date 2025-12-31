@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid("uuid")->unique();
             $table->string("no_pesanan", 50)->index();
             $table->string("no_pengajuan", 50)->nullable()->index();
-            $table->string("nama_seller", 100)->nullable();
+            $table->string("nama_seller")->nullable();
             $table->string("username", 100)->index();
             $table->date("waktu_pesanan")->index();
             $table->string("metode_pembayaran", 30)->index();
@@ -24,13 +24,13 @@ return new class extends Migration
             $table->bigInteger("harga_asli")->default(0);
             $table->bigInteger("total_diskon")->default(0);
             $table->bigInteger("jumlah_pengembalian")->default(0);
-            $table->bigInteger("diskon_produk")->default(0);
+            $table->bigInteger("diskon_produk_shopee")->default(0);
             $table->bigInteger("voucher_penjual")->default(0);
             $table->bigInteger("cashback_koin")->default(0);
             $table->bigInteger("ongkir_dibayar")->default(0);
             $table->bigInteger("diskon_ongkir_ditanggung")->default(0);
-            $table->bigInteger("gratis_ongkir")->default(0);
-            $table->bigInteger("ongkir_diteruskan")->default(0);
+            $table->bigInteger("gratis_ongkir_shopee")->default(0);
+            $table->bigInteger("ongkir_diteruskan_shopee")->default(0);
             $table->bigInteger("ongkos_kirim_pengembalian")->default(0);
             $table->bigInteger("kembali_ke_biaya_pengiriman")->default(0);
             $table->bigInteger("pengembalian_biaya_kirim")->default(0);

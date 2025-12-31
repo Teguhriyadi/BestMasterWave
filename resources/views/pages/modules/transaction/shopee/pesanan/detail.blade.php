@@ -329,6 +329,13 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="judul">Catatan</td>
+                        <td class="pemisah">:</td>
+                        <td>
+                            {{ $detail->catatan }}
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="judul">Username</td>
                         <td class="pemisah">:</td>
                         <td>
@@ -353,7 +360,7 @@
                         <td class="judul">Alamat</td>
                         <td class="pemisah">:</td>
                         <td>
-                            {{ $detail->alamat }}
+                            {{ $detail->alamat_pengiriman }}
                         </td>
                     </tr>
                     <tr>

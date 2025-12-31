@@ -20,7 +20,7 @@
         <div class="alert alert-success">
             <strong>Berhasil,</strong> {{ session('success') }}
         </div>
-    @elseif(session("error"))
+    @elseif(session('error'))
         <div class="alert alert-danger">
             <strong>Gagal,</strong> {{ session('error') }}
         </div>
@@ -31,6 +31,52 @@
             <h6 class="m-0 font-weight-bold text-primary">List Data Pendapatan</h6>
         </div>
         <div class="card-body">
+            <form method="GET" action="">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="filter_by">Filter Kolom Dengan</label>
+                            <select name="filter_by" class="form-control" id="filter_by">
+                                <option value="">- Pilih -</option>
+                                <option value="waktu_pesanan"
+                                    {{ request('filter_by') == 'waktu_pesanan' ? 'selected' : '' }}>
+                                    Waktu Pesanan
+                                </option>
+                                <option value="tanggal_dana_dilepaskan"
+                                    {{ request('filter_by') == 'tanggal_dana_dilepaskan' ? 'selected' : '' }}>
+                                    Tanggal Dana Dilepaskan
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="dari">Dari</label>
+                            <input type="date" class="form-control" name="dari" value="{{ request('dari') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="sampai">Sampai</label>
+                            <input type="date" class="form-control" name="sampai" value="{{ request('sampai') }}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fa fa-search"></i> Filter Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <hr>
+
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -48,7 +94,7 @@
                     </thead>
                     <tbody>
                         @php
-                            $nomer = 0
+                            $nomer = 0;
                         @endphp
                         @foreach ($kelola as $item)
                             <tr>
@@ -67,7 +113,8 @@
                                 </td>
                                 <td class="text-center">{{ $item->metode_pembayaran }}</td>
                                 <td class="text-center">
-                                    <a href="{{ url('/admin-panel/shopee/pendapatan/data/' . $item->uuid . '/detail') }}" class="btn btn-info btn-sm">
+                                    <a href="{{ url('/admin-panel/shopee/pendapatan/data/' . $item->uuid . '/detail') }}"
+                                        class="btn btn-info btn-sm">
                                         <i class="fa fa-search"></i> Detail
                                     </a>
                                 </td>

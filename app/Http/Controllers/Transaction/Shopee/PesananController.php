@@ -458,13 +458,31 @@ class PesananController extends Controller
         }
     }
 
-    public function kelola()
+    public function kelola(Request $request)
     {
         try {
 
             DB::beginTransaction();
 
-            $data["kelola"] = ShopeePesanan::get();
+            $query = ShopeePesanan::query();
+
+            $filterBy = $request->filter_by;
+            $dari     = $request->dari;
+            $sampai   = $request->sampai;
+
+            $allowedColumns = [
+                'waktu_pesanan_dibuat',
+                'waktu_pembayaran_dilakukan',
+            ];
+
+            if (in_array($filterBy, $allowedColumns) && $sampai) {
+                $query->whereBetween($filterBy, [
+                    $dari . ' 00:00:00',
+                    $sampai . ' 23:59:59'
+                ]);
+            }
+
+            $data["kelola"] = $query->orderBy("created_at", "DESC")->get();
 
             DB::commit();
 

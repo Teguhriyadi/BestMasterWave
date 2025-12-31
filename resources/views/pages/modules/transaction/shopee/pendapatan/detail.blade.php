@@ -112,7 +112,7 @@
                         <td class="judul">Diskon Produk</td>
                         <td class="pemisah">:</td>
                         <td>
-                            {{ number_format($detail->diskon_produk, 0, ',', '.') }}
+                            {{ number_format($detail->diskon_produk_shopee, 0, ',', '.') }}
                         </td>
                     </tr>
                     <tr>
@@ -147,14 +147,14 @@
                         <td class="judul">Gratis Ongkir</td>
                         <td class="pemisah">:</td>
                         <td>
-                            {{ number_format($detail->gratis_ongkir, 0, ',', '.') }}
+                            {{ number_format($detail->gratis_ongkir_shopee, 0, ',', '.') }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="judul">Ongkir Diteruskan</td>
+                        <td class="judul">Ongkir Diteruskan Shopee</td>
                         <td class="pemisah">:</td>
                         <td>
-                            {{ number_format($detail->ongkir_diteruskan, 0, ',', '.') }}
+                            {{ number_format($detail->ongkir_diteruskan_shopee, 0, ',', '.') }}
                         </td>
                     </tr>
                     <tr>

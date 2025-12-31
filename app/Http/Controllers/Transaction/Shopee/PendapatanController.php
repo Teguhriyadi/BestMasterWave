@@ -355,13 +355,31 @@ class PendapatanController extends Controller
         return (float) str_replace(',', '.', $clean);
     }
 
-    public function kelola()
+    public function kelola(Request $request)
     {
         try {
 
             DB::beginTransaction();
 
-            $data["kelola"] = ShopeePendapatan::get();
+            $query = ShopeePendapatan::query();
+
+            $filterBy = $request->filter_by;
+            $dari     = $request->dari;
+            $sampai   = $request->sampai;
+
+            $allowedColumns = [
+                'waktu_pesanan',
+                'tanggal_dana_dilepaskan',
+            ];
+
+            if (in_array($filterBy, $allowedColumns) && $sampai) {
+                $query->whereBetween($filterBy, [
+                    $dari . ' 00:00:00',
+                    $sampai . ' 23:59:59'
+                ]);
+            }
+
+            $data["kelola"] = $query->orderBy('created_at', 'desc')->get();
 
             DB::commit();
 
