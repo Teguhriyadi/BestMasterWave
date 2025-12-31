@@ -58,9 +58,6 @@
                             <td class="text-center">{{ $item['total_ppn'] }}</td>
                             <td>{{ $item['supplier'] }}</td>
                             <td class="text-center">
-                                <a href="" class="btn btn-info btn-sm">
-                                    <i class="fa fa-search"></i> Detail
-                                </a>
                                 <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/edit') }}" class="btn btn-warning btn-sm">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
