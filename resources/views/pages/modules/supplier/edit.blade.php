@@ -88,7 +88,11 @@
         </div>
         <div class="form-group">
             <label for="pkp" class="form-label">PKP</label>
-            <input type="text" class="form-control" name="pkp" id="pkp" placeholder="Masukkan Data PKP">
+            <select name="pkp" class="form-control" id="pkp">
+                <option value="">- Pilih -</option>
+                <option {{ $edit['pkp'] == "PKP" ? 'selected' : '' }} value="PKP">PKP</option>
+                <option {{ $edit['pkp'] == "Non PKP" ? 'selected' : '' }} value="Non PKP">Non PKP</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="alamat" class="form-label"> Alamat </label>

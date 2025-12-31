@@ -39,6 +39,7 @@
                         <th>Tempo Pembayaran</th>
                         <th>No. Rekening</th>
                         <th>Nama Rekening</th>
+                        <th class="text-center">PKP</th>
                         <th>Bank</th>
                         <th>Alamat</th>
                         <th class="text-center">Aksi</th>
@@ -63,6 +64,7 @@
                             <td>{{ $item['tempo_pembayaran'] }} Hari</td>
                             <td>{{ $item['no_rekening'] }}</td>
                             <td>{{ $item['nama_rekening'] }}</td>
+                            <td class="text-center">{{ $item['status_pkp'] }}</td>
                             <td>{{ $item['bank'] }}</td>
                             <td>{{ $item['alamat'] }}</td>
                             <td class="text-center">
@@ -188,8 +190,11 @@
                         </div>
                         <div class="form-group">
                             <label for="pkp" class="form-label">PKP</label>
-                            <input type="text" class="form-control" name="pkp" id="pkp"
-                                placeholder="Masukkan Data PKP">
+                            <select name="pkp" class="form-control" id="pkp">
+                                <option value="">- Pilih -</option>
+                                <option value="PKP">PKP</option>
+                                <option value="Non PKP">Non PKP</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="alamat" class="form-label"> Alamat </label>

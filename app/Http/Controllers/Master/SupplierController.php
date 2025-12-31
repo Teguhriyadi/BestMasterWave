@@ -20,6 +20,10 @@ class SupplierController extends Controller
         $data["supplier"] = $this->supplier_service->list();
         $data["bank"] = $this->bank_service->list();
 
+        if ($data["bank"]->count() == 0) {
+            return redirect()->to("/admin-panel/bank")->with("error", "Data Bank Tidak Ada");
+        }
+
         return view("pages.modules.supplier.index", $data);
     }
 

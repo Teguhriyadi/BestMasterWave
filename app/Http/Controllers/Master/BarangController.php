@@ -20,6 +20,10 @@ class BarangController extends Controller
         $data["seller"] = $this->seller_service->list();
         $data["barang"] = $this->barang_service->list();
 
+        if ($data["seller"]->count() == 0) {
+            return redirect()->to("/admin-panel/seller")->with("error", "Data Barang Tidak Ada");
+        }
+
         return view("pages.modules.barang.index", $data);
     }
 

@@ -28,6 +28,14 @@ class PembelianController extends Controller
         $data["barang"] = $this->barang_service->list_barang_sku();
         $data["supplier"] = $this->supplier_service->list();
 
+        if ($data["barang"]->count() == 0) {
+            return redirect()->to("/admin-panel/barang")->with("error", "Data Barang Tidak Ada");
+        }
+
+        if ($data["supplier"]->count() == 0) {
+            return redirect()->to("/admin-panel/supplier")->with("error", "Data Supplier Tidak Ada");
+        }
+
         return view("pages.modules.transaction.invoice.pembelian.create", $data);
     }
 

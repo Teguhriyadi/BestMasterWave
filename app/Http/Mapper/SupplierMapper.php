@@ -20,8 +20,8 @@ class SupplierMapper
                 'nama_rekening'     => $supplier->nama_rekening,
                 'bank'              => $supplier->bank->alias,
                 'alamat'            => $supplier->alamat,
-                'tempo_pembayaran'  => $supplier->ketentuan_tempo_pembayaran
-                // 'status_pkp'     => $supplier->pkp ? 'PKP' : 'Non PKP',
+                'tempo_pembayaran'  => $supplier->ketentuan_tempo_pembayaran,
+                'status_pkp'        => $supplier->pkp
             ];
         });
     }
