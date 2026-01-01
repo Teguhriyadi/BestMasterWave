@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil,</strong> {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>,{{ session('error') }}
         </div>
     @endif
 
@@ -48,12 +48,12 @@
                         @foreach ($seller as $item)
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
-                                <td>{{ $item["platform"] }}</td>
-                                <td>{{ $item["nama"] }}</td>
-                                <td>{{ $item["slug"] }}</td>
+                                <td>{{ $item['platform'] }}</td>
+                                <td>{{ $item['nama'] }}</td>
+                                <td>{{ $item['slug'] }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-success text-white">
-                                        {{ $item["status"] }}
+                                        {{ $item['status'] }}
                                     </span>
                                 </td>
                                 <td class="text-center">
@@ -95,20 +95,34 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="platform_id" class="form-label"> Nama Platform </label>
-                            <select name="platform_id" class="form-control" id="platform_id">
+                            <label for="platform_id" class="form-label">
+                                Nama Platform
+                                <small class="text-danger">*</small>
+                            </label>
+                            <select name="platform_id" class="form-control @error('platform_id') is-invalid @enderror"
+                                id="platform_id">
                                 <option value="">- Pilih -</option>
                                 @foreach ($platform as $item)
-                                    <option value="{{ $item->id }}">
+                                    <option value="{{ $item->id }}"
+                                        {{ old('platform_id') == $item->id ? 'selected' : '' }}>
                                         {{ $item->nama }}
                                     </option>
                                 @endforeach
                             </select>
+                            @error('platform_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
-                            <label for="nama" class="form-label"> Nama Seller </label>
-                            <input type="text" class="form-control" name="nama" id="nama"
-                                placeholder="Masukkan Nama Seller">
+                            <label for="nama" class="form-label">
+                                Nama Seller
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" name="nama"
+                                id="nama" placeholder="Masukkan Nama Seller" value="{{ old('nama') }}">
+                            @error('nama')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

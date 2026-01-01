@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil,</strong> {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal,</strong> {{ session('error') }}
         </div>
     @endif
 
@@ -58,11 +58,11 @@
                                 <span class="badge bg-success text-white">
                                     @if ($item['kontak_hubungi'] == 'WA_HP')
                                         WhatsApp & Nomor Handphone
-                                    @elseif($item['kontak_hubungi'] == "WA")
+                                    @elseif($item['kontak_hubungi'] == 'WA')
                                         WhatsApp
-                                    @elseif($item['kontak_hubungi'] == "NO_HP")
+                                    @elseif($item['kontak_hubungi'] == 'NO_HP')
                                         Nomor Handphone
-                                    @elseif($item['kontak_hubungi'] == "GMAIL")
+                                    @elseif($item['kontak_hubungi'] == 'GMAIL')
                                         Email
                                     @endif
                                 </span>
@@ -113,59 +113,98 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="nama_supplier" class="form-label"> Nama Supplier </label>
-                                    <input type="text" class="form-control" name="nama_supplier" id="nama_supplier"
+                                    <label for="nama_supplier" class="form-label">
+                                        Nama Supplier
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('nama_supplier') is-invalid @enderror" name="nama_supplier" id="nama_supplier"
                                         placeholder="Masukkan Nama Supplier">
+                                    @error('nama_supplier')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="no_npwp" class="form-label"> No. NPWP </label>
-                                    <input type="text" class="form-control" name="no_npwp" id="no_npwp"
+                                    <label for="no_npwp" class="form-label">
+                                        No. NPWP
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" id="no_npwp"
                                         placeholder="Masukkan No. NPWP">
+                                    @error('no_npwp')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="kontak_hubungi" class="form-label"> Jenis Kontak Yang Dihubungi </label>
-                                    <select name="kontak_hubungi" class="form-control" id="kontak_hubungi">
+                                    <label for="kontak_hubungi" class="form-label">
+                                        Jenis Kontak Yang Dihubungi
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <select name="kontak_hubungi" class="form-control @error('kontak_hubungi') is-invalid @enderror" id="kontak_hubungi">
                                         <option value="">- Pilih -</option>
                                         <option value="WA_HP">WhatsApp + Nomor Handphone</option>
                                         <option value="WA">WhatApp</option>
                                         <option value="NO_HP">Nomor Handphone</option>
                                         <option value="GMAIL">Email</option>
                                     </select>
+                                    @error('kontak_hubungi')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="nomor_kontak" class="form-label"> Kontak Yang Bisa Dihubungi </label>
-                                    <input type="text" class="form-control" name="nomor_kontak" id="nomor_kontak"
+                                    <label for="nomor_kontak" class="form-label">
+                                        Kontak Yang Bisa Dihubungi
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('nomor_kontak') is-invalid @enderror" name="nomor_kontak" id="nomor_kontak"
                                         placeholder="Contoh : 081214711741 / ex@gmail.com">
+                                    @error('nomor_kontak')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="no_rekening" class="form-label">No. Rekening</label>
-                                    <input type="text" class="form-control" name="no_rekening" id="no_rekening"
+                                    <label for="no_rekening" class="form-label">
+                                        No. Rekening
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('no_rekening') is-invalid @enderror" name="no_rekening" id="no_rekening"
                                         placeholder="Masukkan No. Rekening">
+                                    @error('no_rekening')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="nama_rekening" class="form-label">Nama Rekening</label>
-                                    <input type="text" class="form-control" name="nama_rekening" id="nama_rekening"
+                                    <label for="nama_rekening" class="form-label">
+                                        Nama Rekening
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('nama_rekening') is-invalid @enderror" name="nama_rekening" id="nama_rekening"
                                         placeholder="Masukkan Nama Rekening">
+                                    @error('nama_rekening')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="bank_id" class="form-label">Nama Bank</label>
-                                    <select name="bank_id" class="form-control" id="bank_id">
+                                    <label for="bank_id" class="form-label">
+                                        Nama Bank
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <select name="bank_id" class="form-control @error('bank_id') is-invalid @enderror" id="bank_id">
                                         <option value="">- Pilih -</option>
                                         @foreach ($bank as $item)
                                             <option value="{{ $item['id'] }}">
@@ -173,37 +212,63 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    @error('bank_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="ketentuan_tempo_pembayaran" class="form-label">Ketentuan Tempo
-                                        Pembayaran</label>
-                                    <input type="text" class="form-control" name="ketentuan_tempo_pembayaran"
+                                    <label for="ketentuan_tempo_pembayaran" class="form-label">
+                                        Ketentuan Tempo Pembayaran
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control @error('ketentuan_tempo_pembayaran') is-invalid @enderror" name="ketentuan_tempo_pembayaran"
                                         id="ketentuan_tempo_pembayaran" placeholder="Masukkan Tempo Pembayaran">
+                                    @error('ketentuan_tempo_pembayaran')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="rate_ppn" class="form-label">Rate PPN</label>
-                                    <input type="number" class="form-control" name="rate_ppn" id="rate_ppn"
-                                        placeholder="0" min="1">
+                                    <label for="rate_ppn" class="form-label">
+                                        Rate PPN
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="number" class="form-control @error('rate_ppn') is-invalid @enderror" name="rate_ppn" id="rate_ppn"
+                                        placeholder="0" min="0">
+                                    @error('rate_ppn')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="pkp" class="form-label">PKP</label>
-                            <select name="pkp" class="form-control" id="pkp">
+                            <label for="pkp" class="form-label">
+                                PKP
+                                <small class="text-danger">*</small>
+                            </label>
+                            <select name="pkp" class="form-control @error('pkp') is-invalid @enderror" id="pkp">
                                 <option value="">- Pilih -</option>
                                 <option value="PKP">PKP</option>
                                 <option value="Non PKP">Non PKP</option>
                             </select>
+                            @error('pkp')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
-                            <label for="alamat" class="form-label"> Alamat </label>
-                            <textarea name="alamat" class="form-control" id="alamat" rows="5" placeholder="Masukkan Alamat"></textarea>
+                            <label for="alamat" class="form-label">
+                                Alamat
+                                <small class="text-danger">*</small>
+                            </label>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5" placeholder="Masukkan Alamat"></textarea>
+                            @error('alamat')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

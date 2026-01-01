@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Http\Mapper\BankMapper;
 use App\Http\Repositories\BankRepository;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BankService
 {
@@ -35,6 +36,8 @@ class BankService
 
     public function update(string $id, array $data)
     {
+        $data['slug_bank'] = Str::slug($data['nama_bank']);
+
         return DB::transaction(function () use ($id, $data) {
             return $this->bank_repository->update_by_id($id, $data);
         });

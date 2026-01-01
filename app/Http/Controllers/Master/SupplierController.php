@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Supplier\CreateRequest;
+use App\Http\Requests\Supplier\UpdateRequest;
 use App\Http\Services\BankService;
 use App\Http\Services\SupplierService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -27,10 +29,10 @@ class SupplierController extends Controller
         return view("pages.modules.supplier.index", $data);
     }
 
-    public function store(Request $request)
+    public function store(CreateRequest $request)
     {
         try {
-            $this->supplier_service->create($request->all());
+            $this->supplier_service->create($request->validated());
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
@@ -58,10 +60,10 @@ class SupplierController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->supplier_service->update($id, $request->all());
+            $this->supplier_service->update($id, $request->validated());
 
             return back()->with('success', 'Data berhasil diperbarui');
 

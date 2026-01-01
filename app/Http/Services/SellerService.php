@@ -14,9 +14,9 @@ class SellerService
 
     public function list()
     {
-        $supplier = $this->seller_repository->get_all_data();
+        $seller = $this->seller_repository->get_all_data();
 
-        return SellerMapper::toTable($supplier);
+        return SellerMapper::toTable($seller);
     }
 
     public function create(array $data)

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Bank\CreateRequest;
+use App\Http\Requests\Bank\UpdateRequest;
 use App\Http\Services\BankService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -20,7 +22,7 @@ class BankController extends Controller
         return view("pages.modules.bank.index", $data);
     }
 
-    public function store(Request $request)
+    public function store(CreateRequest $request)
     {
         try {
             $this->bank_service->create($request->all());
@@ -42,7 +44,7 @@ class BankController extends Controller
         try {
             $data["edit"] = $this->bank_service->edit($id);
 
-            return view("pages.modules.supplier.edit", $data);
+            return view("pages.modules.bank.edit", $data);
         } catch (\Throwable $e) {
             return redirect()
                 ->back()
@@ -50,10 +52,12 @@ class BankController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->bank_service->update($id, $request->all());
+            $data = $request->validated();
+
+            $this->bank_service->update($id, $data);
 
             return back()->with('success', 'Data berhasil diperbarui');
 

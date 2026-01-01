@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil,</strong> {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal,</strong> {{ session('error') }}
         </div>
     @endif
 
@@ -50,7 +50,11 @@
                             <td>{{ $item['nama_bank'] }}</td>
                             <td>{{ $item['alias'] }}</td>
                             <td>{{ $item['slug_bank'] }}</td>
-                            <td class="text-center">{{ $item['aktif'] }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-success text-white">
+                                    {{ $item['aktif'] }}
+                                </span>
+                            </td>
                             <td class="text-center">
                                 <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
@@ -89,12 +93,24 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="nama_bank" class="form-label"> Nama Bank </label>
-                            <input type="text" class="form-control" name="nama_bank" id="nama_bank" placeholder="Masukkan Nama Bank">
+                            <label for="nama_bank" class="form-label">
+                                Nama Bank
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('nama_bank') is-invalid @enderror" name="nama_bank" id="nama_bank" placeholder="Masukkan Nama Bank" value="{{ old('nama_bank') }}">
+                            @error('nama_bank')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
-                            <label for="alias" class="form-label"> Nama Alias Bank </label>
-                            <input type="text" class="form-control" name="alias" id="alias" placeholder="Masukkan Nama Alias Bank">
+                            <label for="alias" class="form-label">
+                                Nama Alias Bank
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('alias') is-invalid @enderror" name="alias" id="alias" placeholder="Masukkan Nama Alias Bank" value="{{ old('alias') }}">
+                            @error('alias')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -148,7 +164,7 @@
 
         function editSupplier(id) {
             $.ajax({
-                url: "{{ url('/admin-panel/supplier') }}" + "/" + id + "/edit",
+                url: "{{ url('/admin-panel/bank') }}" + "/" + id + "/edit",
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)

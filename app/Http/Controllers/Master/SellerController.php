@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Seller\CreateRequest;
+use App\Http\Requests\Seller\UpdateRequest;
 use App\Http\Services\SellerService;
 use App\Models\Platform;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -35,7 +37,7 @@ class SellerController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(CreateRequest $request)
     {
         try {
             $this->seller_service->create($request->all());
@@ -62,11 +64,12 @@ class SellerController extends Controller
         } catch (\Throwable $e) {
             return redirect()
                 ->back()
+                ->withInput()
                 ->with('error', $e->getMessage());
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         try {
             $this->seller_service->update($id, $request->all());
