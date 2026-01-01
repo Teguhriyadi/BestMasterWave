@@ -18,7 +18,7 @@ class BarangMapper
                 'harga_modal'                   => number_format($supplier->harga_modal),
                 'harga_pembelian_terakhir'      => number_format($supplier->kontak_hubungi),
                 'tanggal_pembelian_terakhir'    => $supplier->tanggal_pembelian_terakhir,
-                'seller_id'                     => $supplier->seller->nama,
+                'seller_id'                     => empty($supplier->seller) ? null : $supplier->seller->nama,
                 'status_sku'                    => $supplier->status_sku === "A" ? "Aktif" : "Tidak Aktif"
             ];
         });
