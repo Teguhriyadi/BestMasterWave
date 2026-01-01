@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Transaction\Invoice;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Pembelian\CreateRequest;
 use App\Http\Services\BarangService;
 use App\Http\Services\PembelianService;
 use App\Http\Services\SupplierService;
@@ -39,7 +40,7 @@ class PembelianController extends Controller
         return view("pages.modules.transaction.invoice.pembelian.create", $data);
     }
 
-    public function store(Request $request)
+    public function store(CreateRequest $request)
     {
         try {
             $this->pembelian_service->create($request->all());

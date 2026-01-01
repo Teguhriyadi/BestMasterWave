@@ -34,6 +34,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->nullOnDelete();
+            $table->text("keterangan")->nullable()->index();
             $table->timestamps();
         });
     }

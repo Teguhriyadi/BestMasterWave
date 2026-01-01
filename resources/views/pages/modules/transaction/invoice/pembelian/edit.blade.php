@@ -28,41 +28,73 @@
             @csrf
             @method('PUT')
             <div class="card-body">
-                <div class="mb-3 row">
-                    <label for="no_invoice" class="col-sm-2 col-form-label">Nomor Invoice</label>
-                    <div class="col-sm-4">
-                        <input type="text" name="no_invoice" class="form-control" id="no_invoice"
-                            placeholder="Masukkan No. Invoice" value="{{ $edit['no_invoice'] }}">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3 row">
+                            <label for="no_invoice" class="col-sm-3 col-form-label">Nomor Invoice</label>
+                            <div class="col-md-9">
+                                <input type="text" name="no_invoice" class="form-control @error('no_invoice') is-invalid @enderror" id="no_invoice"
+                                    placeholder="Masukkan No. Invoice" value="{{ old('no_invoice', $edit['no_invoice']) }}">
+                                @error('no_invoice')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="supplier_id" class="col-sm-3 col-form-label">Nama Supplier</label>
+                            <div class="col-sm-9">
+                                <select name="supplier_id" class="form-control @error('supplier_id') is-invalid @enderror" id="supplier_id">
+                                    <option value="">- Pilih -</option>
+                                    @foreach ($supplier as $item)
+                                        <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}"
+                                            {{ $edit['supplier_id'] == $item['id'] ? 'selected' : '' }}>
+                                            {{ $item['nama_supplier'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('supplier_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="tanggal_invoice" class="col-sm-3 col-form-label">Tanggal Invoice</label>
+                            <div class="col-md-9">
+                                <input type="date" name="tanggal_invoice @error('tanggal_invoice') is-invalid @enderror" id="tanggal_invoice" class="form-control"
+                                    value="{{ \Carbon\Carbon::parse($edit['tanggal_invoice'])->format('Y-m-d') }}">
+                                @error('tanggal_invoice')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="tanggal_jatuh_tempo" class="col-sm-3 col-form-label">Tanggal Jatuh Tempo</label>
+                            <div class="col-md-9">
+                                <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo"
+                                    class="form-control @error('tanggal_jatuh_tempo') is-invalid @enderror"
+                                    value="{{ \Carbon\Carbon::parse($edit['tanggal_jatuh_tempo'])->format('Y-m-d') }}">
+                                @error('tanggal_jatuh_tempo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3 row">
+                            <label for="keterangan" class="col-sm-3 col-form-label">
+                                Keterangan
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" rows="5" placeholder="Masukkan Keterangan">{{ $edit['keterangan'] }}</textarea>
+                                @error('keterangan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="supplier_id" class="col-sm-2 col-form-label">Nama Supplier</label>
-                    <div class="col-sm-6">
-                        <select name="supplier_id" class="form-control" id="supplier_id">
-                            <option value="">- Pilih -</option>
-                            @foreach ($supplier as $item)
-                                <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}"
-                                    {{ $edit['supplier_id'] == $item['id'] ? 'selected' : '' }}>
-                                    {{ $item['nama_supplier'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="tanggal_invoice" class="col-sm-2 col-form-label">Tanggal Invoice</label>
-                    <div class="col-sm-4">
-                        <input type="date" name="tanggal_invoice" id="tanggal_invoice" class="form-control"
-                            value="{{ \Carbon\Carbon::parse($edit['tanggal_invoice'])->format('Y-m-d') }}">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="tanggal_jatuh_tempo" class="col-sm-2 col-form-label">Tanggal Jatuh Tempo</label>
-                    <div class="col-sm-4">
-                        <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo" class="form-control"
-                            value="{{ \Carbon\Carbon::parse($edit['tanggal_jatuh_tempo'])->format('Y-m-d') }}">
-                    </div>
-                </div>
+
                 <button type="button" class="btn btn-primary btn-sm" id="btnAddItem">
                     <i class="fa fa-plus"></i> Tambah Data Barang
                 </button>

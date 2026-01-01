@@ -86,6 +86,7 @@ class PembelianService
                     'total_ppn'            => $totalPPN,
                     'total_qty'            => $totalQty,
                     'updated_by'           => Auth::user()->id,
+                    'keterangan'           => $data['keterangan'],
                 ],
                 $items
             );

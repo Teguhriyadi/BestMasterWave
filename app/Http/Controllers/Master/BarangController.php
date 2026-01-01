@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Barang\CreateRequest;
 use App\Http\Services\BarangService;
 use App\Http\Services\SellerService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -27,10 +28,10 @@ class BarangController extends Controller
         return view("pages.modules.barang.index", $data);
     }
 
-    public function store(Request $request)
+    public function store(CreateRequest $request)
     {
         try {
-            $this->barang_service->create($request->all());
+            $this->barang_service->create($request->validated());
 
             return back()
                 ->with('success', 'Data berhasil disimpan');

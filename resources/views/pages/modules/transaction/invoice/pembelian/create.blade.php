@@ -27,36 +27,85 @@
         <form action="{{ url('/admin-panel/pembelian') }}" method="POST">
             @csrf
             <div class="card-body">
-                <div class="mb-3 row">
-                    <label for="no_invoice" class="col-sm-2 col-form-label">Nomor Invoice</label>
-                    <div class="col-sm-4">
-                        <input type="text" name="no_invoice" class="form-control" id="no_invoice"
-                            placeholder="Masukkan No. Invoice">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3 row">
+                            <label for="no_invoice" class="col-sm-3 col-form-label">
+                                Nomor Invoice
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="text" name="no_invoice"
+                                    class="form-control @error('no_invoice') is-invalid @enderror" id="no_invoice"
+                                    placeholder="Masukkan No. Invoice" value="{{ old('no_invoice') }}">
+                                @error('no_invoice')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="supplier_id" class="col-sm-3 col-form-label">
+                                Nama Supplier
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <select name="supplier_id" class="form-control @error('supplier_id') is-invalid @enderror"
+                                    id="supplier_id">
+                                    <option value="">- Pilih -</option>
+                                    @foreach ($supplier as $item)
+                                        <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}">
+                                            {{ $item['nama_supplier'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('supplier_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="tanggal_invoice" class="col-sm-3 col-form-label">
+                                Tanggal Invoice
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="date" name="tanggal_invoice"
+                                    class="form-control @error('tanggal_invoice') is-invalid @enderror"
+                                    id="tanggal_invoice" value="{{ old('tanggal_invoice') }}">
+                                @error('tanggal_invoice')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="tanggal_jatuh_tempo" class="col-sm-3 col-form-label">
+                                Tanggal Jatuh Tempo
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="date" name="tanggal_jatuh_tempo"
+                                    class="form-control @error('tanggal_jatuh_tempo') is-invalid @enderror"
+                                    id="tanggal_jatuh_tempo" value="{{ old('tanggal_jatuh_tempo') }}">
+                                @error('tanggal_jatuh_tempo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="supplier_id" class="col-sm-2 col-form-label">Nama Supplier</label>
-                    <div class="col-sm-6">
-                        <select name="supplier_id" class="form-control" id="supplier_id">
-                            <option value="">- Pilih -</option>
-                            @foreach ($supplier as $item)
-                                <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}">
-                                    {{ $item['nama_supplier'] }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="tanggal_invoice" class="col-sm-2 col-form-label">Tanggal Invoice</label>
-                    <div class="col-sm-4">
-                        <input type="date" name="tanggal_invoice" class="form-control" id="tanggal_invoice">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="tanggal_jatuh_tempo" class="col-sm-2 col-form-label">Tanggal Jatuh Tempo</label>
-                    <div class="col-sm-4">
-                        <input type="date" name="tanggal_jatuh_tempo" class="form-control" id="tanggal_jatuh_tempo">
+                    <div class="col-md-4">
+                        <div class="mb-3 row">
+                            <label for="keterangan" class="col-sm-3 col-form-label">
+                                Keterangan
+                                <small class="text-danger">*</small>
+                            </label>
+                            <div class="col-sm-9">
+                                <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan"
+                                    rows="5" placeholder="Masukkan Keterangan">{{ old('keterangan') }}</textarea>
+                                @error('keterangan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" id="btnAddItem">

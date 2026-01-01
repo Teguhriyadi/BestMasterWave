@@ -40,6 +40,7 @@
                         <th class="text-center">Total Diskon</th>
                         <th class="text-center">Total PPN</th>
                         <th>Nama Supplier</th>
+                        <th>Keterangan</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -57,6 +58,7 @@
                             <td class="text-center">{{ $item['total_diskon'] }}</td>
                             <td class="text-center">{{ $item['total_ppn'] }}</td>
                             <td>{{ $item['supplier'] }}</td>
+                            <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">
                                 <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/edit') }}" class="btn btn-warning btn-sm">
                                     <i class="fa fa-edit"></i> Edit

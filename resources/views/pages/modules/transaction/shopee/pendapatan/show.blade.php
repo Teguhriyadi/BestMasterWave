@@ -109,6 +109,7 @@
                         <form action="{{ url('/admin-panel/shopee/pendapatan/' . $file->id . '/process-database') }}"
                             method="POST">
                             @csrf
+                            <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                             <button type="submit" class="btn btn-success btn-block btn-lg">
                                 <i class="fa fa-upload"></i> Konfirmasi Import
                             </button>
@@ -147,7 +148,6 @@
         </div>
     </div>
 
-    {{-- MODAL MAPPING DRAGGABLE --}}
     <div class="modal fade" id="mappingModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -161,7 +161,6 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            {{-- SUMBER: EXCEL --}}
                             <div class="col-md-5">
                                 <h6 class="font-weight-bold"><i class="fa fa-file-excel"></i> Kolom dari Excel</h6>
                                 <input type="text" class="form-control form-control-sm mb-2"
@@ -179,7 +178,6 @@
                                 <i class="fa fa-arrow-right fa-2x text-muted d-none d-md-block"></i>
                             </div>
 
-                            {{-- TUJUAN: DATABASE --}}
                             <div class="col-md-5">
                                 <h6 class="font-weight-bold"><i class="fa fa-database"></i> Kolom di Database</h6>
                                 <input type="text" class="form-control form-control-sm mb-2"

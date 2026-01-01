@@ -24,6 +24,7 @@ class PembelianRepository
             "total_ppn" => $data["total_ppn"],
             "total_qty" => $data["total_qty"],
             "supplier_id" => $data["supplier_id"],
+            "keterangan" => $data["keterangan"],
             "created_by" => Auth::user()->id,
         ]);
 

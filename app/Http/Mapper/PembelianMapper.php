@@ -20,7 +20,8 @@ class PembelianMapper
                 'total_diskon'          => number_format($pembelian->total_diskon, 0, ',', '.'),
                 'total_ppn'             => number_format($pembelian->total_ppn, 0, ',', '.'),
                 'total_qty'             => number_format($pembelian->total_qty, 0, ',', '.'),
-                'supplier'              => $pembelian->supplier->nama_supplier
+                'supplier'              => $pembelian->supplier->nama_supplier,
+                'keterangan'            => $pembelian->keterangan
             ];
         });
     }
