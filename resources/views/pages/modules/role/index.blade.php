@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil,</strong> {{ session('success') }}
         </div>
-    @elseif(session("error"))
+    @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>,{{ session('error') }}
         </div>
     @endif
 
@@ -34,43 +34,40 @@
                     <thead>
                         <tr>
                             <th class="text-center">No.</th>
-                            <th>Nama</th>
+                            <th>Nama Role</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $nomer = 0
+                            $nomer = 0;
                         @endphp
-                        @foreach ($role as $item)
-                        <tr>
-                            <td class="text-center">{{ ++$nomer }}.</td>
-                            <td>{{ $item->nama_role }}</td>
-                            <td class="text-center">
-                                @if ($item->is_active == "1")
-                                <span class="badge bg-success text-white">
-                                    Aktif
-                                </span>
-                                @elseif ($item->is_active == "0")
-                                <span class="badge bg-danger text-white">
-                                    Non - Aktif
-                                </span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="" method="POST" style="display: inline">
-                                    @csrf
-                                    @method("DELETE")
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                        @foreach ($seller as $item)
+                            <tr>
+                                <td class="text-center">{{ ++$nomer }}.</td>
+                                <td>{{ $item['nama_role'] }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-success text-white">
+                                        {{ $item['status'] }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button onclick="editRole('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
-                            </td>
-                        </tr>
+                                    <form action="{{ url('/admin-panel/role/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -78,6 +75,7 @@
         </div>
     </div>
 
+    <!-- Modal Tambah -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -93,8 +91,15 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="nama_role" class="form-label"> Nama Role </label>
-                            <input type="text" class="form-control" name="nama_role" id="nama_role" placeholder="Masukkan Nama Role">
+                            <label for="nama_role" class="form-label">
+                                Nama Role
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('nama_role') is-invalid @enderror" name="nama_role"
+                                id="nama_role" placeholder="Masukkan Nama Seller" value="{{ old('nama_role') }}">
+                            @error('nama_role')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -109,6 +114,27 @@
             </div>
         </div>
     </div>
+    <!-- Modal End -->
+
+    <!-- Modal Tambah -->
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-edit"></i> Edit Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-edit">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal End -->
 @endpush
 
 @push('js_style')
@@ -116,4 +142,19 @@
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
     <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
+
+    <script type="text/javascript">
+        function editRole(id) {
+            $.ajax({
+                url: "{{ url('/admin-panel/role') }}" + "/" + id + "/edit",
+                type: "GET",
+                success: function(response) {
+                    $("#modal-content-edit").html(response)
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
 @endpush
