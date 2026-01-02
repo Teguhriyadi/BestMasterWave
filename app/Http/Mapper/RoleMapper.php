@@ -9,7 +9,7 @@ class RoleMapper
         return [
             "id" => $role->id,
             "nama_role" => $role->nama_role,
-            "is_active" => $role->is_active
+            "is_active" => $role->is_active == 1 ? "Aktif" : "Tidak Aktif"
         ];
     }
 }
