@@ -18,7 +18,6 @@ class UpdateRequest extends FormRequest
             'bank_id' => ['required'],
             'nama_rekening' => ['required'],
             'pkp' => ['required'],
-            'no_npwp' => ['required'],
             'rate_ppn' => ['required'],
         ];
     }
@@ -34,7 +33,6 @@ class UpdateRequest extends FormRequest
             'no_rekening.required'        => 'No. Rekening Wajib Diisi',
             'nama_rekening.required'        => 'Nama Rekening Wajib Diisi',
             'pkp.required'        => 'PKP Wajib Diisi',
-            'no_npwp.required'        => 'No. NPWP Wajib Diisi',
             'rate_ppn.required'        => 'Rate PPN Wajib Diisi',
         ];
     }

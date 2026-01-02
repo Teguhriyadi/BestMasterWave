@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Transaction\Shopee;
 
 use App\Http\Controllers\Controller;
+use App\Http\Services\SellerService;
 use App\Models\InvoiceDataPendapatan;
 use App\Models\InvoiceFilePendapatan;
 use App\Models\InvoiceSchemaPendapatan;
@@ -18,6 +19,10 @@ use Illuminate\Support\Str;
 
 class PendapatanController extends Controller
 {
+    public function __construct(
+        protected SellerService $seller_service
+    ) {}
+
     public function index()
     {
         try {
@@ -84,8 +89,19 @@ class PendapatanController extends Controller
         $headerRow = 6;
         $dataStart = 7;
 
+        $allowedKeywords = ['income', 'penghasilan'];
         foreach ($spreadsheet->getWorksheetIterator() as $sheet) {
-            if (stripos($sheet->getTitle(), 'income') === false && stripos($sheet->getTitle(), 'penghasilan') === false) continue;
+            $title = $sheet->getTitle();
+
+            $matched = false;
+            foreach ($allowedKeywords as $keyword) {
+                if (stripos($title, $keyword) !== false) {
+                    $matched = true;
+                    break;
+                }
+            }
+
+            if (! $matched) continue;
 
             $sheetName = $sheet->getTitle();
             $highestColumn = $sheet->getHighestColumn();
@@ -361,16 +377,23 @@ class PendapatanController extends Controller
 
             DB::beginTransaction();
 
+            $data["seller"] = $this->seller_service->list();
+
             $query = ShopeePendapatan::query();
 
             $filterBy = $request->filter_by;
             $dari     = $request->dari;
             $sampai   = $request->sampai;
+            $nama_seller = $request->nama_seller;
 
             $allowedColumns = [
                 'waktu_pesanan',
                 'tanggal_dana_dilepaskan',
             ];
+
+            if ($nama_seller) {
+                $query->where('nama_seller', $nama_seller);
+            }
 
             if (in_array($filterBy, $allowedColumns) && $sampai) {
                 $query->whereBetween($filterBy, [

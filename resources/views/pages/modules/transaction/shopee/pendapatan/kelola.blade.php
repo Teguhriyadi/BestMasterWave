@@ -4,6 +4,10 @@
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
+
 @endpush
 
 @push('content_app')
@@ -46,6 +50,21 @@
                                     {{ request('filter_by') == 'tanggal_dana_dilepaskan' ? 'selected' : '' }}>
                                     Tanggal Dana Dilepaskan
                                 </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="nama_seller"> Nama Seller </label>
+                            <select name="nama_seller" class="form-control" id="nama_seller">
+                                <option value="">- Pilih -</option>
+                                @foreach ($seller as $item)
+                                    <option value="{{ $item['nama'] }}"
+                                        {{ request('nama_seller') == $item['nama'] ? 'selected' : '' }}>
+                                        {{ $item['nama'] }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -132,4 +151,16 @@
     <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#nama_seller').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Pilih Seller',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
 @endpush

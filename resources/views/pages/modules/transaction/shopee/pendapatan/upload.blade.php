@@ -205,7 +205,7 @@
                 processBtn.classList.remove('d-none');
                 sellerWrapper.classList.remove('d-none');
             })
-            .catch(() => {
+            .catch((res) => {
                 loading.classList.add('d-none');
                 document.getElementById('file').disabled = false;
                 alert('Gagal membaca file Excel. Pastikan format benar.');

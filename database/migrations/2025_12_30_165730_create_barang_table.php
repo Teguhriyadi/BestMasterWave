@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid("id")->primary();
             $table->string('sku_barang', 50)->index();
             $table->unsignedBigInteger('harga_modal');
-            $table->unsignedBigInteger('harga_pembelian_terakhir');
-            $table->dateTime('tanggal_pembelian_terakhir');
+            $table->unsignedBigInteger('harga_pembelian_terakhir')->nullable();
+            $table->dateTime('tanggal_pembelian_terakhir')->nullable();
             $table->uuid('created_by')->nullable()->index();
             $table->foreign('created_by')
                 ->references('id')
@@ -28,7 +28,7 @@ return new class extends Migration
             ->on('users')
             ->nullOnDelete();
 
-            $table->string('status_sku', 50)->index()->nullable();
+            $table->enum('status_sku', ["A", "N"])->index()->default("A");
 
             $table->uuid('seller_id')->nullable()->index();
             $table->foreign('seller_id')

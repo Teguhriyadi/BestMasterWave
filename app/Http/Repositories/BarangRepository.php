@@ -18,10 +18,10 @@ class BarangRepository
         $supplier = Barang::create([
             "sku_barang" => $data["sku_barang"],
             "harga_modal" => $data["harga_modal"],
-            "harga_pembelian_terakhir" => $data["harga_pembelian_terakhir"],
-            "tanggal_pembelian_terakhir" => $data["tanggal_pembelian_terakhir"],
-            "status_sku" => $data["status_sku"],
-            "seller_id" => $data["seller_id"],
+            "harga_pembelian_terakhir" => $data['harga_pembelian_terakhir'] ?? 0,
+            "tanggal_pembelian_terakhir" => $data['tanggal_pembelian_terakhir'] ?? null,
+            "status_sku" => "A",
+            "seller_id" => $data["seller_id"] ?? null,
             "created_by" => Auth::user()->id
         ]);
 

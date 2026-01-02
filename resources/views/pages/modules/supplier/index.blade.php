@@ -128,7 +128,6 @@
                                 <div class="form-group">
                                     <label for="no_npwp" class="form-label">
                                         No. NPWP
-                                        <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" id="no_npwp"
                                         placeholder="Masukkan No. NPWP">
