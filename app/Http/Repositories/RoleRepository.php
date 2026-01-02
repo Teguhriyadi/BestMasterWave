@@ -3,6 +3,7 @@
 namespace App\Http\Repositories;
 
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 class RoleRepository
 {
@@ -15,7 +16,8 @@ class RoleRepository
     {
         $supplier = Role::create([
             "nama_role" => $data["nama_role"],
-            "is_active" => 1,
+            "is_active" => "1",
+            "created_by" => Auth::user()->id
         ]);
 
         return $supplier;

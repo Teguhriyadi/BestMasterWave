@@ -43,7 +43,7 @@
                         @php
                             $nomer = 0;
                         @endphp
-                        @foreach ($seller as $item)
+                        @foreach ($role as $item)
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
                                 <td>{{ $item['nama_role'] }}</td>

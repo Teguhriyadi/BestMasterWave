@@ -18,6 +18,4 @@ class Role extends Model
     protected $keyType = "string";
 
     public $primaryKey = "id";
-
-    public $timestamps = false;
 }
