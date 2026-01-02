@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/master/bank.php';
                     require __DIR__ . '/../routes/master/barang.php';
                     require __DIR__ . '/../routes/transaction/invoice/pembelian.php';
+                    require __DIR__ . '/../routes/master/divisi.php';
                 });
             });
         },
