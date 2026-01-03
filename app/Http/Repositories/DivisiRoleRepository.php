@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Http\Repositories;
+
+use App\Models\Divisi;
+use App\Models\DivisiRole;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class DivisiRoleRepository
+{
+    public function get_all_data()
+    {
+        return Divisi::with("roles")
+            ->orderBy("nama_divisi")
+            ->get();
+    }
+
+    public function insertRoles(string $divisionId, array $roleIds): void
+    {
+        DB::transaction(function () use ($divisionId, $roleIds) {
+
+            DivisiRole::where('divisi_id', $divisionId)->delete();
+
+            if (empty($roleIds)) {
+                return;
+            }
+
+            $payload = [];
+
+            foreach ($roleIds as $roleId) {
+                $payload[] = [
+                    'id'         => (string) Str::uuid(),
+                    'divisi_id'  => $divisionId,
+                    'role_id'    => $roleId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            DivisiRole::insert($payload);
+        });
+    }
+
+    public function syncRoles(int|string $divisionId, array $roleIds): void
+    {
+        $division = DivisiRole::findOrFail($divisionId);
+
+        $division->roles()->sync($roleIds);
+    }
+
+    public function getRoleIdsByDivision(string $divisionId)
+    {
+        return Divisi::with('roles:id')
+            ->findOrFail($divisionId)
+            ->roles
+            ->pluck('id');
+    }
+}

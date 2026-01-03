@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
-class Divisi extends Model
+class DivisiRole extends Model
 {
     use HasUuids;
 
-    protected $table = "divisi";
+    protected $table = "divisi_role";
 
     protected $guarded = [''];
 
