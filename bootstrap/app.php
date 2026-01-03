@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/transaction/invoice/pembelian.php';
                     require __DIR__ . '/../routes/master/divisi.php';
                     require __DIR__ . '/../routes/master/divisi-role.php';
+                    require __DIR__ . '/../routes/master/users.php';
                 });
             });
         },

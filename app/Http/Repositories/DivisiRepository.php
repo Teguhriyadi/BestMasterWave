@@ -41,4 +41,11 @@ class DivisiRepository
         $supplier = Divisi::findOrFail($id);
         $supplier->delete();
     }
+
+    public function getRolesByDivisi(string $divisionId)
+    {
+        return Divisi::with('roles:id,nama_role')
+            ->findOrFail($divisionId)
+            ->roles;
+    }
 }

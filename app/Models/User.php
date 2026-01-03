@@ -20,4 +20,19 @@ class User extends Authenticatable
     public $primaryKey = "id";
 
     public $incrementing = false;
+
+    public function divisiRoles()
+    {
+        return $this->hasMany(UserDivisiRole::class,'user_id','id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class,'users_divisi_role','user_id','role_id');
+    }
+
+    public function divisi()
+    {
+        return $this->belongsToMany(Divisi::class,'users_divisi_role','user_id','divisi_id');
+    }
 }

@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users_divisi_role', function (Blueprint $table) {
+            $table->uuid("id")->primary();
+            $table->uuid('user_id');
+            $table->uuid('divisi_id');
+            $table->uuid('role_id');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('divisi_id')->references('id')->on('divisi')->cascadeOnDelete();
+            $table->foreign('role_id')->references('id')->on('role')->cascadeOnDelete();
+
+            $table->unique(['user_id', 'divisi_id', 'role_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users_divisi_role');
+    }
+};

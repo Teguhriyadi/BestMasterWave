@@ -3,29 +3,38 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Divisi\CreateRequest;
-use App\Http\Requests\Divisi\UpdateRequest;
+use App\Http\Requests\Users\CreateRequest;
+use App\Http\Requests\Users\UpdateRequest;
 use App\Http\Services\DivisiService;
+use App\Http\Services\UsersService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
-class DivisiController extends Controller
+class UserDivisiRoleController extends Controller
 {
     public function __construct(
+        protected UsersService $users_service,
         protected DivisiService $divisi_service
     ) {}
 
     public function index()
     {
+        $data["users"] = $this->users_service->list();
+
+        return view("pages.modules.users.index", $data);
+    }
+
+    public function create()
+    {
         $data["divisi"] = $this->divisi_service->list();
 
-        return view("pages.modules.divisi.index", $data);
+        return view("pages.modules.users.create", $data);
     }
 
     public function store(CreateRequest $request)
     {
         try {
-            $this->divisi_service->create($request->validated());
+            $this->users_service->create($request->all());
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
@@ -42,9 +51,13 @@ class DivisiController extends Controller
     public function edit($id)
     {
         try {
-            $data["edit"] = $this->divisi_service->edit($id);
+            $data["divisi"] = $this->divisi_service->list();
+            $users = $this->users_service->edit($id);
+            $data["edit"] = $users;
+            $data["selectedRoles"] = $users->divisiRoles->pluck("role_id")->toArray();
+            $data["selectedDivisi"] = $users->divisiRoles->first()?->divisi_id;
 
-            return view("pages.modules.divisi.edit", $data);
+            return view("pages.modules.users.edit", $data);
         } catch (\Throwable $e) {
             return redirect()
                 ->back()
@@ -55,13 +68,13 @@ class DivisiController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->divisi_service->update($id, $request->validated());
+            $this->users_service->update($id, $request->validated());
 
             return back()->with('success', 'Data berhasil diperbarui');
 
         } catch (ModelNotFoundException $e) {
 
-            return back()->with('error', 'Supplier tidak ditemukan');
+            return back()->with('error', 'Users tidak ditemukan');
 
         } catch (\Throwable $e) {
 
@@ -72,7 +85,7 @@ class DivisiController extends Controller
     public function destroy($id)
     {
         try {
-            $this->divisi_service->delete($id);
+            $this->users_service->delete($id);
 
             return back()
                 ->with('success', 'Data berhasil dihapus');
@@ -83,18 +96,5 @@ class DivisiController extends Controller
                 ->back()
                 ->with('error', $e->getMessage());
         }
-    }
-
-    public function getRoleDivisi(string $divisionId)
-    {
-        $roles = $this->divisi_service->getRolesByDivision($divisionId);
-
-        return response()->json([
-            'status' => true,
-            'roles'  => $roles->map(fn ($role) => [
-                'id'   => $role->id,
-                'name' => $role->nama_role,
-            ])
-        ]);
     }
 }
