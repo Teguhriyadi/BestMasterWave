@@ -35,6 +35,7 @@
                         <th class="text-center">No.</th>
                         <th class="text-center">No. NPWP</th>
                         <th>Nama Supplier</th>
+                        <th>Jenis Kontak Terhubung</th>
                         <th>Kontak Yang Bisa Dihubungi</th>
                         <th>Tempo Pembayaran</th>
                         <th>No. Rekening</th>
@@ -67,6 +68,7 @@
                                     @endif
                                 </span>
                             </td>
+                            <td>{{ $item['nomor_kontak'] }}</td>
                             <td>{{ $item['tempo_pembayaran'] }} Hari</td>
                             <td>{{ $item['no_rekening'] }}</td>
                             <td>{{ $item['nama_rekening'] }}</td>
@@ -118,7 +120,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('nama_supplier') is-invalid @enderror" name="nama_supplier" id="nama_supplier"
-                                        placeholder="Masukkan Nama Supplier">
+                                        placeholder="Masukkan Nama Supplier" value="{{ old('nama_supplier') }}">
                                     @error('nama_supplier')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -130,7 +132,7 @@
                                         No. NPWP
                                     </label>
                                     <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" id="no_npwp"
-                                        placeholder="Masukkan No. NPWP">
+                                        placeholder="Masukkan No. NPWP" value="{{ old('no_npwp') }}">
                                     @error('no_npwp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -146,10 +148,10 @@
                                     </label>
                                     <select name="kontak_hubungi" class="form-control @error('kontak_hubungi') is-invalid @enderror" id="kontak_hubungi">
                                         <option value="">- Pilih -</option>
-                                        <option value="WA_HP">WhatsApp + Nomor Handphone</option>
-                                        <option value="WA">WhatApp</option>
-                                        <option value="NO_HP">Nomor Handphone</option>
-                                        <option value="GMAIL">Email</option>
+                                        <option {{ old('kontak_hubungi') == "WA_HP" ? 'selected' : '' }} value="WA_HP">WhatsApp + Nomor Handphone</option>
+                                        <option {{ old('kontak_hubungi') == "WA" ? 'selected' : '' }} value="WA">WhatApp</option>
+                                        <option {{ old('kontak_hubungi') == "NO_HP" ? 'selected' : '' }} value="NO_HP">Nomor Handphone</option>
+                                        <option {{ old('kontak_hubungi') == "GMAIL" ? 'selected' : '' }} value="GMAIL">Email</option>
                                     </select>
                                     @error('kontak_hubungi')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -163,7 +165,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('nomor_kontak') is-invalid @enderror" name="nomor_kontak" id="nomor_kontak"
-                                        placeholder="Contoh : 081214711741 / ex@gmail.com">
+                                        placeholder="Contoh : 081214711741 / ex@gmail.com" value="{{ old('nomor_kontak') }}">
                                     @error('nomor_kontak')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -178,7 +180,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('no_rekening') is-invalid @enderror" name="no_rekening" id="no_rekening"
-                                        placeholder="Masukkan No. Rekening">
+                                        placeholder="Masukkan No. Rekening" value="{{ old('no_rekening') }}">
                                     @error('no_rekening')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -191,7 +193,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('nama_rekening') is-invalid @enderror" name="nama_rekening" id="nama_rekening"
-                                        placeholder="Masukkan Nama Rekening">
+                                        placeholder="Masukkan Nama Rekening" value="{{ old('nama_rekening') }}">
                                     @error('nama_rekening')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -206,7 +208,7 @@
                                     <select name="bank_id" class="form-control @error('bank_id') is-invalid @enderror" id="bank_id">
                                         <option value="">- Pilih -</option>
                                         @foreach ($bank as $item)
-                                            <option value="{{ $item['id'] }}">
+                                            <option value="{{ $item['id'] }}" {{ old('bank_id') == $item["id"] ? 'selected' : '' }}>
                                                 {{ $item['alias'] }}
                                             </option>
                                         @endforeach
@@ -225,7 +227,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="text" class="form-control @error('ketentuan_tempo_pembayaran') is-invalid @enderror" name="ketentuan_tempo_pembayaran"
-                                        id="ketentuan_tempo_pembayaran" placeholder="Masukkan Tempo Pembayaran">
+                                        id="ketentuan_tempo_pembayaran" placeholder="Masukkan Tempo Pembayaran" value="{{ old('ketentuan_tempo_pembayaran') }}">
                                     @error('ketentuan_tempo_pembayaran')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -238,7 +240,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="number" class="form-control @error('rate_ppn') is-invalid @enderror" name="rate_ppn" id="rate_ppn"
-                                        placeholder="0" min="0">
+                                        placeholder="0" min="0" value{{ old('rate_ppn') }}>
                                     @error('rate_ppn')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -252,8 +254,8 @@
                             </label>
                             <select name="pkp" class="form-control @error('pkp') is-invalid @enderror" id="pkp">
                                 <option value="">- Pilih -</option>
-                                <option value="PKP">PKP</option>
-                                <option value="Non PKP">Non PKP</option>
+                                <option {{ old('pkp') == "PKP" ? 'selected' : '' }} value="PKP">PKP</option>
+                                <option {{ old('pkp') == "Non PKP" ? 'selected' : '' }} value="Non PKP">Non PKP</option>
                             </select>
                             @error('pkp')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -264,7 +266,7 @@
                                 Alamat
                                 <small class="text-danger">*</small>
                             </label>
-                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5" placeholder="Masukkan Alamat"></textarea>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5" placeholder="Masukkan Alamat">{{ old('alamat') }}</textarea>
                             @error('alamat')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

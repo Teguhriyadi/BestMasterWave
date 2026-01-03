@@ -48,11 +48,17 @@
                                 @csrf
                                 <div class="form-group mb-3">
                                     <label class="label" for="username">Username</label>
-                                    <input type="text" class="form-control" name="username" placeholder="Masukkan Username" id="username" required>
+                                    <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" placeholder="Masukkan Username" id="username" value="{{ old('username') }}">
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="form-group mb-3">
                                     <label class="label" for="password">Password</label>
-                                    <input type="password" class="form-control" name="password" placeholder="Masukkan Password" id="password" required>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Masukkan Password" id="password">
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="form-control btn btn-primary submit px-3">

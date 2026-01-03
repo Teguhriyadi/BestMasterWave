@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <label for="sku_barang" class="form-label"> SKU Barang </label>
                     <input type="text" class="form-control @error('sku_barang') is-invalid @enderror" name="sku_barang" id="sku_barang"
-                        placeholder="Masukkan SKU Barang" value="{{ $edit['sku_barang'] }}">
+                        placeholder="Masukkan SKU Barang" value="{{ old('sku_barang', $edit['sku_barang']) }}">
                     @error('sku_barang')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -17,7 +17,7 @@
                 <div class="form-group">
                     <label for="harga_modal" class="form-label"> Harga Modal </label>
                     <input type="number" min="1" class="form-control @error('harga_modal') is-invalid @enderror" name="harga_modal" id="harga_modal"
-                        placeholder="0" value="{{ $edit['harga_modal'] }}">
+                        placeholder="0" value="{{ old('harga_modal', $edit['harga_modal']) }}">
                     @error('harga_modal')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -29,7 +29,7 @@
                 <div class="form-group">
                     <label for="harga_pembelian_terakhir" class="form-label"> Harga Pembelian Terakhir </label>
                     <input type="number" class="form-control @error('harga_pembelian_terakhir') is-invalid @enderror" name="harga_pembelian_terakhir" min="1"
-                        placeholder="0" id="harga_pembelian_terakhir" value="{{ $edit['harga_pembelian_terakhir'] }}">
+                        placeholder="0" id="harga_pembelian_terakhir" value="{{ old('harga_pembelian_terakhir', $edit['harga_pembelian_terakhir']) }}">
                     @error('harga_pembelian_terakhir')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -39,7 +39,7 @@
                 <div class="form-group">
                     <label for="tanggal_pembelian_terakhir" class="form-label"> Tanggal Pembelian Terakhir </label>
                     <input type="datetime-local" class="form-control @error('tanggal_pembelian_terakhir') is-invalid @enderror" name="tanggal_pembelian_terakhir"
-                        id="tanggal_pembelian_terakhir" value="{{ $edit['tanggal_pembelian_terakhir'] }}">
+                        id="tanggal_pembelian_terakhir" value="{{ old('tanggal_pembelian_terakhir', $edit['tanggal_pembelian_terakhir']) }}">
                     @error('tanggal_pembelian_terakhir')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

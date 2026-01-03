@@ -27,10 +27,11 @@ class CreateRequest extends FormRequest
         return [
             'nama_supplier.required' => 'Nama Supplier Wajib Diisi',
             'alamat.required'        => 'Alamat Wajib Diisi',
-            'kontak_hubungi.required'        => 'Alamat Wajib Diisi',
-            'nomor_kontak.required'        => 'Alamat Wajib Diisi',
+            'kontak_hubungi.required'        => 'Jenis Kontak Wajib Diisi',
+            'nomor_kontak.required'        => 'Kontak Yang Bisa Dihubungi Wajib Diisi',
             'ketentuan_tempo_pembayaran.required' => 'Alamat Wajib Diisi',
             'no_rekening.required'        => 'No. Rekening Wajib Diisi',
+            'bank_id.required'      => 'Nama Bank Wajib Diisi',
             'nama_rekening.required'        => 'Nama Rekening Wajib Diisi',
             'pkp.required'        => 'PKP Wajib Diisi',
             'rate_ppn.required'        => 'Rate PPN Wajib Diisi',

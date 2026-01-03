@@ -28,6 +28,14 @@ class DivisiRoleController extends Controller
         $data["divisi"] = $this->divisi_service->list();
         $data["role"] = $this->role_service->list();
 
+        if ($data["role"]->count() == 0) {
+            return redirect()->to("/admin-panel/role")->with("error", " Data Role Tidak Ada. Silahkan Buat Terlebih Dahulu");
+        }
+
+        if ($data["divisi"]->count() == 0) {
+            return redirect()->to("/admin-panel/divisi")->with("error", " Data Divisi Tidak Ada. Silahkan Buat Terlebih Dahulu");
+        }
+
         return view("pages.modules.divisi-role.create", $data);
     }
 

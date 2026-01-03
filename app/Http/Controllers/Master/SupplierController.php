@@ -32,7 +32,7 @@ class SupplierController extends Controller
     public function store(CreateRequest $request)
     {
         try {
-            $this->supplier_service->create($request->validated());
+            $this->supplier_service->create($request->all());
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
@@ -63,7 +63,7 @@ class SupplierController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->supplier_service->update($id, $request->validated());
+            $this->supplier_service->update($id, $request->all());
 
             return back()->with('success', 'Data berhasil diperbarui');
 

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +15,7 @@ class LoginController extends Controller
         return view("pages.authentication.login");
     }
 
-    public function post_login(Request $request)
+    public function post_login(LoginRequest $request)
     {
         $request->validate([
             'username' => 'required|string',
@@ -21,6 +23,10 @@ class LoginController extends Controller
         ]);
 
         $credentials = $request->only('username', 'password');
+
+        $cek = User::where("username", $request->username)->first();
+
+        if ($cek["is_active"] != "1") return back()->with("error", "Akun Anda Tidak Aktif");
 
         if (Auth::attempt($credentials)) {
 

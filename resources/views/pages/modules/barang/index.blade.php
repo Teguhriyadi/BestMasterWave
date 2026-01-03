@@ -113,7 +113,7 @@
                                         <small class="text-danger">*</small>
                                     </label>
                                     <input type="number" min="1" class="form-control @error('harga_modal') is-invalid @enderror" name="harga_modal"
-                                        id="harga_modal" placeholder="0">
+                                        id="harga_modal" placeholder="0" value="{{ old('harga_modal') }}">
                                     @error('harga_modal')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -127,7 +127,7 @@
                                         Harga Pembelian Terakhir
                                     </label>
                                     <input type="number" class="form-control @error('harga_pembelian_terakhir') is-invalid @enderror" name="harga_pembelian_terakhir"
-                                        min="1" placeholder="0" id="harga_pembelian_terakhir">
+                                        min="1" placeholder="0" id="harga_pembelian_terakhir" value="{{ old('harga_pembelian_terakhir') }}">
                                     @error('harga_pembelian_terakhir')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -139,7 +139,7 @@
                                         Tanggal Pembelian Terakhir
                                     </label>
                                     <input type="datetime-local" class="form-control @error('tanggal_pembelian_terakhir') is-invalid @enderror" name="tanggal_pembelian_terakhir"
-                                        id="tanggal_pembelian_terakhir">
+                                        id="tanggal_pembelian_terakhir" value="{{ old('tanggal_pembelian_terakhir') }}">
                                     @error('tanggal_pembelian_terakhir')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -155,7 +155,7 @@
                                     <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror" id="seller_id">
                                         <option value="">- Pilih -</option>
                                         @foreach ($seller as $item)
-                                            <option value="{{ $item['id'] }}">
+                                            <option value="{{ $item['id'] }}" {{ old('seller_id') == $item['id'] ? 'selected' : '' }}>
                                                 {{ $item['nama'] }}
                                             </option>
                                         @endforeach

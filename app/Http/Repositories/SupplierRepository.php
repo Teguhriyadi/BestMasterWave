@@ -23,7 +23,7 @@ class SupplierRepository
             "bank_id" => $data["bank_id"],
             "nama_rekening" => $data["nama_rekening"],
             "pkp" => $data["pkp"],
-            "no_npwp" => $data["no_npwp"],
+            "no_npwp" => $data["no_npwp"] ?? null,
             "rate_ppn" => empty($data["rate_ppn"]) ? 0 : $data["rate_ppn"]
         ]);
 
