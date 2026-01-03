@@ -68,7 +68,7 @@ class UserDivisiRoleController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->users_service->update($id, $request->validated());
+            $this->users_service->update($id, $request->all());
 
             return back()->with('success', 'Data berhasil diperbarui');
 
@@ -108,6 +108,19 @@ class UserDivisiRoleController extends Controller
 
         } catch (\Throwable $e) {
 
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function detail($id)
+    {
+        try {
+            $data["detail"] = $this->users_service->edit($id);
+
+            return view("pages.modules.users.detail", $data);
+        } catch (\Throwable $e) {
             return redirect()
                 ->back()
                 ->with('error', $e->getMessage());

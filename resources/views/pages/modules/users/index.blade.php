@@ -52,38 +52,54 @@
                                 <td>{{ $item['username'] }}</td>
                                 <td>{{ $item['email'] }}</td>
                                 <td class="text-center">
-                                    @if ($item['status'] == "Aktif")
-                                        <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}" method="POST">
-                                            @csrf
-                                            @method("PUT")
-                                            <button onclick="return confirm('Yakin ? Ingin Menon-Aktifkan Akun Ini?')" type="submit" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-times"></i> Non - Aktifkan
-                                            </button>
-                                        </form>
-                                    @elseif($item['status'] == "Tidak Aktif")
-                                        <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}" method="POST">
-                                            @csrf
-                                            @method("PUT")
-                                            <button onclick="return confirm('Yakin ? Ingin Mengaktifkan Akun Ini?')" type="submit" class="btn btn-success btn-sm">
-                                                <i class="fa fa-check"></i> Aktifkan
-                                            </button>
-                                        </form>
+                                    @if (Auth::user()->id != $item["id"])
+                                        @if ($item['status'] == 'Aktif')
+                                            <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button onclick="return confirm('Yakin ? Ingin Menon-Aktifkan Akun Ini?')"
+                                                    type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-times"></i> Non - Aktifkan
+                                                </button>
+                                            </form>
+                                        @elseif($item['status'] == 'Tidak Aktif')
+                                            <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button onclick="return confirm('Yakin ? Ingin Mengaktifkan Akun Ini?')"
+                                                    type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fa fa-check"></i> Aktifkan
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        -
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url('/admin-panel/users/' . $item['id'] . '/edit') }}"
-                                        class="btn btn-warning btn-sm">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </a>
-                                    <form action="{{ url('/admin-panel/users/' . $item['id']) }}" method="POST"
-                                        style="display: inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="fa fa-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                    @if (Auth::user()->id != $item['id'])
+                                        <a href="{{ url('/admin-panel/users/' . $item['id'] . '/detail') }}"
+                                            class="btn btn-info btn-sm">
+                                            <i class="fa fa-search"></i> Detail
+                                        </a>
+                                        <a href="{{ url('/admin-panel/users/' . $item['id'] . '/edit') }}"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="fa fa-edit"></i> Edit
+                                        </a>
+                                        <form action="{{ url('/admin-panel/users/' . $item['id']) }}" method="POST"
+                                            style="display: inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')"
+                                                type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
