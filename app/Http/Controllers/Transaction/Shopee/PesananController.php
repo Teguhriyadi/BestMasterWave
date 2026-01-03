@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Yajra\DataTables\Facades\DataTables;
 
 class PesananController extends Controller
 {
@@ -460,10 +461,7 @@ class PesananController extends Controller
 
     public function kelola(Request $request)
     {
-        try {
-
-            DB::beginTransaction();
-
+        if ($request->ajax()) {
             $query = ShopeePesanan::query();
 
             $filterBy = $request->filter_by;
@@ -475,24 +473,31 @@ class PesananController extends Controller
                 'waktu_pembayaran_dilakukan',
             ];
 
-            if (in_array($filterBy, $allowedColumns) && $sampai) {
+            if (in_array($filterBy, $allowedColumns) && $dari && $sampai) {
                 $query->whereBetween($filterBy, [
                     $dari . ' 00:00:00',
                     $sampai . ' 23:59:59'
                 ]);
             }
 
-            $data["kelola"] = $query->orderBy("created_at", "DESC")->get();
-
-            DB::commit();
-
-            return view("pages.modules.transaction.shopee.pesanan.kelola", $data);
-        } catch (\Exception $e) {
-
-            DB::rollBack();
-
-            dd($e->getMessage());
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->editColumn('waktu_pesanan_dibuat', function ($row) {
+                    return $row->waktu_pesanan_dibuat ? \Carbon\Carbon::parse($row->waktu_pesanan_dibuat)->translatedFormat('d F Y H:i:s') : '-';
+                })
+                ->editColumn('waktu_pembayaran_dilakukan', function ($row) {
+                    return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
+                })
+                ->addColumn('action', function ($row) {
+                    return '<a href="' . url('/admin-panel/shopee/pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                            <i class="fa fa-search"></i> Detail
+                        </a>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
+
+        return view("pages.modules.transaction.shopee.pesanan.kelola");
     }
 
     public function detail($uuid)
