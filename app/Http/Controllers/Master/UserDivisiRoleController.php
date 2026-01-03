@@ -97,4 +97,20 @@ class UserDivisiRoleController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    public function change_status($id)
+    {
+        try {
+            $this->users_service->toggleStatus($id);
+
+            return back()
+                ->with('success', 'Data berhasil disimpan');
+
+        } catch (\Throwable $e) {
+
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
 }

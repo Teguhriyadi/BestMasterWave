@@ -51,7 +51,25 @@
                                 <td>{{ $item['nama'] }}</td>
                                 <td>{{ $item['username'] }}</td>
                                 <td>{{ $item['email'] }}</td>
-                                <td class="text-center">{{ $item['status'] }}</td>
+                                <td class="text-center">
+                                    @if ($item['status'] == "Aktif")
+                                        <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}" method="POST">
+                                            @csrf
+                                            @method("PUT")
+                                            <button onclick="return confirm('Yakin ? Ingin Menon-Aktifkan Akun Ini?')" type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-times"></i> Non - Aktifkan
+                                            </button>
+                                        </form>
+                                    @elseif($item['status'] == "Tidak Aktif")
+                                        <form action="{{ url('/admin-panel/users/' . $item['id'] . '/change-status') }}" method="POST">
+                                            @csrf
+                                            @method("PUT")
+                                            <button onclick="return confirm('Yakin ? Ingin Mengaktifkan Akun Ini?')" type="submit" class="btn btn-success btn-sm">
+                                                <i class="fa fa-check"></i> Aktifkan
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <a href="{{ url('/admin-panel/users/' . $item['id'] . '/edit') }}"
                                         class="btn btn-warning btn-sm">

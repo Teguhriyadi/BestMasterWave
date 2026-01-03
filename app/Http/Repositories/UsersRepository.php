@@ -99,4 +99,17 @@ class UsersRepository
             ->findOrFail($divisionId)
             ->roles;
     }
+
+    public function updateStatus(string $id): User
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->is_active == "1") {
+            $user->update(['is_active' => "0"]);
+        } else {
+            $user->update(['is_active' => "1"]);
+        }
+
+        return $user;
+    }
 }

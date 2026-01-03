@@ -6,6 +6,7 @@ use App\Http\Mapper\DivisiMapper;
 use App\Http\Mapper\UsersMapper;
 use App\Http\Repositories\DivisiRepository;
 use App\Http\Repositories\UsersRepository;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class UsersService
@@ -47,5 +48,10 @@ class UsersService
         return DB::transaction(function () use ($id) {
             $this->users_repository->delete_by_id($id);
         });
+    }
+
+    public function toggleStatus(string $id): User
+    {
+        return $this->users_repository->updateStatus($id);
     }
 }

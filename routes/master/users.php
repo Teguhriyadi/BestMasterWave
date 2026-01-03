@@ -9,5 +9,6 @@ Route::prefix("users")->group(function() {
     Route::post("/", [UserDivisiRoleController::class, "store"]);
     Route::get("/{id}/edit", [UserDivisiRoleController::class, "edit"]);
     Route::put("/{id}", [UserDivisiRoleController::class, "update"]);
+    Route::put("/{id}/change-status", [UserDivisiRoleController::class, "change_status"]);
     Route::delete("/{id}", [UserDivisiRoleController::class, "destroy"]);
 });
