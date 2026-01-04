@@ -55,19 +55,7 @@
                             <td class="text-center">{{ ++$nomer }}.</td>
                             <td class="text-center">{{ $item['no_npwp'] }}</td>
                             <td>{{ $item['nama_supplier'] }}</td>
-                            <td>
-                                <span class="badge bg-success text-white">
-                                    @if ($item['kontak_hubungi'] == 'WA_HP')
-                                        WhatsApp & Nomor Handphone
-                                    @elseif($item['kontak_hubungi'] == 'WA')
-                                        WhatsApp
-                                    @elseif($item['kontak_hubungi'] == 'NO_HP')
-                                        Nomor Handphone
-                                    @elseif($item['kontak_hubungi'] == 'GMAIL')
-                                        Email
-                                    @endif
-                                </span>
-                            </td>
+                            <td>{{ $item['kontak_hubungi'] }}</td>
                             <td>{{ $item['nomor_kontak'] }}</td>
                             <td>{{ $item['tempo_pembayaran'] }} Hari</td>
                             <td>{{ $item['no_rekening'] }}</td>
@@ -143,16 +131,10 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="kontak_hubungi" class="form-label">
-                                        Jenis Kontak Yang Dihubungi
+                                        Kontak Person
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <select name="kontak_hubungi" class="form-control @error('kontak_hubungi') is-invalid @enderror" id="kontak_hubungi">
-                                        <option value="">- Pilih -</option>
-                                        <option {{ old('kontak_hubungi') == "WA_HP" ? 'selected' : '' }} value="WA_HP">WhatsApp + Nomor Handphone</option>
-                                        <option {{ old('kontak_hubungi') == "WA" ? 'selected' : '' }} value="WA">WhatApp</option>
-                                        <option {{ old('kontak_hubungi') == "NO_HP" ? 'selected' : '' }} value="NO_HP">Nomor Handphone</option>
-                                        <option {{ old('kontak_hubungi') == "GMAIL" ? 'selected' : '' }} value="GMAIL">Email</option>
-                                    </select>
+                                    <input type="text" class="form-control @error('kontak_hubungi') is-invalid @enderror" name="kontak_hubungi" id="kontak_hubungi" placeholder="Masukkan Kontak Person" value="{{ old('kontak_hubungi') }}">
                                     @error('kontak_hubungi')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

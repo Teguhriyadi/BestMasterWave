@@ -34,21 +34,12 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="kontak_hubungi" class="form-label">
-                        Jenis Kontak Yang Dihubungi
+                        Kontak Person
                         <small class="text-danger">*</small>
                     </label>
-                    <select name="kontak_hubungi" class="form-control @error('kontak_hubungi') is-invalid @enderror"
-                        id="kontak_hubungi">
-                        <option value="">- Pilih -</option>
-                        <option value="WA_HP" @selected(old('kontak_hubungi', $edit['kontak_hubungi'] ?? '') === 'WA_HP')>
-                            WhatsApp + Nomor Handphone
-                        </option>
-                        <option value="WA" @selected(old('kontak_hubungi', $edit['kontak_hubungi'] ?? '') === 'WA')>WhatsApp</option>
-                        <option value="NO_HP" @selected(old('kontak_hubungi', $edit['kontak_hubungi'] ?? '') === 'NO_HP')>
-                            Nomor Handphone
-                        </option>
-                        <option value="GMAIL" @selected(old('kontak_hubungi', $edit['kontak_hubungi'] ?? '') === 'GMAIL')>Email</option>
-                    </select>
+                    <input type="text" class="form-control @error('kontak_hubungi') is-invalid @enderror"
+                        name="kontak_hubungi" id="kontak_hubungi" placeholder="Masukkan Kontak Person"
+                        value="{{ old('kontak_hubungi', $edit['kontak_hubungi']) }}">
                     @error('kontak_hubungi')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -127,7 +118,8 @@
                     </label>
                     <input type="text" class="form-control @error('ketentuan_tempo_pembayaran') is-invalid @enderror"
                         name="ketentuan_tempo_pembayaran" id="ketentuan_tempo_pembayaran"
-                        placeholder="Masukkan Tempo Pembayaran" value="{{ old('ketentuan_tempo_pembayaran', $edit['ketentuan_tempo_pembayaran']) }}">
+                        placeholder="Masukkan Tempo Pembayaran"
+                        value="{{ old('ketentuan_tempo_pembayaran', $edit['ketentuan_tempo_pembayaran']) }}">
                     @error('ketentuan_tempo_pembayaran')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

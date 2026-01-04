@@ -195,68 +195,61 @@ class PendapatanController extends Controller
                 }
             });
 
-            $noPesananColIndex = -1;
-            $dateColIndex = -1;
-            $colMap = [];
-            $headerFoundAt = -1;
-
-            $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $request->header_hash)->first();
-
             DB::beginTransaction();
 
             $fileEntry = InvoiceFilePendapatan::create([
                 'id' => (string) Str::uuid(),
                 'seller_id' => $request->seller_id,
-                'schema_id' => $existingSchema ? $existingSchema->id : null,
                 'header_hash' => $request->header_hash,
                 'uploaded_at' => now(),
                 'from_date' => $request->from_date,
                 'to_date' => $request->to_date,
                 'total_rows' => 0,
-                'processed_at' => null,
             ]);
 
             $buffer = [];
             $chunkIdx = 0;
             $totalNew = 0;
+            $headerFoundAt = -1;
 
             foreach ($reader->getSheetIterator() as $sheet) {
-                if (stripos($sheet->getName(), 'income') === false && stripos($sheet->getName(), 'penghasilan') === false) {
+                $sheetName = strtoupper($sheet->getName());
+
+                if (strpos($sheetName, 'INCOME') === false && strpos($sheetName, 'PENGHASILAN') === false) {
                     continue;
                 }
 
                 $currentRowNumber = 0;
+                $noPesananColIndex = -1;
+                $dateColIndex = -1;
+                $colMap = [];
+                $currentSheetHeaderLine = -1;
 
                 foreach ($sheet->getRowIterator() as $row) {
                     $currentRowNumber++;
                     $cells = $row->toArray();
 
-                    if ($headerFoundAt === -1) {
+                    if ($currentSheetHeaderLine === -1) {
                         $rowString = strtoupper(json_encode($cells));
                         if (strpos($rowString, 'NO. PESANAN') !== false) {
+                            $currentSheetHeaderLine = $currentRowNumber;
                             $headerFoundAt = $currentRowNumber;
+
                             foreach ($cells as $idx => $val) {
                                 $colLetter = Coordinate::stringFromColumnIndex($idx + 1);
                                 if (isset($request->columns[$colLetter])) {
                                     $label = $request->columns[$colLetter];
                                     $colMap[$idx] = $label;
-                                    if ($label === 'No. Pesanan') {
-                                        $noPesananColIndex = $idx;
-                                    }
+                                    if ($label === 'No. Pesanan') $noPesananColIndex = $idx;
                                 }
-                                if ($colLetter === $request->date_column) {
-                                    $dateColIndex = $idx;
-                                }
+                                if ($colLetter === $request->date_column) $dateColIndex = $idx;
                             }
                         }
-
                         continue;
                     }
 
-                    if ($currentRowNumber > $headerFoundAt) {
-                        if ($noPesananColIndex === -1 || $dateColIndex === -1) {
-                            continue;
-                        }
+                    if ($currentRowNumber > $currentSheetHeaderLine) {
+                        if ($noPesananColIndex === -1 || $dateColIndex === -1) continue;
 
                         $valNoPesanan = $cells[$noPesananColIndex] ?? null;
                         $noPesanan = strtoupper(trim((string) $valNoPesanan));
@@ -265,6 +258,7 @@ class PendapatanController extends Controller
                             continue;
                         }
 
+                        // Validasi Tanggal
                         $rawDate = $cells[$dateColIndex] ?? null;
                         if ($rawDate instanceof \DateTimeInterface) {
                             $rowDate = $rawDate->format('Y-m-d');
@@ -297,7 +291,6 @@ class PendapatanController extends Controller
                         }
                     }
                 }
-                break;
             }
 
             $reader->close();
@@ -312,8 +305,7 @@ class PendapatanController extends Controller
 
             if ($totalNew === 0) {
                 DB::rollBack();
-                $reason = ($headerFoundAt === -1) ? "Header 'No. Pesanan' tidak ditemukan di sheet." : 'Data mungkin sudah ada semua atau tidak sesuai range tanggal.';
-
+                $reason = ($headerFoundAt === -1) ? "Tidak ada sheet 'Income' yang valid." : 'Data sudah ada semua atau tidak sesuai range tanggal.';
                 return response()->json(['status' => false, 'message' => $reason], 422);
             }
 
@@ -322,21 +314,13 @@ class PendapatanController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => "Berhasil mengimpor $totalNew data baru.",
+                'message' => "Berhasil mengimpor $totalNew data dari semua sheet.",
                 'redirect' => url("/admin-panel/shopee/pendapatan/{$fileEntry->id}/show"),
             ]);
         } catch (\Throwable $e) {
-            if (isset($reader)) {
-                $reader->close();
-            }
-            if (DB::transactionLevel() > 0) {
-                DB::rollBack();
-            }
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Sistem Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')',
-            ], 500);
+            if (isset($reader)) $reader->close();
+            if (DB::transactionLevel() > 0) DB::rollBack();
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
 

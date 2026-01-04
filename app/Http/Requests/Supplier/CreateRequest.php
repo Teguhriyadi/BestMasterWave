@@ -27,7 +27,7 @@ class CreateRequest extends FormRequest
         return [
             'nama_supplier.required' => 'Nama Supplier Wajib Diisi',
             'alamat.required'        => 'Alamat Wajib Diisi',
-            'kontak_hubungi.required'        => 'Jenis Kontak Wajib Diisi',
+            'kontak_hubungi.required'        => 'Kontak Person Wajib Diisi',
             'nomor_kontak.required'        => 'Kontak Yang Bisa Dihubungi Wajib Diisi',
             'ketentuan_tempo_pembayaran.required' => 'Alamat Wajib Diisi',
             'no_rekening.required'        => 'No. Rekening Wajib Diisi',
