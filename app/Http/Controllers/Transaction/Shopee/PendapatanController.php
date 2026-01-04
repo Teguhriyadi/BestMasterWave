@@ -186,11 +186,15 @@ class PendapatanController extends Controller
 
             DB::reconnect();
 
+            // --- TAMBAHAN: Cari schema lama berdasarkan hash ---
+            $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $request->header_hash)->first();
+
             DB::beginTransaction();
 
             $fileEntry = InvoiceFilePendapatan::create([
                 'id' => (string) Str::uuid(),
                 'seller_id' => $request->seller_id,
+                'schema_id' => $existingSchema ? $existingSchema->id : null, // Hubungkan otomatis jika ada
                 'header_hash' => $request->header_hash,
                 'uploaded_at' => now(),
                 'from_date' => $request->from_date,
@@ -205,9 +209,7 @@ class PendapatanController extends Controller
 
             foreach ($reader->getSheetIterator() as $sheet) {
                 $sheetName = strtoupper($sheet->getName());
-                if (strpos($sheetName, 'INCOME') === false && strpos($sheetName, 'PENGHASILAN') === false) {
-                    continue;
-                }
+                if (strpos($sheetName, 'INCOME') === false && strpos($sheetName, 'PENGHASILAN') === false) continue;
 
                 $currentRowNumber = 0;
                 $currentSheetHeaderLine = -1;
@@ -226,7 +228,7 @@ class PendapatanController extends Controller
                             $headerFoundAt = $currentRowNumber;
 
                             foreach ($cells as $idx => $val) {
-                                $colLetter = Coordinate::stringFromColumnIndex($idx + 1);
+                                $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($idx + 1);
                                 if (isset($request->columns[$colLetter])) {
                                     $label = $request->columns[$colLetter];
                                     $colMap[$idx] = $label;
@@ -246,7 +248,6 @@ class PendapatanController extends Controller
 
                         if ($noPesanan === '' || isset($allExisting[$noPesanan])) continue;
 
-                        // Validasi Tanggal
                         $rawDate = $cells[$dateColIndex] ?? null;
                         if ($rawDate instanceof \DateTimeInterface) {
                             $rowDate = $rawDate->format('Y-m-d');
@@ -267,19 +268,14 @@ class PendapatanController extends Controller
                         $totalNew++;
                         $allExisting[$noPesanan] = true;
 
-                        // MODIFIKASI: Gunakan batch size 200 agar paket SQL tidak terlalu besar (mencegah gone away)
                         if (count($buffer) >= 200) {
-                            // Cek koneksi setiap kali akan insert besar
                             if (!DB::connection()->getPdo()) DB::reconnect();
-
                             InvoiceDataPendapatan::create([
                                 'invoice_file_pendapatan_id' => $fileEntry->id,
                                 'chunk_index' => $chunkIdx++,
                                 'payload' => ['rows' => $buffer],
                             ]);
-
                             $buffer = [];
-                            // Paksa garbage collection untuk bebaskan RAM
                             if ($chunkIdx % 10 === 0) gc_collect_cycles();
                         }
                     }
@@ -298,8 +294,7 @@ class PendapatanController extends Controller
 
             if ($totalNew === 0) {
                 DB::rollBack();
-                $reason = ($headerFoundAt === -1) ? "Format file salah." : 'Data sudah ada atau tanggal tidak sesuai.';
-                return response()->json(['status' => false, 'message' => $reason], 422);
+                return response()->json(['status' => false, 'message' => 'Data sudah ada atau format salah.'], 422);
             }
 
             $fileEntry->update(['total_rows' => $totalNew]);
@@ -307,27 +302,32 @@ class PendapatanController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => "Berhasil mengimpor $totalNew data dari semua sheet.",
+                'message' => "Berhasil mengimpor $totalNew data baru.",
                 'redirect' => url("/admin-panel/shopee/pendapatan/{$fileEntry->id}/show"),
             ]);
         } catch (\Throwable $e) {
             if (isset($reader)) $reader->close();
             if (DB::transactionLevel() > 0) DB::rollBack();
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Sistem Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
-            ], 500);
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
     public function show(string $id)
     {
         $file = InvoiceFilePendapatan::with(['seller.platform', 'schema', 'chunks'])->findOrFail($id);
+
+        // --- TAMBAHAN: Re-check Schema jika schema_id masih null ---
+        if (is_null($file->schema_id)) {
+            $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $file->header_hash)->first();
+            if ($existingSchema) {
+                $file->update(['schema_id' => $existingSchema->id]);
+                $file->load('schema'); // Reload agar data schema muncul di view
+            }
+        }
+
         $firstChunk = $file->chunks->first();
 
-        $needMapping = is_null($file->processed_at) &&
-            (is_null($file->schema_id) || empty($file->schema?->columns_mapping));
+        $needMapping = is_null($file->processed_at) && is_null($file->schema_id);
 
         $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatan'))
             ->reject(fn($c) => in_array($c, [
@@ -339,8 +339,7 @@ class PendapatanController extends Controller
                 'harga_modal',
                 'seller_id',
                 'invoice_file_id',
-            ]))
-            ->values();
+            ]))->values();
 
         return view('pages.modules.transaction.shopee.pendapatan.show', [
             'file' => $file,
@@ -355,19 +354,20 @@ class PendapatanController extends Controller
     public function processDatabase(Request $request, $fileId)
     {
         $file = InvoiceFilePendapatan::findOrFail($fileId);
+
+        // Ambil mapping dari input (jika mapping baru) atau dari schema yang sudah terhubung
         $mapping = $request->input('mapping') ?? ($file->schema ? $file->schema->columns_mapping : null);
 
         if (!$mapping) {
-            return back()->with('error', 'Mapping kolom tidak tersedia.');
+            return back()->with('error', 'Mapping kolom tidak ditemukan. Silakan lakukan mapping terlebih dahulu.');
         }
 
         $nama_seller = $request->nama_seller;
-
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
 
         try {
-            // Simpan Schema mapping agar ngebekas (Hash Table)
+            // 1. Simpan/Update Schema
             $schema = InvoiceSchemaPendapatan::updateOrCreate(
                 ['header_hash' => $file->header_hash],
                 ['columns_mapping' => $mapping]
@@ -375,13 +375,12 @@ class PendapatanController extends Controller
 
             $file->update(['schema_id' => $schema->id]);
 
-            // Ambil ID chunk secara ringan
+            // 2. Proses per Chunk
             $chunkIds = InvoiceDataPendapatan::where('invoice_file_pendapatan_id', $fileId)
                 ->orderBy('chunk_index', 'asc')
                 ->pluck('id');
 
             foreach ($chunkIds as $id) {
-                // RECONNECT: Jaga koneksi database tetap hidup di setiap putaran chunk besar
                 if (!DB::connection()->getPdo()) DB::reconnect();
 
                 $chunk = InvoiceDataPendapatan::find($id);
@@ -394,9 +393,8 @@ class PendapatanController extends Controller
 
                     if (empty($noPesanan)) continue;
 
-                    // Data dasar yang wajib ada
                     $saveData = [
-                        'uuid'            => (string) Str::uuid(),
+                        'uuid'            => (string) \Illuminate\Support\Str::uuid(),
                         'nama_seller'     => $nama_seller,
                         'no_pesanan'      => $noPesanan,
                         'created_at'      => now(),
@@ -407,38 +405,30 @@ class PendapatanController extends Controller
                         if (empty($excelHeader) || $dbColumn === 'no_pesanan') continue;
 
                         $value = $row[$excelHeader] ?? null;
-                        $numericColumns = ['total_penghasilan', 'biaya_admin', 'biaya_layanan', 'biaya_proses'];
-
-                        if (in_array($dbColumn, $numericColumns)) {
+                        if (in_array($dbColumn, ['total_penghasilan', 'biaya_admin', 'biaya_layanan', 'biaya_proses'])) {
                             $saveData[$dbColumn] = $this->parseNumber($value);
                         } else {
                             $saveData[$dbColumn] = $value;
                         }
                     }
-
                     $batchData[] = $saveData;
                 }
 
                 if (!empty($batchData)) {
-                    // Gunakan Transaction per Batch agar lebih aman dan tidak mengunci tabel terlalu lama
                     DB::transaction(function () use ($batchData, $mapping) {
-                        // upsert(data, [kolom_unik], [kolom_yang_diupdate])
                         $updateColumns = array_merge(array_keys($mapping), ['updated_at', 'nama_seller']);
                         ShopeePendapatan::upsert($batchData, ['no_pesanan'], $updateColumns);
                     });
                 }
 
-                // Bersihkan memori segera
-                $chunk = null;
                 unset($batchData, $rows);
                 gc_collect_cycles();
             }
 
             $file->update(['processed_at' => now()]);
-
-            return redirect('/admin-panel/shopee/pendapatan')->with('success', 'Import selesai dan data berhasil diproses ke database.');
+            return redirect('/admin-panel/shopee/pendapatan')->with('success', 'Data berhasil diproses ke database.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Gagal memproses database: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
         }
     }
 
