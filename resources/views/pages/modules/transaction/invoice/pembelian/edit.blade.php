@@ -169,7 +169,7 @@
 
                     <td>
                         <select name="items[${itemIndex}][barang_id]"
-                                class="form-control barang-select">
+                                class="form-control barang-select" required>
                             ${options}
                         </select>
                     </td>
@@ -178,21 +178,21 @@
                         <input type="number"
                             name="items[${itemIndex}][qty]"
                             class="form-control qty"
-                            value="${data?.qty ?? 1}">
+                            value="${data?.qty ?? 1}" required>
                     </td>
 
                     <td>
                         <input type="text"
                             name="items[${itemIndex}][satuan]"
                             class="form-control satuan"
-                            value="${data?.satuan ?? 'set'}">
+                            value="${data?.satuan ?? 'set'}" required>
                     </td>
 
                     <td>
                         <input type="number"
                             name="items[${itemIndex}][harga_satuan]"
                             class="form-control harga_satuan"
-                            value="${data?.harga_satuan ?? 0}">
+                            value="${data?.harga_satuan ?? 0}" required>
                     </td>
 
                     <td>

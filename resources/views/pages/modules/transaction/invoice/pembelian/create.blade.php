@@ -183,7 +183,7 @@
                 <tr id="row-${itemIndex}">
                     <td>
                         <select name="items[${itemIndex}][barang_id]"
-                                class="form-control barang-select">
+                                class="form-control barang-select" required>
                             ${options}
                         </select>
                     </td>
@@ -191,10 +191,10 @@
                         <input type="number"
                             name="items[${itemIndex}][qty]"
                             class="form-control qty"
-                            min="1">
+                            min="1" required>
                     </td>
                     <td>
-                        <select class="form-control satuan" name="items[${itemIndex}][satuan]">
+                        <select class="form-control satuan" name="items[${itemIndex}][satuan]" required>
                             <option value="">- Pilih Satuan -</option>
                             <option value="set">Set</option>
                         </select>
@@ -202,7 +202,7 @@
                     <td>
                         <input type="number"
                             name="items[${itemIndex}][harga_satuan]"
-                            class="form-control harga_satuan">
+                            class="form-control harga_satuan" required>
                     </td>
                     <td>
                         <input type="number"
