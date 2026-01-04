@@ -441,7 +441,7 @@ class PendapatanController extends Controller
 
     public function kelola(Request $request)
     {
-        $data['seller'] = $this->seller_service->list();
+        $data['seller'] = $this->seller_service->list_seller();
 
         if ($request->ajax()) {
             $query = ShopeePendapatan::query();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Repositories;
 
+use App\Models\Platform;
 use App\Models\Seller;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,16 @@ class SellerRepository
     {
         return Seller::orderBy("created_at", "DESC")
             ->with("platform")->get();
+    }
+
+    public function list_data_seller()
+    {
+        $platform = Platform::where("nama", "Shopee")->where("status", "1")
+            ->first();
+
+        return Seller::where("platform_id", $platform["id"])
+            ->where("status", "1")
+            ->get();
     }
 
     public function insert_data(array $data)

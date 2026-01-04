@@ -18,7 +18,7 @@ class BarangController extends Controller
 
     public function index()
     {
-        $data["seller"] = $this->seller_service->list();
+        $data["seller"] = $this->seller_service->list_seller();
         $data["barang"] = $this->barang_service->list();
 
         if ($data["seller"]->count() == 0) {
@@ -31,7 +31,7 @@ class BarangController extends Controller
     public function store(CreateRequest $request)
     {
         try {
-            $this->barang_service->create($request->validated());
+            $this->barang_service->create($request->all());
 
             return back()
                 ->with('success', 'Data berhasil disimpan');

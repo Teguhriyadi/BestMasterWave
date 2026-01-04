@@ -12,8 +12,7 @@ class CreateRequest extends FormRequest
             'no_invoice' => ['required'],
             'supplier_id' => ['required'],
             'tanggal_invoice' => ['required'],
-            'tanggal_jatuh_tempo' => ['required'],
-            'keterangan' => ['required']
+            'tanggal_jatuh_tempo' => ['required']
         ];
     }
 
@@ -23,8 +22,7 @@ class CreateRequest extends FormRequest
             'no_invoice.required' => 'Nomor Invoice Wajib Diisi',
             'supplier_id.required' => 'Nama Supplier Wajib Diisi',
             'tanggal_invoice.required' => 'Tanggal Invoice Wajib Diisi',
-            'tanggal_jatuh_tempo.required' => 'Tanggal Jatuh Tempo Wajib Diisi',
-            'keterangan.required' => 'Keterangan Wajib Diisi'
+            'tanggal_jatuh_tempo.required' => 'Tanggal Jatuh Tempo Wajib Diisi'
         ];
     }
 }

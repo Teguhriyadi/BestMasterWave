@@ -24,22 +24,22 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label>Filter Kolom Dengan</label>
-                            <select name="filter_by" class="form-control" id="filter_by">
-                                <option value="">- Pilih -</option>
-                                <option value="waktu_pesanan">Waktu Pesanan</option>
-                                <option value="tanggal_dana_dilepaskan">Tanggal Dana Dilepaskan</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
                             <label>Nama Seller</label>
                             <select name="nama_seller" class="form-control" id="nama_seller">
                                 <option value="">- Pilih -</option>
                                 @foreach ($seller as $item)
                                     <option value="{{ $item["nama"] }}">{{ $item["nama"] }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Filter Kolom Dengan</label>
+                            <select name="filter_by" class="form-control" id="filter_by">
+                                <option value="">- Pilih -</option>
+                                <option value="waktu_pesanan">Waktu Pesanan</option>
+                                <option value="tanggal_dana_dilepaskan">Tanggal Dana Dilepaskan</option>
                             </select>
                         </div>
                     </div>

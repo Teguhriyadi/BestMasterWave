@@ -3,6 +3,8 @@
 @push('title_module', 'Upload Excel Shopee Pesanan')
 
 @push('css_style')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
     <style>
         #process-loading {
             position: fixed;
@@ -124,11 +126,18 @@
 @endpush
 
 @push('js_style')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <script>
         let uploadedFile = null;
         let schemaId = null;
         let headerHash = null;
         let allHeaders = {};
+
+        $(document).ready(function() {
+            $('#seller_id').select2({
+                theme: 'bootstrap4'
+            });
+        })
 
         document.getElementById('file').addEventListener('change', function() {
 

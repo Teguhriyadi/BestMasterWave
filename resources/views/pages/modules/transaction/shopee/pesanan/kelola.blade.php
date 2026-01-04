@@ -4,6 +4,8 @@
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -20,7 +22,18 @@
         <div class="card-body">
             <form id="filter-form">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Nama Seller</label>
+                            <select name="nama_seller" class="form-control" id="nama_seller">
+                                <option value="">- Pilih -</option>
+                                @foreach ($seller as $item)
+                                    <option value="{{ $item["nama"] }}">{{ $item["nama"] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="filter_by">Filter Kolom Dengan</label>
                             <select name="filter_by" class="form-control" id="filter_by">
@@ -60,6 +73,7 @@
                         <tr>
                             <th class="text-center">No.</th>
                             <th>No. Pesanan</th>
+                            <th>Nama Seller</th>
                             <th>No. Referensi SKU</th>
                             <th>Nama Produk</th>
                             <th class="text-center">Waktu Dibuat</th>
@@ -78,9 +92,12 @@
 @push('js_style')
     <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
+            $('#nama_seller').select2({ theme: 'bootstrap4' });
+
             let table = $('#pesananTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -102,6 +119,10 @@
                     {
                         data: 'no_pesanan',
                         name: 'no_pesanan'
+                    },
+                    {
+                        data: 'nama_seller',
+                        name: 'nama_seller'
                     },
                     {
                         data: 'nomor_referensi_sku',

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid("uuid")->unique();
             $table->string("no_pesanan", 50)->index()->nullable();
             $table->string("status_pesanan", 30)->index()->nullable();
+            $table->string("nama_seller")->nullable();
             $table->text("alasan_pembatalan")->nullable();
             $table->string("status_pembatalan", 30)->nullable()->index();
             $table->string("no_resi", 30)->nullable()->index()->nullable();

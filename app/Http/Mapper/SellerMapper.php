@@ -20,6 +20,16 @@ class SellerMapper
         });
     }
 
+    public static function toListOption(Collection $seller): Collection
+    {
+        return $seller->map(function(Seller $seller) {
+            return [
+                'id'          => $seller->id,
+                'nama'        => $seller->nama
+            ];
+        });
+    }
+
     public static function toListSelectOption(Collection $supplier): Collection
     {
         return $supplier->map(function(Seller $supplier) {

@@ -96,7 +96,6 @@
                         <div class="mb-3 row">
                             <label for="keterangan" class="col-sm-3 col-form-label">
                                 Keterangan
-                                <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-9">
                                 <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan"
@@ -116,10 +115,22 @@
                     <table class="table table-bordered" id="tableItem" style="display:none;">
                         <thead class="thead-light">
                             <tr>
-                                <th>SKU Barang</th>
-                                <th>QTY</th>
-                                <th>Satuan</th>
-                                <th>Harga Satuan</th>
+                                <th>
+                                    SKU Barang
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    QTY
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    Satuan
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    Harga Satuan
+                                    <small class="text-danger">*</small>
+                                </th>
                                 <th>Diskon</th>
                                 <th>PPN</th>
                                 <th>Total</th>

@@ -19,6 +19,13 @@ class SellerService
         return SellerMapper::toTable($seller);
     }
 
+    public function list_seller()
+    {
+        $seller = $this->seller_repository->list_data_seller();
+
+        return SellerMapper::toListOption($seller);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {

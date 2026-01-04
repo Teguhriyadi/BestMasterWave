@@ -5,6 +5,7 @@ namespace App\Http\Mapper;
 use App\Models\Barang;
 use App\Models\Supplier;
 use BcMath\Number;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class BarangMapper
@@ -17,7 +18,7 @@ class BarangMapper
                 'sku_barang'                    => $supplier->sku_barang,
                 'harga_modal'                   => number_format($supplier->harga_modal, 0, ',', '.'),
                 'harga_pembelian_terakhir'      => number_format($supplier->harga_pembelian_terakhir, 0, ',', '.'),
-                'tanggal_pembelian_terakhir'    => $supplier["tanggal_pembelian_terakhir"] == null ? null : \Carbon\Carbon::parse($supplier['tanggal_pembelian_terakhir'])->format('Y-m-d H:i:s'),
+                'tanggal_pembelian_terakhir'    => $supplier["tanggal_pembelian_terakhir"] == null ? null : Carbon::parse($supplier["tanggal_pembelian_terakhir"])->translatedFormat('d F Y H:i:s'),
                 'seller_id'                     => empty($supplier->seller) ? "-" : $supplier->seller->nama,
                 'status_sku'                    => $supplier->status_sku === "A" ? "Aktif" : "Tidak Aktif"
             ];

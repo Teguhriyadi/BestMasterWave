@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Transaction\Shopee;
 
 use App\Http\Controllers\Controller;
+use App\Http\Services\SellerService;
 use App\Models\InvoiceDataPesanan;
 use App\Models\InvoiceFilePesanan;
 use App\Models\InvoiceSchemaPesanan;
@@ -17,6 +18,10 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PesananController extends Controller
 {
+    public function __construct(
+        protected SellerService $seller_service
+    ) {}
+
     protected array $dateColumns = [
         'Pesanan Harus Dikirimkan Sebelum (Menghindari keterlambatan)',
         'Waktu Pengiriman Diatur',
@@ -217,7 +222,6 @@ class PesananController extends Controller
             return null;
         }
 
-        // string kosong
         if (is_string($value)) {
             $value = trim($value);
             if ($value === '') return null;
@@ -461,8 +465,14 @@ class PesananController extends Controller
 
     public function kelola(Request $request)
     {
+        $data['seller'] = $this->seller_service->list_seller();
+
         if ($request->ajax()) {
             $query = ShopeePesanan::query();
+
+            if ($request->nama_seller) {
+                $query->where('nama_seller', $request->nama_seller);
+            }
 
             $filterBy = $request->filter_by;
             $dari     = $request->dari;
@@ -497,7 +507,7 @@ class PesananController extends Controller
                 ->make(true);
         }
 
-        return view("pages.modules.transaction.shopee.pesanan.kelola");
+        return view("pages.modules.transaction.shopee.pesanan.kelola", $data);
     }
 
     public function detail($uuid)
