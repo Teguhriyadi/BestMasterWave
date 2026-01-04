@@ -158,7 +158,7 @@ class PendapatanController extends Controller
 
     public function process(Request $request)
     {
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '1024M');
         set_time_limit(0);
 
         $request->validate([
@@ -184,16 +184,7 @@ class PendapatanController extends Controller
                 }
             });
 
-            InvoiceDataPendapatan::select('payload')->chunk(500, function ($chunks) use (&$allExisting) {
-                foreach ($chunks as $chunk) {
-                    $rows = $chunk->payload['rows'] ?? [];
-                    foreach ($rows as $r) {
-                        if (isset($r['No. Pesanan'])) {
-                            $allExisting[strtoupper(trim((string) $r['No. Pesanan']))] = true;
-                        }
-                    }
-                }
-            });
+            DB::reconnect();
 
             DB::beginTransaction();
 
@@ -214,16 +205,15 @@ class PendapatanController extends Controller
 
             foreach ($reader->getSheetIterator() as $sheet) {
                 $sheetName = strtoupper($sheet->getName());
-
                 if (strpos($sheetName, 'INCOME') === false && strpos($sheetName, 'PENGHASILAN') === false) {
                     continue;
                 }
 
                 $currentRowNumber = 0;
+                $currentSheetHeaderLine = -1;
                 $noPesananColIndex = -1;
                 $dateColIndex = -1;
                 $colMap = [];
-                $currentSheetHeaderLine = -1;
 
                 foreach ($sheet->getRowIterator() as $row) {
                     $currentRowNumber++;
@@ -254,9 +244,7 @@ class PendapatanController extends Controller
                         $valNoPesanan = $cells[$noPesananColIndex] ?? null;
                         $noPesanan = strtoupper(trim((string) $valNoPesanan));
 
-                        if ($noPesanan === '' || isset($allExisting[$noPesanan])) {
-                            continue;
-                        }
+                        if ($noPesanan === '' || isset($allExisting[$noPesanan])) continue;
 
                         // Validasi Tanggal
                         $rawDate = $cells[$dateColIndex] ?? null;
@@ -267,9 +255,7 @@ class PendapatanController extends Controller
                             $rowDate = $timestamp ? date('Y-m-d', $timestamp) : null;
                         }
 
-                        if (! $rowDate || $rowDate < $request->from_date || $rowDate > $request->to_date) {
-                            continue;
-                        }
+                        if (!$rowDate || $rowDate < $request->from_date || $rowDate > $request->to_date) continue;
 
                         $item = [];
                         foreach ($colMap as $idx => $label) {
@@ -281,13 +267,20 @@ class PendapatanController extends Controller
                         $totalNew++;
                         $allExisting[$noPesanan] = true;
 
-                        if (count($buffer) >= 500) {
+                        // MODIFIKASI: Gunakan batch size 200 agar paket SQL tidak terlalu besar (mencegah gone away)
+                        if (count($buffer) >= 200) {
+                            // Cek koneksi setiap kali akan insert besar
+                            if (!DB::connection()->getPdo()) DB::reconnect();
+
                             InvoiceDataPendapatan::create([
                                 'invoice_file_pendapatan_id' => $fileEntry->id,
                                 'chunk_index' => $chunkIdx++,
                                 'payload' => ['rows' => $buffer],
                             ]);
+
                             $buffer = [];
+                            // Paksa garbage collection untuk bebaskan RAM
+                            if ($chunkIdx % 10 === 0) gc_collect_cycles();
                         }
                     }
                 }
@@ -295,7 +288,7 @@ class PendapatanController extends Controller
 
             $reader->close();
 
-            if (! empty($buffer)) {
+            if (!empty($buffer)) {
                 InvoiceDataPendapatan::create([
                     'invoice_file_pendapatan_id' => $fileEntry->id,
                     'chunk_index' => $chunkIdx,
@@ -305,7 +298,7 @@ class PendapatanController extends Controller
 
             if ($totalNew === 0) {
                 DB::rollBack();
-                $reason = ($headerFoundAt === -1) ? "Tidak ada sheet 'Income' yang valid." : 'Data sudah ada semua atau tidak sesuai range tanggal.';
+                $reason = ($headerFoundAt === -1) ? "Format file salah." : 'Data sudah ada atau tanggal tidak sesuai.';
                 return response()->json(['status' => false, 'message' => $reason], 422);
             }
 
@@ -320,7 +313,11 @@ class PendapatanController extends Controller
         } catch (\Throwable $e) {
             if (isset($reader)) $reader->close();
             if (DB::transactionLevel() > 0) DB::rollBack();
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Sistem Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
+            ], 500);
         }
     }
 
@@ -370,8 +367,7 @@ class PendapatanController extends Controller
         ini_set('memory_limit', '1024M');
 
         try {
-            DB::beginTransaction();
-
+            // Simpan Schema mapping agar ngebekas (Hash Table)
             $schema = InvoiceSchemaPendapatan::updateOrCreate(
                 ['header_hash' => $file->header_hash],
                 ['columns_mapping' => $mapping]
@@ -379,11 +375,15 @@ class PendapatanController extends Controller
 
             $file->update(['schema_id' => $schema->id]);
 
+            // Ambil ID chunk secara ringan
             $chunkIds = InvoiceDataPendapatan::where('invoice_file_pendapatan_id', $fileId)
                 ->orderBy('chunk_index', 'asc')
                 ->pluck('id');
 
             foreach ($chunkIds as $id) {
+                // RECONNECT: Jaga koneksi database tetap hidup di setiap putaran chunk besar
+                if (!DB::connection()->getPdo()) DB::reconnect();
+
                 $chunk = InvoiceDataPendapatan::find($id);
                 $rows = $chunk->payload['rows'] ?? [];
                 $batchData = [];
@@ -394,6 +394,7 @@ class PendapatanController extends Controller
 
                     if (empty($noPesanan)) continue;
 
+                    // Data dasar yang wajib ada
                     $saveData = [
                         'uuid'            => (string) Str::uuid(),
                         'nama_seller'     => $nama_seller,
@@ -419,20 +420,24 @@ class PendapatanController extends Controller
                 }
 
                 if (!empty($batchData)) {
-                    ShopeePendapatan::upsert($batchData, ['no_pesanan'], array_keys($mapping));
+                    // Gunakan Transaction per Batch agar lebih aman dan tidak mengunci tabel terlalu lama
+                    DB::transaction(function () use ($batchData, $mapping) {
+                        // upsert(data, [kolom_unik], [kolom_yang_diupdate])
+                        $updateColumns = array_merge(array_keys($mapping), ['updated_at', 'nama_seller']);
+                        ShopeePendapatan::upsert($batchData, ['no_pesanan'], $updateColumns);
+                    });
                 }
 
+                // Bersihkan memori segera
                 $chunk = null;
                 unset($batchData, $rows);
                 gc_collect_cycles();
             }
 
             $file->update(['processed_at' => now()]);
-            DB::commit();
 
-            return redirect('/admin-panel/shopee/pendapatan')->with('success', 'Import selesai.');
+            return redirect('/admin-panel/shopee/pendapatan')->with('success', 'Import selesai dan data berhasil diproses ke database.');
         } catch (\Throwable $e) {
-            DB::rollBack();
             return back()->with('error', 'Gagal memproses database: ' . $e->getMessage());
         }
     }
