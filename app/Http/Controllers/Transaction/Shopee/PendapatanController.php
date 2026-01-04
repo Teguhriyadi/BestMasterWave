@@ -186,7 +186,6 @@ class PendapatanController extends Controller
 
             DB::reconnect();
 
-            // --- TAMBAHAN: Cari schema lama berdasarkan hash ---
             $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $request->header_hash)->first();
 
             DB::beginTransaction();
@@ -194,7 +193,7 @@ class PendapatanController extends Controller
             $fileEntry = InvoiceFilePendapatan::create([
                 'id' => (string) Str::uuid(),
                 'seller_id' => $request->seller_id,
-                'schema_id' => $existingSchema ? $existingSchema->id : null, // Hubungkan otomatis jika ada
+                'schema_id' => $existingSchema ? $existingSchema->id : null,
                 'header_hash' => $request->header_hash,
                 'uploaded_at' => now(),
                 'from_date' => $request->from_date,
@@ -316,12 +315,11 @@ class PendapatanController extends Controller
     {
         $file = InvoiceFilePendapatan::with(['seller.platform', 'schema', 'chunks'])->findOrFail($id);
 
-        // --- TAMBAHAN: Re-check Schema jika schema_id masih null ---
         if (is_null($file->schema_id)) {
             $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $file->header_hash)->first();
             if ($existingSchema) {
                 $file->update(['schema_id' => $existingSchema->id]);
-                $file->load('schema'); // Reload agar data schema muncul di view
+                $file->load('schema');
             }
         }
 
@@ -355,7 +353,6 @@ class PendapatanController extends Controller
     {
         $file = InvoiceFilePendapatan::findOrFail($fileId);
 
-        // Ambil mapping dari input (jika mapping baru) atau dari schema yang sudah terhubung
         $mapping = $request->input('mapping') ?? ($file->schema ? $file->schema->columns_mapping : null);
 
         if (!$mapping) {
