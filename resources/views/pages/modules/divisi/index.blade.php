@@ -34,6 +34,7 @@
                     <tr>
                         <th class="text-center">No.</th>
                         <th>Nama Divisi</th>
+                        <th>Slug</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -46,6 +47,7 @@
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
                             <td>{{ $item['nama_divisi'] }}</td>
+                            <td>{{ $item['slug'] }}</td>
                             <td class="text-center">{{ $item["status"] }}</td>
                             <td class="text-center">
                                 <button onclick="editSupplier('{{ $item['id'] }}')" type="button"

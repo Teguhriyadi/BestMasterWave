@@ -15,7 +15,9 @@ class UsersMapper
                 "nama"          => $users["nama"],
                 "username"      => $users["username"],
                 "email"         => $users["email"],
-                "status"        => $users["is_active"] == "1" ? "Aktif" : "Tidak Aktif"
+                "status"        => $users["is_active"] == "1" ? "Aktif" : "Tidak Aktif",
+                "divisi"        => empty($users["one_divisi_roles"]) ? "-" : $users["one_divisi_roles"]["divisi"]["nama_divisi"],
+                "role"          => empty($users["one_divisi_roles"]) ? "-" : $users["one_divisi_roles"]["roles"]["nama_role"]
             ];
         });
     }

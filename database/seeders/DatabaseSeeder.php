@@ -17,8 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PlatformSeeder::class,
-            SellerSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            DivisiSeeder::class,
+            RoleSeeder::class,
+            SellerSeeder::class
         ]);
     }
 }

@@ -14,6 +14,7 @@ class DivisiMapper
             return [
                 "id"          => $divisi["id"],
                 "nama_divisi" => $divisi["nama_divisi"],
+                "slug"        => $divisi["slug"],
                 "status"      => $divisi["is_active"] == "1" ? "Aktif" : "Tidak Aktif",
             ];
         });

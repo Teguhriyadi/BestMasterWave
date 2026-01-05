@@ -26,6 +26,13 @@ class SellerService
         return SellerMapper::toListOption($seller);
     }
 
+    public function list_seller_by_divisi()
+    {
+        $seller = $this->seller_repository->list_data_seller_by_id();
+
+        return SellerMapper::toListOption($seller);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {

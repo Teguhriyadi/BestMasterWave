@@ -35,4 +35,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Divisi::class,'users_divisi_role','user_id','divisi_id');
     }
+
+    public function one_divisi_roles()
+    {
+        return $this->hasOne(UserDivisiRole::class, "user_id", "id");
+    }
 }

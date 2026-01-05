@@ -2,6 +2,7 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Barang;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +11,13 @@ class BarangRepository
 {
     public function get_all_data()
     {
-        return Barang::orderBy("created_at", "DESC")->get();
+        if (empty(AuthDivisi::check_data())) {
+            return Barang::orderBy("created_at", "DESC")->get();
+        } else {
+            return Barang::where("divisi_id", AuthDivisi::id())
+                ->orderBy("created_at", "DESC")
+                ->get();
+        }
     }
 
     public function insert_data(array $data)
@@ -22,7 +29,8 @@ class BarangRepository
             "tanggal_pembelian_terakhir" => $data['tanggal_pembelian_terakhir'] ?? null,
             "status_sku" => "A",
             "seller_id" => $data["seller_id"] ?? null,
-            "created_by" => Auth::user()->id
+            "created_by" => Auth::user()->id,
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $supplier;
@@ -44,7 +52,8 @@ class BarangRepository
             "tanggal_pembelian_terakhir" => $data["tanggal_pembelian_terakhir"],
             "status_sku" => $data["status_sku"],
             "seller_id" => $data["seller_id"],
-            "updated_by" => Auth::user()->id
+            "updated_by" => Auth::user()->id,
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $supplier;

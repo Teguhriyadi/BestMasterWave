@@ -37,6 +37,8 @@
                             <th>Nama</th>
                             <th>Username</th>
                             <th>Email</th>
+                            <th>Divisi</th>
+                            <th>Role</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -51,6 +53,8 @@
                                 <td>{{ $item['nama'] }}</td>
                                 <td>{{ $item['username'] }}</td>
                                 <td>{{ $item['email'] }}</td>
+                                <td>{{ $item['divisi'] }}</td>
+                                <td>{{ $item['role'] }}</td>
                                 <td class="text-center">
                                     @if (Auth::user()->id != $item["id"])
                                         @if ($item['status'] == 'Aktif')

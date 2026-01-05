@@ -2,16 +2,24 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Platform;
 use App\Models\Seller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class SellerRepository
 {
     public function get_all_data()
     {
-        return Seller::orderBy("created_at", "DESC")
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Seller::orderBy("created_at", "DESC")
+                ->with("platform")->get();
+        } else {
+            return Seller::where("divisi_id", AuthDivisi::id())
+            ->orderBy("created_at", "DESC")
             ->with("platform")->get();
+        }
     }
 
     public function list_data_seller()
@@ -24,12 +32,24 @@ class SellerRepository
             ->get();
     }
 
+    public function list_data_seller_by_id()
+    {
+        $platform = Platform::where("nama", "Shopee")->where("status", "1")
+            ->first();
+
+        return Seller::where("platform_id", $platform["id"])
+            ->where("divisi_id", AuthDivisi::id())
+            ->where("status", "1")
+            ->get();
+    }
+
     public function insert_data(array $data)
     {
         $supplier = Seller::create([
             "platform_id" => $data["platform_id"],
             "nama" => $data["nama"],
             "slug" => Str::slug($data["nama"]),
+            "divisi_id" => AuthDivisi::id(),
             "status" => 1
         ]);
 
@@ -48,7 +68,8 @@ class SellerRepository
         $seller->update([
             "platform_id" => $data["platform_id"],
             "nama" => $data["nama"],
-            "slug" => Str::slug($data["nama"])
+            "slug" => Str::slug($data["nama"]),
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $seller;

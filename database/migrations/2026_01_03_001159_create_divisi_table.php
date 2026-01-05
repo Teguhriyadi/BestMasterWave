@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('divisi', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->string("nama_divisi", 50)->index();
+            $table->string("slug", 100)->nullable();
             $table->enum("is_active", ["1", "0"])->default("1");
             $table->uuid('created_by')->nullable()->index();
             $table->foreign('created_by')

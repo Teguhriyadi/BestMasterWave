@@ -36,8 +36,9 @@ class PembelianRepository
                 "satuan" => $item["satuan"],
                 "harga_satuan" => $item["harga_satuan"],
                 "diskon" => $item["diskon"] ?? 0,
-                "ppn" => $item["ppn"] ?? 0,
-                "total_harga" => $item["total_harga"],
+                "total_sebelum_ppn" => $item["total_sebelum_ppn"] ?? 0,
+                "ppn" => $item["rate_ppn"] ?? 0,
+                "total" => $item["total_sesudah_ppn"],
                 "keterangan" => $item["keterangan"] ?? null,
             ]);
         }

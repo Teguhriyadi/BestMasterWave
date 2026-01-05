@@ -23,9 +23,10 @@ return new class extends Migration
             $table->string("satuan", 50)->index();
             $table->unsignedBigInteger("harga_satuan")->default(0);
             $table->unsignedBigInteger("diskon")->default(0);
+            $table->unsignedBigInteger("total_sebelum_ppn")->default(0);
             $table->unsignedBigInteger("ppn")->default(0);
             $table->unsignedBigInteger("total")->default(0);
-            $table->text("keterangan");
+            $table->text("keterangan")->nullable();
             $table->timestamps();
         });
     }

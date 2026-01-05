@@ -4,6 +4,7 @@ namespace App\Http\Repositories;
 
 use App\Models\Divisi;
 use App\Models\DivisiRole;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserDivisiRole;
 use Illuminate\Support\Facades\DB;
@@ -18,23 +19,37 @@ class UsersRepository
 
     public function insert_data(array $data)
     {
+        $cek = Role::select("id")->where("nama_role", "Super Admin")
+            ->where("is_active", "1")
+            ->first();
+
+        $divisi = Divisi::select("slug")->where("id", $data["divisi_id"])
+            ->first();
+
         $users = User::create([
             "nama" => $data["nama"],
             "username" => $data["username"],
             "email" => $data["email"],
-            "password" => bcrypt($data['password']),
+            "password" => bcrypt("password_" . $divisi["slug"]),
             "is_active" => "1",
             "nomor_handphone" => $data["nomor_handphone"] ?? null,
             "alamat" => $data["alamat"] ?? null
         ]);
 
-        foreach ($data["role_id"] as $item) {
-            UserDivisiRole::create([
-                "user_id" => $users["id"],
-                "divisi_id" => $data["divisi_id"],
-                "role_id" => $item
-            ]);
-        }
+        UserDivisiRole::create([
+            "user_id" => $users["id"],
+            "divisi_id" => $data["divisi_id"],
+            "role_id" => $data["role_id"],
+            "is_admin" => $data["role_id"] == $cek["id"] ? "1" : "0"
+        ]);
+
+        // foreach ($data["role_id"] as $item) {
+        //     UserDivisiRole::create([
+        //         "user_id" => $users["id"],
+        //         "divisi_id" => $data["divisi_id"],
+        //         "role_id" => $item
+        //     ]);
+        // }
 
         return $users;
     }
@@ -59,26 +74,11 @@ class UsersRepository
                 "alamat"          => $data["alamat"] ?? null
             ]);
 
-            UserDivisiRole::where('user_id', $user->id)
-                ->where('divisi_id', $data['divisi_id'])
-                ->delete();
-
-            if (!empty($data['role_id'])) {
-                $payload = [];
-
-                foreach ($data['role_id'] as $roleId) {
-                    $payload[] = [
-                        'id'         => (string) Str::uuid(),
-                        'user_id'    => $user->id,
-                        'divisi_id'  => $data['divisi_id'],
-                        'role_id'    => $roleId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                UserDivisiRole::insert($payload);
-            }
+            UserDivisiRole::where("user_id", $user->id)->update([
+                'divisi_id'  => $data['divisi_id'],
+                'role_id'    => $data["role_id"],
+                'updated_at' => now(),
+            ]);
 
             return $user;
         });

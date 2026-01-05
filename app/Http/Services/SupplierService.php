@@ -20,6 +20,13 @@ class SupplierService
         return SupplierMapper::toTable($supplier);
     }
 
+    public function list_supplier_data()
+    {
+        $supplier = $this->supplier_repository->list_supplier();
+
+        return SupplierMapper::toList($supplier);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {

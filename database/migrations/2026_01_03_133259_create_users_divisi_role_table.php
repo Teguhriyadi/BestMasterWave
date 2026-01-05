@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreign('divisi_id')->references('id')->on('divisi')->cascadeOnDelete();
             $table->foreign('role_id')->references('id')->on('role')->cascadeOnDelete();
 
+            $table->enum("is_admin", ["1", "0"])->default("0");
             $table->unique(['user_id', 'divisi_id', 'role_id']);
         });
     }

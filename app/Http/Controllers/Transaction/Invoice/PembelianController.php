@@ -27,7 +27,7 @@ class PembelianController extends Controller
     public function create()
     {
         $data["barang"] = $this->barang_service->list_barang_sku();
-        $data["supplier"] = $this->supplier_service->list();
+        $data["supplier"] = $this->supplier_service->list_supplier_data();
 
         if ($data["barang"]->count() == 0) {
             return redirect()->to("/admin-panel/barang")->with("error", "Data Barang Tidak Ada");

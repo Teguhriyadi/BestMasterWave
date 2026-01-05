@@ -2,13 +2,26 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Supplier;
 
 class SupplierRepository
 {
     public function get_all_data()
     {
-        return Supplier::orderBy("created_at", "DESC")->get();
+        if (empty(AuthDivisi::check_data())) {
+            return Supplier::orderBy("created_at", "DESC")->get();
+        } else {
+            return Supplier::where("divisi_id", AuthDivisi::id())
+                ->orderBy("created_at", "DESC")->get();
+        }
+    }
+
+    public function list_supplier()
+    {
+        return Supplier::where("divisi_id", AuthDivisi::id())
+            ->orderBy("created_at", "DESC")
+            ->get();
     }
 
     public function insert_data(array $data)
@@ -24,7 +37,8 @@ class SupplierRepository
             "nama_rekening" => $data["nama_rekening"],
             "pkp" => $data["pkp"],
             "no_npwp" => $data["no_npwp"] ?? null,
-            "rate_ppn" => empty($data["rate_ppn"]) ? 0 : $data["rate_ppn"]
+            "rate_ppn" => empty($data["rate_ppn"]) ? 0 : $data["rate_ppn"],
+            "divisi_id" => AuthDivisi::id(),
         ]);
 
         return $supplier;
@@ -50,7 +64,8 @@ class SupplierRepository
             "nama_rekening" => $data["nama_rekening"],
             "pkp" => $data["pkp"],
             "no_npwp" => $data["no_npwp"],
-            "rate_ppn" => empty($data["rate_ppn"]) ? 0 : $data["rate_ppn"]
+            "rate_ppn" => empty($data["rate_ppn"]) ? 0 : $data["rate_ppn"],
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $supplier;

@@ -2,6 +2,19 @@
 
 @push('title_module', 'Pembelian')
 
+@push("css_style")
+    <style>
+    .table-scroll-x {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    #tableItem {
+        white-space: nowrap;
+    }
+</style>
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -31,7 +44,10 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="mb-3 row">
-                            <label for="no_invoice" class="col-sm-3 col-form-label">Nomor Invoice</label>
+                            <label for="no_invoice" class="col-sm-3 col-form-label">
+                                Nomor Invoice
+                                <small class="text-danger">*</small>
+                            </label>
                             <div class="col-md-9">
                                 <input type="text" name="no_invoice" class="form-control @error('no_invoice') is-invalid @enderror" id="no_invoice"
                                     placeholder="Masukkan No. Invoice" value="{{ old('no_invoice', $edit['no_invoice']) }}">
@@ -41,7 +57,10 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="supplier_id" class="col-sm-3 col-form-label">Nama Supplier</label>
+                            <label for="supplier_id" class="col-sm-3 col-form-label">
+                                Nama Supplier
+                                <small class="text-danger">*</small>
+                            </label>
                             <div class="col-sm-9">
                                 <select name="supplier_id" class="form-control @error('supplier_id') is-invalid @enderror" id="supplier_id">
                                     <option value="">- Pilih -</option>
@@ -58,7 +77,10 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="tanggal_invoice" class="col-sm-3 col-form-label">Tanggal Invoice</label>
+                            <label for="tanggal_invoice" class="col-sm-3 col-form-label">
+                                Tanggal Invoice
+                                <small class="text-danger">*</small>
+                            </label>
                             <div class="col-md-9">
                                 <input type="date" name="tanggal_invoice @error('tanggal_invoice') is-invalid @enderror" id="tanggal_invoice" class="form-control"
                                     value="{{ \Carbon\Carbon::parse($edit['tanggal_invoice'])->format('Y-m-d') }}">
@@ -68,7 +90,10 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="tanggal_jatuh_tempo" class="col-sm-3 col-form-label">Tanggal Jatuh Tempo</label>
+                            <label for="tanggal_jatuh_tempo" class="col-sm-3 col-form-label">
+                                Tanggal Jatuh Tempo
+                                <small class="text-danger">*</small>
+                            </label>
                             <div class="col-md-9">
                                 <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo"
                                     class="form-control @error('tanggal_jatuh_tempo') is-invalid @enderror"
@@ -83,7 +108,6 @@
                         <div class="mb-3 row">
                             <label for="keterangan" class="col-sm-3 col-form-label">
                                 Keterangan
-                                <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-9">
                                 <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" rows="5" placeholder="Masukkan Keterangan">{{ $edit['keterangan'] }}</textarea>
@@ -99,15 +123,28 @@
                     <i class="fa fa-plus"></i> Tambah Data Barang
                 </button>
 
-                <div class="table-responsive mt-3">
+                <div class="table-responsive mt-3 table-scroll-x">
                     <table class="table table-bordered" id="tableItem">
                         <thead class="thead-light">
                             <tr>
-                                <th>SKU Barang</th>
-                                <th>QTY</th>
-                                <th>Satuan</th>
-                                <th>Harga Satuan</th>
+                                <th>
+                                    SKU Barang
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    QTY
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    Satuan
+                                    <small class="text-danger">*</small>
+                                </th>
+                                <th>
+                                    Harga Satuan
+                                    <small class="text-danger">*</small>
+                                </th>
                                 <th>Diskon</th>
+                                <th>Total Sebelum PPN</th>
                                 <th>PPN</th>
                                 <th>Total</th>
                                 <th>Keterangan</th>
@@ -193,6 +230,12 @@
                             name="items[${itemIndex}][harga_satuan]"
                             class="form-control harga_satuan"
                             value="${data?.harga_satuan ?? 0}" required>
+                    </td>
+
+                    <td>
+                        <input type="number"
+                            name="items[${itemIndex}][ppn]"
+                            class="form-control ppn">
                     </td>
 
                     <td>

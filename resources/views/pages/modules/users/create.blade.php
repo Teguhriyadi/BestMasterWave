@@ -117,7 +117,7 @@
                                         Nama Role
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <select name="role_id[]" class="form-control @error('role_id') is-invalid @enderror" id="role_id" multiple>
+                                    <select name="role_id" class="form-control @error('role_id') is-invalid @enderror" id="role_id">
                                         <option value="">- Pilih Role -</option>
                                     </select>
                                     @error('role_id')

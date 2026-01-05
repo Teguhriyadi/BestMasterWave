@@ -16,11 +16,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil</strong>, {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>, {{ session('error') }}
         </div>
     @endif
 
@@ -117,32 +117,6 @@
                                     <input type="number" min="1" class="form-control @error('harga_modal') is-invalid @enderror" name="harga_modal"
                                         id="harga_modal" placeholder="0" value="{{ old('harga_modal') }}">
                                     @error('harga_modal')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="harga_pembelian_terakhir" class="form-label">
-                                        Harga Pembelian Terakhir
-                                    </label>
-                                    <input type="number" class="form-control @error('harga_pembelian_terakhir') is-invalid @enderror" name="harga_pembelian_terakhir"
-                                        min="1" placeholder="0" id="harga_pembelian_terakhir" value="{{ old('harga_pembelian_terakhir') }}">
-                                    @error('harga_pembelian_terakhir')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="tanggal_pembelian_terakhir" class="form-label">
-                                        Tanggal Pembelian Terakhir
-                                    </label>
-                                    <input type="datetime-local" class="form-control @error('tanggal_pembelian_terakhir') is-invalid @enderror" name="tanggal_pembelian_terakhir"
-                                        id="tanggal_pembelian_terakhir" value="{{ old('tanggal_pembelian_terakhir') }}">
-                                    @error('tanggal_pembelian_terakhir')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

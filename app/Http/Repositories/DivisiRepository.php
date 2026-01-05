@@ -3,6 +3,7 @@
 namespace App\Http\Repositories;
 
 use App\Models\Divisi;
+use Illuminate\Support\Str;
 
 class DivisiRepository
 {
@@ -14,7 +15,8 @@ class DivisiRepository
     public function insert_data(array $data)
     {
         $divisi = Divisi::create([
-            "nama_divisi" => $data["nama_divisi"]
+            "nama_divisi" => $data["nama_divisi"],
+            "slug" => Str::slug($data["nama_divisi"])
         ]);
 
         return $divisi;
@@ -31,6 +33,7 @@ class DivisiRepository
 
         $divisi->update([
             "nama_divisi" => $data["nama_divisi"],
+            "slug"        => Str::slug($data["nama_divisi"])
         ]);
 
         return $divisi;

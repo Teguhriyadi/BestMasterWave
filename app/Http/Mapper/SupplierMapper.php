@@ -25,4 +25,16 @@ class SupplierMapper
             ];
         });
     }
+
+    public static function toList(Collection $supplier): Collection
+    {
+        return $supplier->map(function(Supplier $supplier) {
+            return [
+                'id'                => $supplier->id,
+                'nama_supplier'     => $supplier->nama_supplier,
+                'ppn'               => $supplier->rate_ppn,
+                'tempo_pembayaran'  => $supplier->ketentuan_tempo_pembayaran
+            ];
+        });
+    }
 }

@@ -2,6 +2,19 @@
 
 @push('title_module', 'Pembelian')
 
+@push('css_style')
+    <style>
+        .table-scroll-x {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        #tableItem {
+            white-space: nowrap;
+        }
+    </style>
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -10,11 +23,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil</strong>, {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>, {{ session('error') }}
         </div>
     @endif
 
@@ -53,7 +66,9 @@
                                     id="supplier_id">
                                     <option value="">- Pilih -</option>
                                     @foreach ($supplier as $item)
-                                        <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}">
+                                        <option value="{{ $item['id'] }}"
+                                            {{ old('supplier_id') == $item['id'] ? 'selected' : '' }}
+                                            data-tempo="{{ $item['tempo_pembayaran'] }}" data-ppn="{{ $item['ppn'] }}">
                                             {{ $item['nama_supplier'] }}
                                         </option>
                                     @endforeach
@@ -70,8 +85,8 @@
                             </label>
                             <div class="col-sm-9">
                                 <input type="date" name="tanggal_invoice"
-                                    class="form-control @error('tanggal_invoice') is-invalid @enderror"
-                                    id="tanggal_invoice" value="{{ old('tanggal_invoice') }}">
+                                    class="form-control @error('tanggal_invoice') is-invalid @enderror" id="tanggal_invoice"
+                                    value="{{ old('tanggal_invoice') }}">
                                 @error('tanggal_invoice')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -111,7 +126,7 @@
                     <i class="fa fa-plus"></i> Tambah Data Barang
                 </button>
 
-                <div class="table-responsive mt-3">
+                <div class="table-responsive mt-3 table-scroll-x">
                     <table class="table table-bordered" id="tableItem" style="display:none;">
                         <thead class="thead-light">
                             <tr>
@@ -133,7 +148,8 @@
                                 </th>
                                 <th>Diskon</th>
                                 <th>PPN</th>
-                                <th>Total</th>
+                                <th>Total Sebelum PPN</th>
+                                <th>Total Setelah PPN</th>
                                 <th>Keterangan</th>
                                 <th>#</th>
                             </tr>
@@ -141,6 +157,24 @@
                         <tbody id="itemBody">
 
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4"></th>
+                                <th>
+                                    <input type="number" id="total_diskon" class="form-control" readonly>
+                                </th>
+                                <th>
+                                    <input type="number" id="total_ppn" class="form-control" readonly>
+                                </th>
+                                <th>
+                                    <input type="number" id="total_sebelum_ppn" class="form-control" readonly>
+                                </th>
+                                <th>
+                                    <input type="number" id="total_setelah_ppn" class="form-control" readonly>
+                                </th>
+                            </tr>
+                        </tfoot>
+
                     </table>
                 </div>
             </div>
@@ -157,145 +191,165 @@
 @endpush
 
 @push('js_style')
-    <script type="text/javascript">
+    <script>
         const barangList = @json($barang);
         let itemIndex = 0;
+        let supplierRatePPN = 0;
 
         $("#btnAddItem").on("click", function(e) {
-            e.preventDefault()
-
+            e.preventDefault();
             $("#tableItem").show();
-
             itemIndex++;
 
             let options = `<option value="">- Pilih Barang -</option>`;
             barangList.forEach(item => {
                 options += `
-                    <option value="${item.id}"
-                            data-harga="${item.harga_modal ?? 0}"
-                            data-satuan="${item.satuan ?? ''}">
-                        ${item.sku_barang}
-                    </option>
-                `;
+                <option value="${item.id}"
+                        data-harga="${item.harga_modal ?? 0}"
+                        data-satuan="${item.satuan ?? ''}">
+                    ${item.sku_barang}
+                </option>`;
             });
 
             let row = `
-                <tr id="row-${itemIndex}">
-                    <td>
-                        <select name="items[${itemIndex}][barang_id]"
-                                class="form-control barang-select" required>
-                            ${options}
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][qty]"
-                            class="form-control qty"
-                            min="1" required>
-                    </td>
-                    <td>
-                        <select class="form-control satuan" name="items[${itemIndex}][satuan]" required>
-                            <option value="">- Pilih Satuan -</option>
-                            <option value="set">Set</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][harga_satuan]"
-                            class="form-control harga_satuan" required>
-                    </td>
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][diskon]"
-                            class="form-control diskon">
-                    </td>
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][ppn]"
-                            class="form-control ppn">
-                    </td>
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][total_harga]"
-                            class="form-control total_harga">
-                    </td>
-                    <td>
-                        <input type="text"
-                            name="items[${itemIndex}][keterangan]"
-                            class="form-control keterangan" placeholder="Masukkan Keterangan">
-                    </td>
-                    <td class="text-center">
-                        <button type="button"
-                                class="btn btn-danger btn-sm"
-                                onclick="removeRow(${itemIndex})">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-
+        <tr id="row-${itemIndex}">
+            <td>
+                <select name="items[${itemIndex}][barang_id]"
+                        class="form-control barang-select" required>
+                    ${options}
+                </select>
+            </td>
+            <td>
+                <input type="number" name="items[${itemIndex}][qty]"
+                       class="form-control qty" min="1" required placeholder="0">
+            </td>
+            <td>
+                <select class="form-control" name="items[${itemIndex}][satuan]">
+                    <option>- Pilih -</option>
+                    <option value="Set">Set</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" name="items[${itemIndex}][harga_satuan]"
+                       class="form-control harga_satuan" required placeholder="0">
+            </td>
+            <td>
+                <input type="number" name="items[${itemIndex}][diskon]"
+                       class="form-control diskon" value="0">
+            </td>
+            <td>
+                <input type="number"
+                       name="items[${itemIndex}][rate_ppn]"
+                       class="form-control rate_ppn" placeholder="0">
+            </td>
+            <td>
+                <input type="number"
+                       name="items[${itemIndex}][total_sebelum_ppn]"
+                       class="form-control total_sebelum_ppn" placeholder="0">
+            </td>
+            <td>
+                <input type="number"
+                       name="items[${itemIndex}][total_sesudah_ppn]"
+                       class="form-control total_sesudah_ppn" placeholder="0">
+            </td>
+            <td>
+                <input type="text"
+                       name="items[${itemIndex}][keterangan]"
+                       class="form-control" placeholder="Masukkan Keterangan">
+            </td>
+            <td class="text-center">
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        onclick="removeRow(${itemIndex})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
             $("#itemBody").append(row);
-        })
+        });
 
         function removeRow(id) {
             $("#row-" + id).remove();
-
             if ($("#itemBody tr").length === 0) {
                 $("#tableItem").hide();
+                $("#total_diskon,#total_ppn,#total_sebelum_ppn,#total_setelah_ppn").val(0);
+            } else {
+                hitungTotalAllIn();
             }
         }
 
         $(document).on("change", ".barang-select", function() {
             let row = $(this).closest("tr");
-            let selected = $(this).find(":selected");
+            let harga = parseFloat($(this).find(":selected").data("harga")) || 0;
+            let satuan = $(this).find(":selected").data("satuan") || "";
 
-            let hargaModal = parseFloat(selected.data("harga")) || 0;
-
-            row.find(".harga_satuan").val(hargaModal);
+            row.find(".harga_satuan").val(harga);
+            row.find(".satuan").val(satuan);
+            row.find(".rate_ppn").val(supplierRatePPN);
 
             hitungTotal(row);
         });
 
-        $(document).on("input", ".qty, .harga_satuan, .diskon, .ppn", function() {
-            let row = $(this).closest("tr");
-            hitungTotal(row);
+        $(document).on("input", ".qty,.harga_satuan,.diskon", function() {
+            hitungTotal($(this).closest("tr"));
         });
 
         function hitungTotal(row) {
             let qty = parseFloat(row.find(".qty").val()) || 0;
-            let hargaSatuan = parseFloat(row.find(".harga_satuan").val()) || 0;
+            let harga = parseFloat(row.find(".harga_satuan").val()) || 0;
             let diskon = parseFloat(row.find(".diskon").val()) || 0;
-            let ppn = parseFloat(row.find(".ppn").val()) || 0;
+            let ratePPN = parseFloat(row.find(".rate_ppn").val()) || 0;
 
-            let subtotal = qty * hargaSatuan;
-            let total = subtotal - diskon + ppn;
+            let subtotal = qty * harga;
+            let totalSebelumPPN = subtotal - diskon;
+            if (totalSebelumPPN < 0) totalSebelumPPN = 0;
 
-            row.find(".total_harga").val(total);
+            let ppnNominal = totalSebelumPPN * ratePPN / 100;
+
+            row.find(".total_sebelum_ppn").val(Math.round(totalSebelumPPN));
+            row.find(".total_sesudah_ppn").val(Math.round(ppnNominal)); // 👈 FIX DI SINI
+
+            hitungTotalAllIn();
         }
 
+        function hitungTotalAllIn() {
+            let totalDiskon = 0;
+            let totalSebelumPPN = 0;
+            let totalSetelahPPN = 0;
 
-        function editSupplier(id) {
-            $.ajax({
-                url: "{{ url('/admin-panel/supplier') }}" + "/" + id + "/edit",
-                type: "GET",
-                success: function(response) {
-                    $("#modal-content-edit").html(response)
-                },
-                error: function(error) {
-                    console.log(error);
-                }
+            $("#itemBody tr").each(function() {
+                totalDiskon += parseFloat($(this).find(".diskon").val()) || 0;
+                totalSebelumPPN += parseFloat($(this).find(".total_sebelum_ppn").val()) || 0;
+                totalSetelahPPN += parseFloat($(this).find(".total_sesudah_ppn").val()) || 0;
             });
+
+            $("#total_diskon").val(Math.round(totalDiskon));
+            $("#total_ppn").val(supplierRatePPN); // 👈 FIX: TETAP 20
+            $("#total_sebelum_ppn").val(Math.round(totalSebelumPPN));
+            $("#total_setelah_ppn").val(Math.round(totalSetelahPPN));
         }
-    </script>
 
-    <script>
+        $("#supplier_id").on("change", function() {
+            supplierRatePPN = parseFloat($(this).find(":selected").data("ppn")) || 0;
+            hitungTanggalJatuhTempo();
+
+            $("#itemBody tr").each(function() {
+                $(this).find(".rate_ppn").val(supplierRatePPN);
+                hitungTotal($(this));
+            });
+
+            $("#total_ppn").val(supplierRatePPN);
+        });
+
+        $("#tanggal_invoice").on("change", function() {
+            hitungTanggalJatuhTempo();
+        });
+
         function hitungTanggalJatuhTempo() {
-            let supplier = $("#supplier_id option:selected");
-            let tempo = parseInt(supplier.data("tempo")) || 0;
-
+            let tempo = parseInt($("#supplier_id").find(":selected").data("tempo")) || 0;
             let tanggalInvoice = $("#tanggal_invoice").val();
 
-            if (!tanggalInvoice || tempo <= 0) {
+            if (!tanggalInvoice) {
                 $("#tanggal_jatuh_tempo").val("");
                 return;
             }
@@ -309,9 +363,6 @@
 
             $("#tanggal_jatuh_tempo").val(`${yyyy}-${mm}-${dd}`);
         }
-
-        $("#supplier_id").on("change", hitungTanggalJatuhTempo);
-
-        $("#tanggal_invoice").on("change", hitungTanggalJatuhTempo);
     </script>
+
 @endpush

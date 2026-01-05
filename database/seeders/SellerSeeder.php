@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Divisi;
 use App\Models\Platform;
 use App\Models\Seller;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,6 +19,7 @@ class SellerSeeder extends Seeder
         $shopee = Platform::where("slug", "shopee")->first();
         $tiktok = Platform::where("slug", "tiktok")->first();
         $lazada = Platform::where("slug", "lazada")->first();
+        $divisi = Divisi::select("id")->first();
 
         $shopee_data = [
             'BARANG IMPORT TERMURAH JAKARTA',
@@ -44,7 +46,8 @@ class SellerSeeder extends Seeder
                 'platform_id' => $shopee->id,
                 'nama' => $name,
                 'slug' => Str::slug($name),
-                'status' => '1'
+                'status' => '1',
+                "divisi_id" => $divisi["id"]
             ]);
         }
 
@@ -63,7 +66,8 @@ class SellerSeeder extends Seeder
                 'platform_id' => $tiktok->id,
                 'nama' => $name,
                 'slug' => Str::slug($name),
-                'status' => '1'
+                'status' => '1',
+                "divisi_id" => $divisi["id"]
             ]);
         }
 
@@ -81,7 +85,8 @@ class SellerSeeder extends Seeder
                 'platform_id' => $lazada->id,
                 'nama' => $name,
                 'slug' => Str::slug($name),
-                'status' => '1'
+                'status' => '1',
+                "divisi_id" => $divisi["id"]
             ]);
         }
     }

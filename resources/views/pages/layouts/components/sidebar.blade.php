@@ -10,6 +10,17 @@
     <!-- Divider -->
     <hr class="sidebar-divider my-0">
 
+    @if (!empty(Auth::user()->one_divisi_roles))
+        <div class="sidebar-heading mt-3 mb-3 text-white fw-bold">
+            Divisi :
+            <br>
+            <span style="font-size: 14px">
+                {{ Auth::user()->one_divisi_roles->divisi->nama_divisi }}
+            </span>
+        </div>
+        <hr class="sidebar-divider">
+    @endif
+
     <!-- Nav Item - Dashboard -->
     <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
         <a class="nav-link" href="{{ url('/admin-panel/dashboard') }}">
@@ -27,19 +38,29 @@
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') ? 'active' : '' }}">
+    <li
+        class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
             aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-book"></i>
             <span>Master</span>
         </a>
-        <div id="collapseTwo" class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapseTwo"
+            class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}" href="{{ url('/admin-panel/platform') }}">Platform</a>
-                <a class="collapse-item {{ Request::is('admin-panel/seller') ? 'active' : '' }}" href="{{ url('/admin-panel/seller') }}">Seller</a>
-                <a class="collapse-item {{ Request::is('admin-panel/bank') ? 'active' : '' }}" href="{{ url('/admin-panel/bank') }}">Bank</a>
-                <a class="collapse-item {{ Request::is('admin-panel/supplier') ? 'active' : '' }}" href="{{ url('/admin-panel/supplier') }}">Supplier</a>
-                <a class="collapse-item {{ Request::is('admin-panel/barang') ? 'active' : '' }}" href="{{ url('/admin-panel/barang') }}">Barang</a>
+                <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/platform') }}">Platform</a>
+                <a class="collapse-item {{ Request::is('admin-panel/seller') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/seller') }}">Seller</a>
+                @if (empty(Auth::user()?->one_divisi_roles))
+                <a class="collapse-item {{ Request::is('admin-panel/bank') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/bank') }}">Bank</a>
+                @endif
+                <a class="collapse-item {{ Request::is('admin-panel/supplier') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/supplier') }}">Supplier</a>
+                <a class="collapse-item {{ Request::is('admin-panel/barang') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/barang') }}">Barang</a>
             </div>
         </div>
     </li>
@@ -57,23 +78,30 @@
             <i class="fas fa-fw fa-book"></i>
             <span>Transaksi</span>
         </a>
-        <div id="collapsePembelian" class="collapse {{ Request::is('admin-panel/pembelian*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapsePembelian" class="collapse {{ Request::is('admin-panel/pembelian*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ Request::is('admin-panel/pembelian*') ? 'active' : '' }}" href="{{ url('/admin-panel/pembelian') }}">Pembelian</a>
+                <a class="collapse-item {{ Request::is('admin-panel/pembelian*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/pembelian') }}">Pembelian</a>
             </div>
         </div>
     </li>
 
-    <li class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
+    <li
+        class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseShopee"
             aria-expanded="true" aria-controls="collapseShopee">
             <i class="fas fa-fw fa-book"></i>
             <span>Shopee</span>
         </a>
-        <div id="collapseShopee" class="collapse {{ Request::is('admin-panel/shopee/pendapatan*') || Request::is('admin-panel/shopee/pesanan*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapseShopee"
+            class="collapse {{ Request::is('admin-panel/shopee/pendapatan*') || Request::is('admin-panel/shopee/pesanan*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ Request::is('admin-panel/shopee/pendapatan*') ? 'active' : '' }}" href="{{ url('/admin-panel/shopee/pendapatan') }}">Pendapatan</a>
-                <a class="collapse-item {{ Request::is('admin-panel/shopee/pesanan*') ? 'active' : '' }}" href="{{ url('/admin-panel/shopee/pesanan') }}">Pesanan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pendapatan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/shopee/pendapatan') }}">Pendapatan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pesanan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/shopee/pesanan') }}">Pesanan</a>
             </div>
         </div>
     </li>
@@ -84,18 +112,25 @@
         Master User
     </div>
 
-    <li class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'active' : '' }}">
+    <li
+        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengaturan"
             aria-expanded="true" aria-controls="collapsePengaturan">
             <i class="fas fa-fw fa-book"></i>
             <span>Pengaturan</span>
         </a>
-        <div id="collapsePengaturan" class="collapse {{ Request::is('admin-panel/role*') || Request::is('admin-panel/divisi*') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'show' : '' }} " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapsePengaturan"
+            class="collapse {{ Request::is('admin-panel/role*') || Request::is('admin-panel/divisi*') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ Request::is('admin-panel/role*') ? 'active' : '' }}" href="{{ url('/admin-panel/role') }}">Role</a>
-                <a class="collapse-item {{ Request::is('admin-panel/divisi') ? 'active' : '' }}" href="{{ url('/admin-panel/divisi') }}">Divisi</a>
-                <a class="collapse-item {{ Request::is('admin-panel/divisi-role*') ? 'active' : '' }}" href="{{ url('/admin-panel/divisi-role') }}">Role Divisi</a>
-                <a class="collapse-item {{ Request::is('admin-panel/users*') ? 'active' : '' }}" href="{{ url('/admin-panel/users') }}">Users</a>
+                <a class="collapse-item {{ Request::is('admin-panel/role*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/role') }}">Role</a>
+                <a class="collapse-item {{ Request::is('admin-panel/divisi') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/divisi') }}">Divisi</a>
+                <a class="collapse-item {{ Request::is('admin-panel/divisi-role*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/divisi-role') }}">Role Divisi</a>
+                <a class="collapse-item {{ Request::is('admin-panel/users*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/users') }}">Users</a>
             </div>
         </div>
     </li>

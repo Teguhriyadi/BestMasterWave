@@ -18,11 +18,12 @@ class BarangController extends Controller
 
     public function index()
     {
-        $data["seller"] = $this->seller_service->list_seller();
+        $data["seller"] = $this->seller_service->list_seller_by_divisi();
+
         $data["barang"] = $this->barang_service->list();
 
         if ($data["seller"]->count() == 0) {
-            return redirect()->to("/admin-panel/seller")->with("error", "Data Barang Tidak Ada");
+            return redirect()->to("/admin-panel/seller")->with("error", "Data Seller Tidak Ada");
         }
 
         return view("pages.modules.barang.index", $data);
