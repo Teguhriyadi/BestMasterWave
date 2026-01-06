@@ -48,9 +48,8 @@ class BarangRepository
         $supplier->update([
             "sku_barang" => $data["sku_barang"],
             "harga_modal" => $data["harga_modal"],
-            "harga_pembelian_terakhir" => $data["harga_pembelian_terakhir"],
-            "tanggal_pembelian_terakhir" => $data["tanggal_pembelian_terakhir"],
-            "status_sku" => $data["status_sku"],
+            "harga_pembelian_terakhir" => empty($data["harga_pembelian_terakhir"]) ? $supplier["harga_pembelian_terakhir"] : $data["harga_pembelian_terakhir"],
+            "tanggal_pembelian_terakhir" => empty($data["tanggal_pembelian_terakhir"]) ? $supplier['tanggal_pembelian_terakhir'] : $data["tanggal_pembelian_terakhir"],
             "seller_id" => $data["seller_id"],
             "updated_by" => Auth::user()->id,
             "divisi_id" => AuthDivisi::id()

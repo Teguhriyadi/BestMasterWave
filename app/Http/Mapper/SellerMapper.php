@@ -4,6 +4,7 @@ namespace App\Http\Mapper;
 
 use App\Models\Seller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class SellerMapper
 {
@@ -15,7 +16,8 @@ class SellerMapper
                 'nama'        => $seller->nama,
                 'slug'        => $seller->slug,
                 'platform'    => $seller->platform->nama,
-                'status'      => $seller->status == "1" ? "Aktif" : "Tidak Aktif"
+                'status'      => $seller->status == "1" ? "Aktif" : "Tidak Aktif",
+                'divisi'      => !empty(Auth::user()->one_divisi_roles) ? "A" : $seller["divisi"]["nama_divisi"]
             ];
         });
     }

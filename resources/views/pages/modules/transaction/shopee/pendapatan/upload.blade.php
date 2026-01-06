@@ -67,9 +67,13 @@
     </h1>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">
+            <strong>Berhasil</strong>, {{ session('success') }}
+        </div>
     @elseif(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger">
+            <strong>Gagal</strong>, {{ session('error') }}
+        </div>
     @endif
 
     <a href="{{ url('/admin-panel/shopee/pendapatan/data') }}" class="btn btn-primary btn-sm mb-4">

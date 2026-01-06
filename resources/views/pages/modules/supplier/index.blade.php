@@ -23,16 +23,21 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (!empty(Auth::user()->one_divisi_roles))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
             </button>
         </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                        @endif
                         <th class="text-center">No. NPWP</th>
                         <th>Nama Supplier</th>
                         <th>Jenis Kontak Terhubung</th>
@@ -43,7 +48,9 @@
                         <th class="text-center">PKP</th>
                         <th>Bank</th>
                         <th>Alamat</th>
+                        @if (!empty(Auth::user()->one_divisi_roles))
                         <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -53,6 +60,9 @@
                     @foreach ($supplier as $item)
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                            <td>{{ $item['divisi'] }}</td>
+                            @endif
                             <td class="text-center">{{ $item['no_npwp'] }}</td>
                             <td>{{ $item['nama_supplier'] }}</td>
                             <td>{{ $item['kontak_hubungi'] }}</td>
@@ -63,6 +73,7 @@
                             <td class="text-center">{{ $item['status_pkp'] }}</td>
                             <td>{{ $item['bank'] }}</td>
                             <td>{{ $item['alamat'] }}</td>
+                            @if (!empty(Auth::user()->one_divisi_roles))
                             <td class="text-center">
                                 <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
@@ -78,6 +89,7 @@
                                     </button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>

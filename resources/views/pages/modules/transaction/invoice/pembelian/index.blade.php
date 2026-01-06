@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil</strong>, {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>, {{ session('error') }}
         </div>
     @endif
 

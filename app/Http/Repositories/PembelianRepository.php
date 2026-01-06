@@ -2,6 +2,7 @@
 
 namespace App\Http\Repositories;
 
+use App\Models\Barang;
 use App\Models\DetailPembelian;
 use App\Models\Pembelian;
 use App\Models\Supplier;
@@ -41,6 +42,11 @@ class PembelianRepository
                 "total" => $item["total_sesudah_ppn"],
                 "keterangan" => $item["keterangan"] ?? null,
             ]);
+
+            Barang::where("id", $item["barang_id"])->update([
+                "tanggal_pembelian_terakhir" => $data["tanggal_invoice"],
+                "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
+            ]);
         }
 
         return $pembelian;
@@ -73,9 +79,14 @@ class PembelianRepository
                         'harga_satuan' => $item['harga_satuan'],
                         'diskon'       => $item['diskon'] ?? 0,
                         'ppn'          => $item['ppn'] ?? 0,
-                        'total'        => $item['total_harga'],
+                        'total'        => $item['total_sesudah_ppn'],
                         'keterangan'   => $item['keterangan'] ?? null,
                     ]);
+
+                Barang::where("id", $item["barang_id"])->update([
+                    "tanggal_pembelian_terakhir" => $pembelian["tanggal_invoice"],
+                    "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
+                ]);
 
                 $existingDetailIds[] = $item['id'];
             }
@@ -88,8 +99,13 @@ class PembelianRepository
                     'harga_satuan' => $item['harga_satuan'],
                     'diskon'       => $item['diskon'] ?? 0,
                     'ppn'          => $item['ppn'] ?? 0,
-                    'total'        => $item['total_harga'],
+                    'total'        => $item['total_sesudah_ppn'],
                     'keterangan'   => $item['keterangan'] ?? null,
+                ]);
+
+                Barang::where("id", $item["barang_id"])->update([
+                    "tanggal_pembelian_terakhir" => $pembelian["tanggal_invoice"],
+                    "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
                 ]);
 
                 $existingDetailIds[] = $detail->id;

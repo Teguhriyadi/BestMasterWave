@@ -60,7 +60,16 @@ class PembelianController extends Controller
     public function edit($id)
     {
         $data["barang"] = $this->barang_service->list_barang_sku();
-        $data["supplier"] = $this->supplier_service->list();
+        $data["supplier"] = $this->supplier_service->list_supplier_data();
+
+        if ($data["barang"]->count() == 0) {
+            return redirect()->to("/admin-panel/barang")->with("error", "Data Barang Tidak Ada");
+        }
+
+        if ($data["supplier"]->count() == 0) {
+            return redirect()->to("/admin-panel/supplier")->with("error", "Data Supplier Tidak Ada");
+        }
+
         $data["edit"] = $this->pembelian_service->edit($id);
 
         return view("pages.modules.transaction.invoice.pembelian.edit", $data);

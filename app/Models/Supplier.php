@@ -21,4 +21,12 @@ class Supplier extends Model
     {
         return $this->belongsTo(Bank::class, "bank_id");
     }
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id")
+            ->withDefault([
+                "nama_divisi" => "-"
+            ]);
+    }
 }

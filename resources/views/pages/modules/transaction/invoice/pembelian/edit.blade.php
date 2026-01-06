@@ -2,17 +2,17 @@
 
 @push('title_module', 'Pembelian')
 
-@push("css_style")
+@push('css_style')
     <style>
-    .table-scroll-x {
-        overflow-x: auto;
-        width: 100%;
-    }
+        .table-scroll-x {
+            overflow-x: auto;
+            width: 100%;
+        }
 
-    #tableItem {
-        white-space: nowrap;
-    }
-</style>
+        #tableItem {
+            white-space: nowrap;
+        }
+    </style>
 @endpush
 
 @push('content_app')
@@ -23,11 +23,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil</strong>, {{ session('success') }}
         </div>
     @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>, {{ session('error') }}
         </div>
     @endif
 
@@ -49,7 +49,8 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-md-9">
-                                <input type="text" name="no_invoice" class="form-control @error('no_invoice') is-invalid @enderror" id="no_invoice"
+                                <input type="text" name="no_invoice"
+                                    class="form-control @error('no_invoice') is-invalid @enderror" id="no_invoice"
                                     placeholder="Masukkan No. Invoice" value="{{ old('no_invoice', $edit['no_invoice']) }}">
                                 @error('no_invoice')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -62,11 +63,13 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-9">
-                                <select name="supplier_id" class="form-control @error('supplier_id') is-invalid @enderror" id="supplier_id">
+                                <select name="supplier_id" class="form-control @error('supplier_id') is-invalid @enderror"
+                                    id="supplier_id">
                                     <option value="">- Pilih -</option>
                                     @foreach ($supplier as $item)
                                         <option value="{{ $item['id'] }}" data-tempo="{{ $item['tempo_pembayaran'] }}"
-                                            {{ $edit['supplier_id'] == $item['id'] ? 'selected' : '' }}>
+                                            {{ $edit['supplier_id'] == $item['id'] ? 'selected' : '' }}
+                                            data-ppn="{{ $item['ppn'] }}">
                                             {{ $item['nama_supplier'] }}
                                         </option>
                                     @endforeach
@@ -82,7 +85,8 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-md-9">
-                                <input type="date" name="tanggal_invoice @error('tanggal_invoice') is-invalid @enderror" id="tanggal_invoice" class="form-control"
+                                <input type="date" name="tanggal_invoice" id="tanggal_invoice"
+                                    class="form-control @error('tanggal_invoice') is-invalid @enderror"
                                     value="{{ \Carbon\Carbon::parse($edit['tanggal_invoice'])->format('Y-m-d') }}">
                                 @error('tanggal_invoice')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -110,7 +114,8 @@
                                 Keterangan
                             </label>
                             <div class="col-sm-9">
-                                <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" rows="5" placeholder="Masukkan Keterangan">{{ $edit['keterangan'] }}</textarea>
+                                <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan"
+                                    rows="5" placeholder="Masukkan Keterangan">{{ $edit['keterangan'] }}</textarea>
                                 @error('keterangan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -127,34 +132,30 @@
                     <table class="table table-bordered" id="tableItem">
                         <thead class="thead-light">
                             <tr>
-                                <th>
-                                    SKU Barang
-                                    <small class="text-danger">*</small>
-                                </th>
-                                <th>
-                                    QTY
-                                    <small class="text-danger">*</small>
-                                </th>
-                                <th>
-                                    Satuan
-                                    <small class="text-danger">*</small>
-                                </th>
-                                <th>
-                                    Harga Satuan
-                                    <small class="text-danger">*</small>
-                                </th>
+                                <th>SKU Barang *</th>
+                                <th>QTY *</th>
+                                <th>Satuan *</th>
+                                <th>Harga Satuan *</th>
                                 <th>Diskon</th>
-                                <th>Total Sebelum PPN</th>
                                 <th>PPN</th>
-                                <th>Total</th>
+                                <th>Total Sebelum PPN</th>
+                                <th>Total Setelah PPN</th>
                                 <th>Keterangan</th>
                                 <th>#</th>
                             </tr>
                         </thead>
-                        <tbody id="itemBody">
-
-                        </tbody>
+                        <tbody id="itemBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4"></th>
+                                <th><input type="number" id="total_diskon" class="form-control" readonly></th>
+                                <th><input type="number" id="total_ppn" class="form-control" readonly></th>
+                                <th><input type="number" id="total_sebelum_ppn" class="form-control" readonly></th>
+                                <th><input type="number" id="total_setelah_ppn" class="form-control" readonly></th>
+                            </tr>
+                        </tfoot>
                     </table>
+
                 </div>
             </div>
             <div class="card-footer">
@@ -172,13 +173,17 @@
 @push('js_style')
     <script type="text/javascript">
         const barangList = @json($barang);
-        let itemIndex = 0;
         const detailPembelian = @json($edit->details);
+        let itemIndex = 0;
+        let supplierRatePPN = 0;
 
         $(document).ready(function() {
+            supplierRatePPN = +$("#supplier_id option:selected").data("ppn") || 0;
+
             detailPembelian.forEach(item => renderRow(item));
-            hitungTanggalJatuhTempo()
-        })
+            hitungTanggalJatuhTempo();
+            hitungTotalAllIn();
+        });
 
         $("#btnAddItem").on("click", function() {
             renderRow();
@@ -190,109 +195,98 @@
             let options = `<option value="">- Pilih Barang -</option>`;
             barangList.forEach(b => {
                 let selected = data && data.sku_barang == b.id ? 'selected' : '';
-                options += `
-            <option value="${b.id}"
-                    data-harga="${b.harga_modal}"
-                    ${selected}>
-                ${b.sku_barang}
-            </option>`;
+                options +=
+                    `<option value="${b.id}" data-harga="${b.harga_modal}" ${selected}>${b.sku_barang}</option>`;
             });
 
             let row = `
                 <tr id="row-${itemIndex}">
-                    <input type="hidden"
-                        name="items[${itemIndex}][id]"
-                        value="${data?.id ?? ''}">
+                    <input type="hidden" name="items[${itemIndex}][id]" value="${data?.id ?? ''}">
 
                     <td>
-                        <select name="items[${itemIndex}][barang_id]"
-                                class="form-control barang-select" required>
+                        <select name="items[${itemIndex}][barang_id]" class="form-control barang-select" required>
                             ${options}
                         </select>
                     </td>
-
+                    <td><input type="number" name="items[${itemIndex}][qty]" class="form-control qty" value="${data?.qty ?? 1}"></td>
+                    <td><input type="text" name="items[${itemIndex}][satuan]" class="form-control satuan" value="${data?.satuan ?? 'Set'}"></td>
+                    <td><input type="number" name="items[${itemIndex}][harga_satuan]" class="form-control harga_satuan" value="${data?.harga_satuan ?? 0}"></td>
+                    <td><input type="number" name="items[${itemIndex}][diskon]" class="form-control diskon" value="${data?.diskon ?? 0}"></td>
+                    <td><input type="number" name="items[${itemIndex}][rate_ppn]" class="form-control rate_ppn" value="${supplierRatePPN}"></td>
+                    <td><input type="number" name="items[${itemIndex}][total_sebelum_ppn]" class="form-control total_sebelum_ppn" readonly></td>
+                    <td><input type="number" name="items[${itemIndex}][total_sesudah_ppn]" class="form-control total_sesudah_ppn" readonly></td>
+                    <td><input type="text" name="items[${itemIndex}][keterangan]" class="form-control" value="${data?.keterangan ?? ''}"></td>
                     <td>
-                        <input type="number"
-                            name="items[${itemIndex}][qty]"
-                            class="form-control qty"
-                            value="${data?.qty ?? 1}" required>
-                    </td>
-
-                    <td>
-                        <input type="text"
-                            name="items[${itemIndex}][satuan]"
-                            class="form-control satuan"
-                            value="${data?.satuan ?? 'set'}" required>
-                    </td>
-
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][harga_satuan]"
-                            class="form-control harga_satuan"
-                            value="${data?.harga_satuan ?? 0}" required>
-                    </td>
-
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][ppn]"
-                            class="form-control ppn">
-                    </td>
-
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][diskon]"
-                            class="form-control diskon"
-                            value="${data?.diskon ?? 0}">
-                    </td>
-
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][ppn]"
-                            class="form-control ppn"
-                            value="${data?.ppn ?? 0}">
-                    </td>
-
-                    <td>
-                        <input type="number"
-                            name="items[${itemIndex}][total_harga]"
-                            class="form-control total_harga"
-                            value="${data?.total_harga ?? 0}">
-                    </td>
-
-                    <td>
-                        <input type="text"
-                            name="items[${itemIndex}][keterangan]"
-                            class="form-control"
-                            value="${data?.keterangan ?? ''}">
-                    </td>
-
-                    <td>
-                        <button type="button"
-                                class="btn btn-danger btn-sm"
-                                onclick="$('#row-${itemIndex}').remove()">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(${itemIndex})">
                             <i class="fa fa-trash"></i>
                         </button>
                     </td>
-                </tr>`;
+                </tr>
+            `;
 
             $("#itemBody").append(row);
+            hitungTotal($("#row-" + itemIndex));
         }
 
+        function removeRow(id) {
+            $("#row-" + id).remove();
+            hitungTotalAllIn();
+        }
 
-        $(document).on("input change", ".qty, .harga_satuan, .diskon, .ppn", function() {
-            let row = $(this).closest("tr");
-            let qty = +row.find(".qty").val() || 0;
-            let harga = +row.find(".harga_satuan").val() || 0;
-            let diskon = +row.find(".diskon").val() || 0;
-            let ppn = +row.find(".ppn").val() || 0;
-            row.find(".total_harga").val((qty * harga) - diskon + ppn);
+        $(document).on("input change", ".qty,.harga_satuan,.diskon,.rate_ppn", function() {
+            hitungTotal($(this).closest("tr"));
         });
 
         $(document).on("change", ".barang-select", function() {
-            let harga = $(this).find(":selected").data("harga") || 0;
+            let harga = +$(this).find(":selected").data("harga") || 0;
             let row = $(this).closest("tr");
-            row.find(".harga_satuan").val(harga).trigger("input");
+            row.find(".harga_satuan").val(harga);
+            hitungTotal(row);
         });
+
+        function hitungTotal(row) {
+            let qty = +row.find(".qty").val() || 0;
+            let harga = +row.find(".harga_satuan").val() || 0;
+            let diskon = +row.find(".diskon").val() || 0;
+            let ratePPN = +row.find(".rate_ppn").val() || 0;
+
+            let subtotal = qty * harga;
+            let sebelumPPN = Math.max(subtotal - diskon, 0);
+            let ppnNominal = sebelumPPN * ratePPN / 100;
+
+            row.find(".total_sebelum_ppn").val(Math.round(sebelumPPN));
+            row.find(".total_sesudah_ppn").val(Math.round(sebelumPPN + ppnNominal));
+
+            hitungTotalAllIn();
+        }
+
+        function hitungTotalAllIn() {
+            let totalDiskon = 0,
+                totalSebelum = 0,
+                totalSetelah = 0;
+
+            $("#itemBody tr").each(function() {
+                totalDiskon += +$(this).find(".diskon").val() || 0;
+                totalSebelum += +$(this).find(".total_sebelum_ppn").val() || 0;
+                totalSetelah += +$(this).find(".total_sesudah_ppn").val() || 0;
+            });
+
+            $("#total_diskon").val(Math.round(totalDiskon));
+            $("#total_ppn").val(supplierRatePPN);
+            $("#total_sebelum_ppn").val(Math.round(totalSebelum));
+            $("#total_setelah_ppn").val(Math.round(totalSetelah));
+        }
+
+        $("#supplier_id").on("change", function() {
+            supplierRatePPN = +$(this).find(":selected").data("ppn") || 0;
+            $(".rate_ppn").val(supplierRatePPN);
+            $("#itemBody tr").each(function() {
+                hitungTotal($(this));
+            });
+            hitungTanggalJatuhTempo();
+        });
+
+        $("#tanggal_invoice").on("change", hitungTanggalJatuhTempo);
 
         function hitungTanggalJatuhTempo() {
             let tempo = +$("#supplier_id option:selected").data("tempo") || 0;
@@ -301,12 +295,8 @@
 
             let d = new Date(tgl);
             d.setDate(d.getDate() + tempo);
-
-            $("#tanggal_jatuh_tempo").val(
-                d.toISOString().slice(0, 10)
-            );
+            $("#tanggal_jatuh_tempo").val(d.toISOString().slice(0, 10));
         }
-
-        $("#supplier_id, #tanggal_invoice").on("change", hitungTanggalJatuhTempo);
     </script>
+
 @endpush

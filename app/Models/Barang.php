@@ -21,4 +21,12 @@ class Barang extends Model
     {
         return $this->belongsTo(Seller::class, "seller_id");
     }
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id")
+            ->withDefault([
+                "nama_divisi" => "-"
+            ]);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Mapper;
 
 use App\Models\Supplier;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierMapper
 {
@@ -21,7 +22,8 @@ class SupplierMapper
                 'bank'              => $supplier->bank->alias,
                 'alamat'            => $supplier->alamat,
                 'tempo_pembayaran'  => $supplier->ketentuan_tempo_pembayaran,
-                'status_pkp'        => $supplier->pkp
+                'status_pkp'        => $supplier->pkp,
+                'divisi'            => !empty(Auth::user()->one_divisi_roles) ? "A" : $supplier["divisi"]["nama_divisi"]
             ];
         });
     }

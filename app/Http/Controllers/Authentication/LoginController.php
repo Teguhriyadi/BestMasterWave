@@ -26,6 +26,8 @@ class LoginController extends Controller
 
         $cek = User::where("username", $request->username)->first();
 
+        if (empty($cek)) return back()->with("error", "Akun Tidak Ditemukan");
+
         if ($cek["is_active"] != "1") return back()->with("error", "Akun Anda Tidak Aktif");
 
         if (Auth::attempt($credentials)) {

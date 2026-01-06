@@ -8,6 +8,7 @@ use App\Http\Services\BarangService;
 use App\Http\Services\SellerService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
@@ -22,8 +23,10 @@ class BarangController extends Controller
 
         $data["barang"] = $this->barang_service->list();
 
-        if ($data["seller"]->count() == 0) {
-            return redirect()->to("/admin-panel/seller")->with("error", "Data Seller Tidak Ada");
+        if (!empty(Auth::user()->one_divisi_roles)) {
+            if ($data["seller"]->count() == 0) {
+                return redirect()->to("/admin-panel/seller")->with("error", "Data Seller Tidak Ada");
+            }
         }
 
         return view("pages.modules.barang.index", $data);

@@ -25,23 +25,30 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (!empty(Auth::user()->one_divisi_roles))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
             </button>
         </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                        @endif
                         <th class="text-center">SKU Barang</th>
                         <th>Nama Seller</th>
                         <th class="text-center">Harga Modal</th>
                         <th class="text-center">Harga Pembelian Terakhir</th>
                         <th class="text-center">Tanggal Pembelian Terakhir</th>
                         <th class="text-center">Status SKU</th>
+                        @if (!empty(Auth::user()->one_divisi_roles))
                         <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -51,12 +58,16 @@
                     @foreach ($barang as $item)
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                                <td>{{ $item['divisi'] }}</td>
+                            @endif
                             <td class="text-center">{{ $item['sku_barang'] }}</td>
                             <td>{{ $item['seller_id'] }}</td>
                             <td class="text-center">{{ $item['harga_modal'] }}</td>
                             <td class="text-center">{{ $item['harga_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['tanggal_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['status_sku'] }}</td>
+                            @if (!empty(Auth::user()->one_divisi_roles))
                             <td class="text-center">
                                 <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
@@ -72,6 +83,7 @@
                                     </button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
