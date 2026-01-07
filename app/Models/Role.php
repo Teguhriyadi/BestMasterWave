@@ -18,4 +18,12 @@ class Role extends Model
     protected $keyType = "string";
 
     public $primaryKey = "id";
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id")
+            ->withDefault([
+                "nama_divisi" => "-"
+            ]);
+    }
 }

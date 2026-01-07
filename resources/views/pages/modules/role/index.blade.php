@@ -23,20 +23,27 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (!empty(Auth::user()->one_divisi_roles))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
             </button>
         </div>
+        @endif
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="text-center">No.</th>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                            @endif
                             <th>Nama Role</th>
                             <th class="text-center">Status</th>
+                            @if (!empty(Auth::user()->one_divisi_roles))
                             <th class="text-center">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -46,12 +53,16 @@
                         @foreach ($role as $item)
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
+                                @if (empty(Auth::user()->one_divisi_roles))
+                                <td>{{ $item['divisi'] }}</td>
+                                @endif
                                 <td>{{ $item['nama_role'] }}</td>
                                 <td class="text-center">
                                     <span class="badge bg-success text-white">
                                         {{ $item['status'] }}
                                     </span>
                                 </td>
+                                @if (!empty(Auth::user()->one_divisi_roles))
                                 <td class="text-center">
                                     <button onclick="editRole('{{ $item['id'] }}')" type="button"
                                         class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
@@ -67,6 +78,7 @@
                                         </button>
                                     </form>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Divisi;
 use App\Models\DivisiRole;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -11,9 +13,15 @@ class DivisiRoleRepository
 {
     public function get_all_data()
     {
-        return Divisi::with("roles")
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Divisi::with("roles")
             ->orderBy("nama_divisi")
             ->get();
+        } else {
+            return Divisi::where("id", AuthDivisi::id())->with("roles")
+            ->orderBy("nama_divisi")
+            ->get();
+        }
     }
 
     public function insertRoles(string $divisionId, array $roleIds): void

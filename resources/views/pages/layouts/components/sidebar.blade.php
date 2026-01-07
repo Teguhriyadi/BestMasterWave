@@ -125,8 +125,12 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('admin-panel/role*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/role') }}">Role</a>
+                @if (!empty(Auth::user()->one_divisi_roles))
+
+                @else
                 <a class="collapse-item {{ Request::is('admin-panel/divisi') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/divisi') }}">Divisi</a>
+                @endif
                 <a class="collapse-item {{ Request::is('admin-panel/divisi-role*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/divisi-role') }}">Role Divisi</a>
                 <a class="collapse-item {{ Request::is('admin-panel/users*') ? 'active' : '' }}"

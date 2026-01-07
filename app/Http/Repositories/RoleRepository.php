@@ -2,6 +2,7 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 
@@ -9,7 +10,12 @@ class RoleRepository
 {
     public function get_all_data()
     {
-        return Role::orderBy("created_at", "DESC")->get();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Role::orderBy("created_at", "DESC")->get();
+        } else {
+            return Role::where("divisi_id", AuthDivisi::id())
+                ->orderBy("created_at", "DESC")->get();
+        }
     }
 
     public function insert_data(array $data)
@@ -17,7 +23,8 @@ class RoleRepository
         $supplier = Role::create([
             "nama_role" => $data["nama_role"],
             "is_active" => "1",
-            "created_by" => Auth::user()->id
+            "created_by" => Auth::user()->id,
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $supplier;
@@ -33,7 +40,8 @@ class RoleRepository
         $supplier = Role::findOrFail($id);
 
         $supplier->update([
-            "nama_role" => $data["nama_role"]
+            "nama_role" => $data["nama_role"],
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         return $supplier;
