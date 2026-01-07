@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction\Shopee;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Services\SellerService;
 use App\Imports\ReadFilters\HeadersFilter;
@@ -13,6 +14,7 @@ use App\Models\Seller;
 use App\Models\ShopeePendapatan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -33,9 +35,15 @@ class PendapatanController extends Controller
 
             DB::beginTransaction();
 
+            if (empty(Auth::user()->one_divisi_roles)) {
+                return redirect()->to("/admin-panel/shopee/pendapatan/data");
+            }
+
             $platform = Platform::where('slug', 'shopee')->first();
             $data['seller'] = Seller::where('status', '1')
-                ->where('platform_id', $platform->id)->get();
+                ->where("divisi_id", AuthDivisi::id())
+                ->where('platform_id', $platform->id)
+                ->get();
 
             DB::commit();
 

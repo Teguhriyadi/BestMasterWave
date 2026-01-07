@@ -46,81 +46,22 @@ class PesananController extends Controller
         'no_resi',
     ];
 
-    public function index(Request $request)
+    public function index()
     {
         try {
 
-            $data = [];
-
-            if (!empty(Auth::user()->one_divisi_roles)) {
-
-                $platform = Platform::where("slug", "shopee")->firstOrFail();
-
-                $data["seller"] = Seller::where("status", "1")
-                    ->where("platform_id", $platform->id)
-                    ->get();
-            } else {
-                $platform = Platform::where("slug", "shopee")->firstOrFail();
-
-                $data["seller"] = Seller::where("status", "1")
-                    ->where("platform_id", $platform->id)
-                    ->get();
-
-                if ($request->ajax()) {
-
-                    $query = ShopeePesanan::query();
-
-                    if ($request->nama_seller) {
-                        $query->where('nama_seller', $request->nama_seller);
-                    }
-
-                    $allowedColumns = [
-                        'waktu_pesanan_dibuat',
-                        'waktu_pembayaran_dilakukan',
-                    ];
-
-                    if (
-                        in_array($request->filter_by, $allowedColumns)
-                        && $request->dari
-                        && $request->sampai
-                    ) {
-                        $query->whereBetween($request->filter_by, [
-                            $request->dari . ' 00:00:00',
-                            $request->sampai . ' 23:59:59'
-                        ]);
-                    }
-
-                    return DataTables::of($query)
-                        ->addIndexColumn()
-                        ->editColumn(
-                            'waktu_pesanan_dibuat',
-                            fn($row) =>
-                            $row->waktu_pesanan_dibuat
-                                ? \Carbon\Carbon::parse($row->waktu_pesanan_dibuat)->translatedFormat('d F Y H:i:s')
-                                : '-'
-                        )
-                        ->editColumn(
-                            'waktu_pembayaran_dilakukan',
-                            fn($row) =>
-                            $row->waktu_pembayaran_dilakukan
-                                ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s')
-                                : '-'
-                        )
-                        ->addColumn(
-                            'action',
-                            fn($row) =>
-                            '<a href="' . url('/admin-panel/shopee/pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
-                            <i class="fa fa-search"></i> Detail
-                        </a>'
-                        )
-                        ->rawColumns(['action'])
-                        ->make(true);
-                }
+            if (empty(Auth::user()->one_divisi_roles)) {
+                return redirect()->to("/admin-panel/shopee/pendapatan/data");
             }
 
-            return empty(Auth::user()->one_divisi_roles)
-                ? view("pages.modules.transaction.shopee.pesanan.kelola", $data)
-                : view("pages.modules.transaction.shopee.pesanan.upload", $data);
+            $platform = Platform::where("slug", "shopee")->firstOrFail();
+            $data["seller"] = Seller::where("status", "1")
+                ->where("divisi_id", AuthDivisi::id())
+                ->where("platform_id", $platform->id)
+                ->get();
+
+            return view('pages.modules.transaction.shopee.pesanan.upload', $data);
+
         } catch (\Exception $e) {
             abort(500, $e->getMessage());
         }
