@@ -31,4 +31,12 @@ class Pembelian extends Model
     {
         return $this->hasMany(DetailPembelian::class, "pembelian_id", "id");
     }
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id")
+            ->withDefault([
+                "nama_divisi" => "-"
+            ]);
+    }
 }

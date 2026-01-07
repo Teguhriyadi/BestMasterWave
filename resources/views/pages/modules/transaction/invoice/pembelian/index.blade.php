@@ -23,16 +23,21 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (!empty(Auth::user()->one_divisi_roles))
         <div class="card-header py-3">
             <a href="{{ url('/admin-panel/pembelian/create') }}" class="btn btn-primary btn-sm">
                 <i class="fa fa-plus"></i> Tambah Data
             </a>
         </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                        @endif
                         <th class="text-center">No. Invoice</th>
                         <th class="text-center">Tanggal Invoice</th>
                         <th class="text-center">Tanggal Jatuh Tempo</th>
@@ -41,7 +46,9 @@
                         <th class="text-center">Total PPN</th>
                         <th>Nama Supplier</th>
                         <th>Keterangan</th>
+                        @if (!empty(Auth::user()->one_divisi_roles))
                         <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -51,6 +58,9 @@
                     @foreach ($pembelian as $item)
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                            <td>{{ $item['divisi'] }}</td>
+                            @endif
                             <td class="text-center">{{ $item['no_invoice'] }}</td>
                             <td class="text-center">{{ $item['tanggal_invoice'] }}</td>
                             <td class="text-center">{{ $item['tanggal_jatuh_tempo'] }}</td>
@@ -59,6 +69,7 @@
                             <td class="text-center">{{ $item['total_ppn'] }}</td>
                             <td>{{ $item['supplier'] }}</td>
                             <td>{{ $item['keterangan'] }}</td>
+                            @if (!empty(Auth::user()->one_divisi_roles))
                             <td class="text-center">
                                 <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/edit') }}" class="btn btn-warning btn-sm">
                                     <i class="fa fa-edit"></i> Edit
@@ -73,6 +84,7 @@
                                     </button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
