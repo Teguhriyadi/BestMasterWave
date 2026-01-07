@@ -2,10 +2,10 @@
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
             <span>
-                Copyright &copy; 2025. Project Dibuat Oleh :
+                © 2025
                 <strong>
-                    Mohammad Ilham Teguhriyadi
-                </strong>
+                    {{ config('app.company_name') }}
+                </strong>. All rights reserved.
             </span>
         </div>
     </div>

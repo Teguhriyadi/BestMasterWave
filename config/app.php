@@ -38,7 +38,7 @@ return [
     | application. If disabled, a simple generic error page is shown.
     |
     */
-
+    'company_name' => 'Best Master Ware',
     'debug' => (bool) env('APP_DEBUG', false),
 
     /*

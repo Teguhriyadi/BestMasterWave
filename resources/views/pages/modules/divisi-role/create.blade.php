@@ -2,6 +2,12 @@
 
 @push('title_module', 'Divisi Role')
 
+@push('css_style')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -69,7 +75,14 @@
 @endpush
 
 @push('js_style')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('#divisi_id').select2({
+                theme: 'bootstrap4'
+            });
+        })
+
         document.getElementById('divisi_id').addEventListener('change', function() {
 
             const divisiId = this.value;
