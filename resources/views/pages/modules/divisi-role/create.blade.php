@@ -93,7 +93,7 @@
 
             if (!divisiId) return;
 
-            fetch(`/admin-panel/divisi-role/${divisiId}/roles`)
+            fetch(`{{ url('admin-panel/divisi-role/${divisiId}/roles') }}`)
                 .then(res => res.json())
                 .then(res => {
                     if (!res.status) return;

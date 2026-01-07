@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction\Shopee;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Services\SellerService;
 use App\Models\InvoiceDataPesanan;
@@ -11,6 +12,7 @@ use App\Models\Platform;
 use App\Models\Seller;
 use App\Models\ShopeePesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -44,26 +46,86 @@ class PesananController extends Controller
         'no_resi',
     ];
 
-    public function index()
+    public function index(Request $request)
     {
         try {
 
-            DB::beginTransaction();
+            $data = [];
 
-            $platform = Platform::where("slug", "shopee")->first();
-            $data["seller"] = Seller::where("status", "1")
-                ->where("platform_id", $platform->id)->get();
+            if (!empty(Auth::user()->one_divisi_roles)) {
 
-            DB::commit();
+                $platform = Platform::where("slug", "shopee")->firstOrFail();
 
-            return view("pages.modules.transaction.shopee.pesanan.upload", $data);
+                $data["seller"] = Seller::where("status", "1")
+                    ->where("platform_id", $platform->id)
+                    ->get();
+            } else {
+                $platform = Platform::where("slug", "shopee")->firstOrFail();
+
+                $data["seller"] = Seller::where("status", "1")
+                    ->where("platform_id", $platform->id)
+                    ->get();
+
+                if ($request->ajax()) {
+
+                    $query = ShopeePesanan::query();
+
+                    if ($request->nama_seller) {
+                        $query->where('nama_seller', $request->nama_seller);
+                    }
+
+                    $allowedColumns = [
+                        'waktu_pesanan_dibuat',
+                        'waktu_pembayaran_dilakukan',
+                    ];
+
+                    if (
+                        in_array($request->filter_by, $allowedColumns)
+                        && $request->dari
+                        && $request->sampai
+                    ) {
+                        $query->whereBetween($request->filter_by, [
+                            $request->dari . ' 00:00:00',
+                            $request->sampai . ' 23:59:59'
+                        ]);
+                    }
+
+                    return DataTables::of($query)
+                        ->addIndexColumn()
+                        ->editColumn(
+                            'waktu_pesanan_dibuat',
+                            fn($row) =>
+                            $row->waktu_pesanan_dibuat
+                                ? \Carbon\Carbon::parse($row->waktu_pesanan_dibuat)->translatedFormat('d F Y H:i:s')
+                                : '-'
+                        )
+                        ->editColumn(
+                            'waktu_pembayaran_dilakukan',
+                            fn($row) =>
+                            $row->waktu_pembayaran_dilakukan
+                                ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s')
+                                : '-'
+                        )
+                        ->addColumn(
+                            'action',
+                            fn($row) =>
+                            '<a href="' . url('/admin-panel/shopee/pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                            <i class="fa fa-search"></i> Detail
+                        </a>'
+                        )
+                        ->rawColumns(['action'])
+                        ->make(true);
+                }
+            }
+
+            return empty(Auth::user()->one_divisi_roles)
+                ? view("pages.modules.transaction.shopee.pesanan.kelola", $data)
+                : view("pages.modules.transaction.shopee.pesanan.upload", $data);
         } catch (\Exception $e) {
-
-            DB::rollBack();
-
-            dd($e->getMessage());
+            abort(500, $e->getMessage());
         }
     }
+
 
     public function store(Request $request)
     {
@@ -103,7 +165,9 @@ class PesananController extends Controller
         $normalized = array_values($headers);
         $headerHash = hash('sha256', json_encode($normalized));
 
-        $existingSchema = \App\Models\InvoiceSchemaPesanan::where('header_hash', $headerHash)->first();
+        $existingSchema = InvoiceSchemaPesanan::where('header_hash', $headerHash)
+            ->where("divisi_id", AuthDivisi::id())
+            ->first();
 
         return response()->json([
             'status'       => true,
@@ -272,11 +336,13 @@ class PesananController extends Controller
                 return response()->json(['status' => false, 'message' => 'Kolom "No. Pesanan" atau "Nomor Referensi SKU" tidak ditemukan'], 422);
             }
 
-            $existingSchema = \App\Models\InvoiceSchemaPesanan::where('header_hash', $request->header_hash)->first();
+            $existingSchema = InvoiceSchemaPesanan::where('header_hash', $request->header_hash)
+                ->where("divisi_id", AuthDivisi::id())
+                ->first();
 
             DB::beginTransaction();
 
-            $file = \App\Models\InvoiceFilePesanan::create([
+            $file = InvoiceFilePesanan::create([
                 'id'           => (string) Str::uuid(),
                 'seller_id'    => $request->seller_id,
                 'schema_id'    => $existingSchema ? $existingSchema->id : null,
@@ -284,6 +350,7 @@ class PesananController extends Controller
                 'uploaded_at'  => now(),
                 'total_rows'   => 0,
                 'processed_at' => null,
+                'divisi_id'    => AuthDivisi::id()
             ]);
 
             $buffer = [];
@@ -310,10 +377,11 @@ class PesananController extends Controller
                     $total++;
 
                     if (count($buffer) === 500) {
-                        \App\Models\InvoiceDataPesanan::create([
+                        InvoiceDataPesanan::create([
                             'invoice_file_pesanan_id' => $file->id,
                             'chunk_index' => $chunk++,
                             'payload' => ['rows' => $buffer],
+                            'divisi_id' => AuthDivisi::id()
                         ]);
                         $buffer = [];
                     }
@@ -322,10 +390,11 @@ class PesananController extends Controller
             }
 
             if (!empty($buffer)) {
-                \App\Models\InvoiceDataPesanan::create([
+                InvoiceDataPesanan::create([
                     'invoice_file_pesanan_id' => $file->id,
                     'chunk_index' => $chunk,
                     'payload' => ['rows' => $buffer],
+                    'divisi_id' => AuthDivisi::id()
                 ]);
             }
 
