@@ -2,6 +2,7 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Barang;
 use App\Models\DetailPembelian;
 use App\Models\Pembelian;
@@ -27,6 +28,7 @@ class PembelianRepository
             "supplier_id" => $data["supplier_id"],
             "keterangan" => $data["keterangan"],
             "created_by" => Auth::user()->id,
+            "divisi_id" => AuthDivisi::id()
         ]);
 
         foreach ($data["items"] as $item) {
@@ -73,7 +75,7 @@ class PembelianRepository
                 DetailPembelian::where('id', $item['id'])
                     ->where('pembelian_id', $id)
                     ->update([
-                        'sku_barang'    => $item['barang_id'],
+                        'sku_barang'   => $item['barang_id'],
                         'qty'          => $item['qty'],
                         'satuan'       => $item['satuan'],
                         'harga_satuan' => $item['harga_satuan'],
@@ -81,6 +83,7 @@ class PembelianRepository
                         'ppn'          => $item['ppn'] ?? 0,
                         'total'        => $item['total_sesudah_ppn'],
                         'keterangan'   => $item['keterangan'] ?? null,
+                        'divisi_id'    => AuthDivisi::id()
                     ]);
 
                 Barang::where("id", $item["barang_id"])->update([
@@ -101,6 +104,7 @@ class PembelianRepository
                     'ppn'          => $item['ppn'] ?? 0,
                     'total'        => $item['total_sesudah_ppn'],
                     'keterangan'   => $item['keterangan'] ?? null,
+                    'divisi_id'    => AuthDivisi::id()
                 ]);
 
                 Barang::where("id", $item["barang_id"])->update([
