@@ -51,7 +51,7 @@ class PesananController extends Controller
         try {
 
             if (empty(Auth::user()->one_divisi_roles)) {
-                return redirect()->to("/admin-panel/shopee/pendapatan/data");
+                return redirect()->to("/admin-panel/shopee/pesanan/data");
             }
 
             $platform = Platform::where("slug", "shopee")->firstOrFail();
