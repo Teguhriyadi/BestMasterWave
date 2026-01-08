@@ -22,6 +22,7 @@ use OpenSpout\Reader\XLSX\Reader;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
+use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
 
 class PendapatanController extends Controller
 {
@@ -41,9 +42,7 @@ class PendapatanController extends Controller
 
             $platform = Platform::where('slug', 'shopee')->first();
             $data['seller'] = Seller::where('status', '1')
-                ->where("divisi_id", AuthDivisi::id())
-                ->where('platform_id', $platform->id)
-                ->get();
+                ->where('platform_id', $platform->id)->get();
 
             DB::commit();
 
@@ -90,7 +89,10 @@ class PendapatanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
         $path = $request->file('file')->getPathname();
 
         $reader = IOFactory::createReaderForFile($path);
@@ -99,30 +101,18 @@ class PendapatanController extends Controller
 
         $spreadsheet = $reader->load($path);
 
-        $headers = [];
-        $sheetName = null;
-        $headerRow = 6;
-        $dataStart = 7;
+        $headers    = [];
+        $sheetName  = null;
+        $headerRow  = 6;
+        $dataStart  = 7;
 
-        $allowedKeywords = ['income', 'penghasilan'];
         foreach ($spreadsheet->getWorksheetIterator() as $sheet) {
-            $title = $sheet->getTitle();
-
-            $matched = false;
-            foreach ($allowedKeywords as $keyword) {
-                if (stripos($title, $keyword) !== false) {
-                    $matched = true;
-                    break;
-                }
-            }
-
-            if (! $matched) {
+            if (!preg_match('/income|penghasilan/i', $sheet->getTitle())) {
                 continue;
             }
 
             $sheetName = $sheet->getTitle();
-            $highestColumn = $sheet->getHighestColumn();
-            $maxCol = Coordinate::columnIndexFromString($highestColumn);
+            $maxCol    = Coordinate::columnIndexFromString($sheet->getHighestColumn());
 
             for ($i = 1; $i <= $maxCol; $i++) {
                 $col = Coordinate::stringFromColumnIndex($i);
@@ -134,35 +124,60 @@ class PendapatanController extends Controller
             break;
         }
 
-        if (! $sheetName || empty($headers)) {
-            return response()->json(['status' => false, 'message' => 'Format file tidak dikenali (Header baris 6 tidak ditemukan)'], 422);
+        if (!$sheetName || empty($headers)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Header tidak ditemukan'
+            ], 422);
         }
 
-        $normalized = array_values($headers);
-        $headerHash = hash('sha256', json_encode($normalized));
+        $headerHash = hash('sha256', json_encode(array_values($headers)));
+        $divisiId   = AuthDivisi::id();
 
-        $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $headerHash)->first();
+        $existingSchema = InvoiceSchemaPendapatan::where([
+            'header_hash' => $headerHash,
+            'divisi_id'   => $divisiId,
+        ])->first();
 
         $sheet = $spreadsheet->getSheetByName($sheetName);
-
         $dateColumns = $this->detectDateColumns($sheet, $headers, $dataStart);
 
+        // === HANDLE FROM DATE ===
         $fromRaw = $sheet->getCell('B2')->getValue();
-        $toRaw = $sheet->getCell('C2')->getValue();
+        if (is_numeric($fromRaw)) {
+            $fromDate = Date::excelToDateTimeObject($fromRaw)->format('Y-m-d');
+        } else {
+            $ts = strtotime((string) $fromRaw);
+            $fromDate = $ts ? date('Y-m-d', $ts) : null;
+        }
 
-        $fromDate = $fromRaw ? (is_numeric($fromRaw) ? Date::excelToDateTimeObject($fromRaw)->format('Y-m-d') : date('Y-m-d', strtotime($fromRaw))) : date('Y-m-d');
-        $toDate = $toRaw ? (is_numeric($toRaw) ? Date::excelToDateTimeObject($toRaw)->format('Y-m-d') : date('Y-m-d', strtotime($toRaw))) : date('Y-m-d');
+        // === HANDLE TO DATE ===
+        $toRaw = $sheet->getCell('C2')->getValue();
+        if (is_numeric($toRaw)) {
+            $toDate = Date::excelToDateTimeObject($toRaw)->format('Y-m-d');
+        } else {
+            $ts = strtotime((string) $toRaw);
+            $toDate = $ts ? date('Y-m-d', $ts) : null;
+        }
+
+        if (!$fromDate || !$toDate) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Periode tanggal tidak valid'
+            ], 422);
+        }
 
         return response()->json([
-            'status' => true,
-            'headers' => $headers,
-            'header_hash' => $headerHash,
-            'schema_id' => $existingSchema ? $existingSchema->id : null,
-            'date_columns' => $dateColumns,
-            'from_date' => $fromDate,
-            'to_date' => $toDate,
+            'status'        => true,
+            'headers'       => $headers,
+            'header_hash'   => $headerHash,
+            'schema_id'     => $existingSchema?->id,
+            'date_columns'  => $dateColumns,
+            'from_date'     => $fromDate,
+            'to_date'       => $toDate,
         ]);
     }
+
 
     public function process(Request $request)
     {
@@ -170,154 +185,191 @@ class PendapatanController extends Controller
         set_time_limit(0);
 
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-            'columns' => 'required|array',
-            'seller_id' => 'required',
+            'file'        => 'required|mimes:xlsx,xls',
+            'columns'     => 'required|array',
+            'seller_id'   => 'required',
             'date_column' => 'required|string',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date',
+            'from_date'   => 'required|date',
+            'to_date'     => 'required|date',
             'header_hash' => 'required',
         ]);
 
-        $reader = new Reader;
+        $divisiId = AuthDivisi::id();
+
+        $reader = new Reader();
+        $reader->open($request->file('file')->getPathname());
+
+        $schema = InvoiceSchemaPendapatan::where([
+            'header_hash' => $request->header_hash,
+            'divisi_id'   => $divisiId,
+        ])->first();
+
+        DB::beginTransaction();
 
         try {
-            $path = $request->file('file')->getPathname();
-            $reader->open($path);
 
-            $allExisting = [];
-            ShopeePendapatan::select('no_pesanan')->chunk(5000, function ($rows) use (&$allExisting) {
-                foreach ($rows as $row) {
-                    $allExisting[strtoupper(trim((string) $row->no_pesanan))] = true;
-                }
-            });
-
-            DB::reconnect();
-
-            $existingSchema = InvoiceSchemaPendapatan::where('header_hash', $request->header_hash)->first();
-
-            DB::beginTransaction();
-
-            $fileEntry = InvoiceFilePendapatan::create([
-                'id' => (string) Str::uuid(),
-                'seller_id' => $request->seller_id,
-                'schema_id' => $existingSchema ? $existingSchema->id : null,
+            $file = InvoiceFilePendapatan::create([
+                'id'          => (string) Str::uuid(),
+                'divisi_id'   => $divisiId,
+                'seller_id'   => $request->seller_id,
+                'schema_id'   => $schema?->id,
                 'header_hash' => $request->header_hash,
+                'from_date'   => $request->from_date,
+                'to_date'     => $request->to_date,
                 'uploaded_at' => now(),
-                'from_date' => $request->from_date,
-                'to_date' => $request->to_date,
-                'total_rows' => 0,
+                'total_rows'  => 0,
             ]);
 
-            $buffer = [];
+            // ambil no_pesanan existing (PER DIVISI)
+            $existing = ShopeePendapatan::where('divisi_id', $divisiId)
+                ->pluck('no_pesanan')
+                ->map(fn($v) => strtoupper(trim($v)))
+                ->flip()
+                ->toArray();
+
+            $buffer   = [];
             $chunkIdx = 0;
             $totalNew = 0;
-            $headerFoundAt = -1;
 
             foreach ($reader->getSheetIterator() as $sheet) {
-                $sheetName = strtoupper($sheet->getName());
-                if (strpos($sheetName, 'INCOME') === false && strpos($sheetName, 'PENGHASILAN') === false) continue;
 
-                $currentRowNumber = 0;
-                $currentSheetHeaderLine = -1;
-                $noPesananColIndex = -1;
-                $dateColIndex = -1;
-                $colMap = [];
+                if (!preg_match('/income|penghasilan/i', $sheet->getName())) {
+                    continue;
+                }
 
-                foreach ($sheet->getRowIterator() as $row) {
-                    $currentRowNumber++;
+                $headerRowIndex = -1;
+                $noPesananIndex = -1;
+                $dateIndex      = -1;
+                $columnIndexes  = [];
+
+                foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+
                     $cells = $row->toArray();
 
-                    if ($currentSheetHeaderLine === -1) {
-                        $rowString = strtoupper(json_encode($cells));
-                        if (strpos($rowString, 'NO. PESANAN') !== false) {
-                            $currentSheetHeaderLine = $currentRowNumber;
-                            $headerFoundAt = $currentRowNumber;
+                    // cari header
+                    if ($headerRowIndex === -1) {
+                        $joined = strtoupper(json_encode($cells));
 
-                            foreach ($cells as $idx => $val) {
-                                $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($idx + 1);
-                                if (isset($request->columns[$colLetter])) {
-                                    $label = $request->columns[$colLetter];
-                                    $colMap[$idx] = $label;
-                                    if ($label === 'No. Pesanan') $noPesananColIndex = $idx;
+                        if (str_contains($joined, 'NO. PESANAN')) {
+                            $headerRowIndex = $rowIndex;
+
+                            foreach ($cells as $idx => $label) {
+                                $label = trim((string) $label);
+                                if ($label === '') continue;
+
+                                if ($label === 'No. Pesanan') {
+                                    $noPesananIndex = $idx;
                                 }
-                                if ($colLetter === $request->date_column) $dateColIndex = $idx;
+
+                                foreach ($request->columns as $colLetter => $expectedLabel) {
+                                    if ($label === $expectedLabel) {
+                                        $columnIndexes[$expectedLabel] = $idx;
+                                    }
+                                }
                             }
+
+                            $dateIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString(
+                                $request->date_column
+                            ) - 1;
                         }
+
                         continue;
                     }
 
-                    if ($currentRowNumber > $currentSheetHeaderLine) {
-                        if ($noPesananColIndex === -1 || $dateColIndex === -1) continue;
+                    if ($rowIndex <= $headerRowIndex) {
+                        continue;
+                    }
 
-                        $valNoPesanan = $cells[$noPesananColIndex] ?? null;
-                        $noPesanan = strtoupper(trim((string) $valNoPesanan));
+                    if ($noPesananIndex === -1 || $dateIndex === -1) {
+                        continue;
+                    }
 
-                        if ($noPesanan === '' || isset($allExisting[$noPesanan])) continue;
+                    $noPesanan = strtoupper(trim((string) ($cells[$noPesananIndex] ?? '')));
+                    if ($noPesanan === '' || isset($existing[$noPesanan])) {
+                        continue;
+                    }
 
-                        $rawDate = $cells[$dateColIndex] ?? null;
-                        if ($rawDate instanceof \DateTimeInterface) {
-                            $rowDate = $rawDate->format('Y-m-d');
-                        } else {
-                            $timestamp = strtotime((string) $rawDate);
-                            $rowDate = $timestamp ? date('Y-m-d', $timestamp) : null;
-                        }
+                    // === HANDLE TANGGAL (OPEN SPOUT STYLE) ===
+                    $rawDate = $cells[$dateIndex] ?? null;
 
-                        if (!$rowDate || $rowDate < $request->from_date || $rowDate > $request->to_date) continue;
+                    if ($rawDate instanceof \DateTimeInterface) {
+                        $rowDate = $rawDate->format('Y-m-d');
+                    } else {
+                        $timestamp = strtotime((string) $rawDate);
+                        $rowDate = $timestamp ? date('Y-m-d', $timestamp) : null;
+                    }
 
-                        $item = [];
-                        foreach ($colMap as $idx => $label) {
-                            $val = $cells[$idx] ?? '';
-                            $item[$label] = ($val instanceof \DateTimeInterface) ? $val->format('Y-m-d H:i:s') : (string) $val;
-                        }
+                    if (
+                        !$rowDate ||
+                        $rowDate < $request->from_date ||
+                        $rowDate > $request->to_date
+                    ) {
+                        continue;
+                    }
 
-                        $buffer[] = $item;
-                        $totalNew++;
-                        $allExisting[$noPesanan] = true;
+                    $item = [];
+                    foreach ($columnIndexes as $label => $idx) {
+                        $val = $cells[$idx] ?? null;
+                        $item[$label] = $val instanceof \DateTimeInterface
+                            ? $val->format('Y-m-d H:i:s')
+                            : (string) $val;
+                    }
 
-                        if (count($buffer) >= 200) {
-                            if (!DB::connection()->getPdo()) DB::reconnect();
-                            InvoiceDataPendapatan::create([
-                                'invoice_file_pendapatan_id' => $fileEntry->id,
-                                'chunk_index' => $chunkIdx++,
-                                'payload' => ['rows' => $buffer],
-                            ]);
-                            $buffer = [];
-                            if ($chunkIdx % 10 === 0) gc_collect_cycles();
-                        }
+                    $buffer[] = $item;
+                    $existing[$noPesanan] = true;
+                    $totalNew++;
+
+                    if (count($buffer) === 200) {
+                        InvoiceDataPendapatan::create([
+                            'invoice_file_pendapatan_id' => $file->id,
+                            'divisi_id'   => $divisiId,
+                            'chunk_index' => $chunkIdx++,
+                            'payload'    => ['rows' => $buffer],
+                        ]);
+                        $buffer = [];
                     }
                 }
             }
 
-            $reader->close();
-
             if (!empty($buffer)) {
                 InvoiceDataPendapatan::create([
-                    'invoice_file_pendapatan_id' => $fileEntry->id,
+                    'invoice_file_pendapatan_id' => $file->id,
+                    'divisi_id'   => $divisiId,
                     'chunk_index' => $chunkIdx,
-                    'payload' => ['rows' => $buffer],
+                    'payload'    => ['rows' => $buffer],
                 ]);
             }
 
             if ($totalNew === 0) {
                 DB::rollBack();
-                return response()->json(['status' => false, 'message' => 'Data sudah ada atau format salah.'], 422);
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Data sudah ada atau tidak sesuai periode'
+                ], 422);
             }
 
-            $fileEntry->update(['total_rows' => $totalNew]);
+            $file->update(['total_rows' => $totalNew]);
+
             DB::commit();
+            $reader->close();
 
             return response()->json([
-                'status' => true,
-                'message' => "Berhasil mengimpor $totalNew data baru.",
-                'redirect' => url("/admin-panel/shopee/pendapatan/{$fileEntry->id}/show"),
+                'status'  => true,
+                'message' => "Berhasil import {$totalNew} data",
+                'redirect' => url("/admin-panel/shopee/pendapatan/{$file->id}/show"),
             ]);
         } catch (\Throwable $e) {
-            if (isset($reader)) $reader->close();
-            if (DB::transactionLevel() > 0) DB::rollBack();
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+
+            DB::rollBack();
+            $reader->close();
+
+            return response()->json([
+                'status'  => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
+
 
     public function show(string $id)
     {
@@ -359,83 +411,112 @@ class PendapatanController extends Controller
 
     public function processDatabase(Request $request, $fileId)
     {
-        $file = InvoiceFilePendapatan::findOrFail($fileId);
-
-        $mapping = $request->input('mapping') ?? ($file->schema ? $file->schema->columns_mapping : null);
-
-        if (!$mapping) {
-            return back()->with('error', 'Mapping kolom tidak ditemukan. Silakan lakukan mapping terlebih dahulu.');
-        }
-
-        $nama_seller = $request->nama_seller;
-        set_time_limit(0);
         ini_set('memory_limit', '1024M');
+        set_time_limit(0);
 
-        try {
-            // 1. Simpan/Update Schema
-            $schema = InvoiceSchemaPendapatan::updateOrCreate(
-                ['header_hash' => $file->header_hash],
-                ['columns_mapping' => $mapping]
-            );
+        $file = InvoiceFilePendapatan::findOrFail($fileId);
+        $divisiId = $file->divisi_id;
 
-            $file->update(['schema_id' => $schema->id]);
+        $mapping = $request->mapping ?? $file->schema?->columns_mapping;
 
-            // 2. Proses per Chunk
-            $chunkIds = InvoiceDataPendapatan::where('invoice_file_pendapatan_id', $fileId)
-                ->orderBy('chunk_index', 'asc')
-                ->pluck('id');
-
-            foreach ($chunkIds as $id) {
-                if (!DB::connection()->getPdo()) DB::reconnect();
-
-                $chunk = InvoiceDataPendapatan::find($id);
-                $rows = $chunk->payload['rows'] ?? [];
-                $batchData = [];
-
-                foreach ($rows as $row) {
-                    $headerNoPesanan = $mapping['no_pesanan'] ?? 'No. Pesanan';
-                    $noPesanan = strtoupper(trim((string) ($row[$headerNoPesanan] ?? '')));
-
-                    if (empty($noPesanan)) continue;
-
-                    $saveData = [
-                        'uuid'            => (string) \Illuminate\Support\Str::uuid(),
-                        'nama_seller'     => $nama_seller,
-                        'no_pesanan'      => $noPesanan,
-                        'created_at'      => now(),
-                        'updated_at'      => now(),
-                    ];
-
-                    foreach ($mapping as $dbColumn => $excelHeader) {
-                        if (empty($excelHeader) || $dbColumn === 'no_pesanan') continue;
-
-                        $value = $row[$excelHeader] ?? null;
-                        if (in_array($dbColumn, ['total_penghasilan', 'biaya_admin', 'biaya_layanan', 'biaya_proses'])) {
-                            $saveData[$dbColumn] = $this->parseNumber($value);
-                        } else {
-                            $saveData[$dbColumn] = $value;
-                        }
-                    }
-                    $batchData[] = $saveData;
-                }
-
-                if (!empty($batchData)) {
-                    DB::transaction(function () use ($batchData, $mapping) {
-                        $updateColumns = array_merge(array_keys($mapping), ['updated_at', 'nama_seller']);
-                        ShopeePendapatan::upsert($batchData, ['no_pesanan'], $updateColumns);
-                    });
-                }
-
-                unset($batchData, $rows);
-                gc_collect_cycles();
-            }
-
-            $file->update(['processed_at' => now()]);
-            return redirect('/admin-panel/shopee/pendapatan')->with('success', 'Data berhasil diproses ke database.');
-        } catch (\Throwable $e) {
-            return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
+        if (!$mapping || !isset($mapping['no_pesanan'])) {
+            return back()->with('error', 'Mapping tidak valid');
         }
+
+        // SIMPAN / UPDATE SCHEMA
+        $schema = InvoiceSchemaPendapatan::updateOrCreate(
+            [
+                'header_hash' => $file->header_hash,
+                'divisi_id'   => $divisiId
+            ],
+            [
+                'columns_mapping' => $mapping
+            ]
+        );
+
+        $file->update(['schema_id' => $schema->id]);
+
+        // AMBIL KOLOM DB VALID
+        $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatan'))
+            ->reject(fn($c) => in_array($c, [
+                'id',
+                'uuid',
+                'created_at',
+                'updated_at'
+            ]))
+            ->values()
+            ->toArray();
+
+        // 🔥 STREAM DATA PER CHUNK (NO SORT, NO GET)
+        InvoiceDataPendapatan::where([
+            'invoice_file_pendapatan_id' => $fileId,
+            'divisi_id' => $divisiId
+        ])
+            ->chunkById(10, function ($chunks) use (
+                $mapping,
+                $dbColumns,
+                $divisiId,
+                $request
+            ) {
+
+                foreach ($chunks as $chunk) {
+
+                    $batch = [];
+
+                    foreach ($chunk->payload['rows'] as $row) {
+
+                        $noPesanan = strtoupper(trim(
+                            (string) ($row[$mapping['no_pesanan']] ?? '')
+                        ));
+
+                        if ($noPesanan === '') {
+                            continue;
+                        }
+
+                        $data = [
+                            'uuid'        => (string) Str::uuid(),
+                            'divisi_id'   => $divisiId,
+                            'no_pesanan'  => $noPesanan,
+                            'nama_seller' => $request->nama_seller,
+                            'created_at'  => now(),
+                            'updated_at'  => now(),
+                        ];
+
+                        foreach ($mapping as $dbColumn => $excelHeader) {
+
+                            if (
+                                $dbColumn === 'no_pesanan' ||
+                                empty($excelHeader) ||
+                                !in_array($dbColumn, $dbColumns)
+                            ) {
+                                continue;
+                            }
+
+                            $data[$dbColumn] = $row[$excelHeader] ?? null;
+                        }
+
+                        $batch[] = $data;
+                    }
+
+                    if (!empty($batch)) {
+                        ShopeePendapatan::upsert(
+                            $batch,
+                            ['divisi_id', 'no_pesanan'],
+                            array_values(array_diff($dbColumns, ['no_pesanan']))
+                        );
+                    }
+
+                    // FREE MEMORY
+                    unset($batch);
+                    gc_collect_cycles();
+                }
+            });
+
+        $file->update(['processed_at' => now()]);
+
+        return back()->with('success', 'Data berhasil diproses ke database');
     }
+
 
     public function parseNumber($value)
     {

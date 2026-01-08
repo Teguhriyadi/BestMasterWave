@@ -4,15 +4,22 @@ namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Services\DivisiService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
+    public function __construct(
+        protected DivisiService $divisi_service
+    ) {}
+
     public function login()
     {
-        return view("pages.authentication.login");
+        $data["divisi"] = $this->divisi_service->list();
+
+        return view("pages.authentication.login", $data);
     }
 
     public function post_login(LoginRequest $request)

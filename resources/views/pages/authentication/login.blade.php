@@ -47,15 +47,35 @@
                             <form action="{{ url('/login') }}" method="POST" class="signin-form">
                                 @csrf
                                 <div class="form-group mb-3">
-                                    <label class="label" for="username">Username</label>
+                                    <label class="label" for="username">
+                                        Username
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" placeholder="Masukkan Username" id="username" value="{{ old('username') }}">
                                     @error('username')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label class="label" for="password">Password</label>
+                                    <label class="label" for="password">
+                                        Password
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Masukkan Password" id="password">
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="divisi_id" class="divisi_id"> Nama Divisi </label>
+                                    <select name="divisi_id" class="form-control" id="divisi_id">
+                                        <option value="">- Pilih Divisi -</option>
+                                        @foreach ($divisi as $item)
+                                            <option value="{{ $item['id'] }}">
+                                                {{ $item['nama_divisi'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                     @error('username')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
