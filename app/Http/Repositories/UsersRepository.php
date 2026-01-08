@@ -30,7 +30,7 @@ class UsersRepository
             "nama" => $data["nama"],
             "username" => $data["username"],
             "email" => $data["email"],
-            "password" => bcrypt("password"),
+            "password" => bcrypt("password_" . $divisi["slug"]),
             "is_active" => "1",
             "nomor_handphone" => $data["nomor_handphone"] ?? null,
             "alamat" => $data["alamat"] ?? null

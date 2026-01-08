@@ -38,6 +38,15 @@
                     @if (!empty(Auth::user()->one_divisi_roles))
                     <input type="hidden" name="divisi_id" value="{{ Auth::user()->one_divisi_roles->divisi->id }}">
                     <input type="text" class="form-control" name="divisi_roles_name" id="divisi_id" placeholder="Masukkan Nama Divisi" value="{{ Auth::user()->one_divisi_roles->divisi->nama_divisi }}" readonly>
+                    @else
+                    <select name="divisi_id" class="form-control" id="divisi_id">
+                        <option value="">- Pilih -</option>
+                        @foreach ($divisi as $item)
+                            <option value="{{ $item['id'] }}">
+                                {{ $item['nama_divisi'] }}
+                            </option>
+                        @endforeach
+                    </select>
                     @endif
                 </div>
 

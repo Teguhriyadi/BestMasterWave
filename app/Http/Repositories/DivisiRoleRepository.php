@@ -5,6 +5,7 @@ namespace App\Http\Repositories;
 use App\Helpers\AuthDivisi;
 use App\Models\Divisi;
 use App\Models\DivisiRole;
+use App\Models\UserDivisiRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -22,6 +23,12 @@ class DivisiRoleRepository
             ->orderBy("nama_divisi")
             ->get();
         }
+    }
+
+    public function get_users_divisi_role()
+    {
+        return UserDivisiRole::where("divisi_id", AuthDivisi::id())
+            ->get();
     }
 
     public function insertRoles(string $divisionId, array $roleIds): void

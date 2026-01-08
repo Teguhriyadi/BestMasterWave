@@ -19,6 +19,13 @@ class DivisiRoleService
         return DivisiRoleMapper::toTable($divisi_role);
     }
 
+    public function list_users()
+    {
+        $divisi_role = $this->divisi_role_repository->get_users_divisi_role();
+
+        return DivisiRoleMapper::toListData($divisi_role);
+    }
+
     public function create(array $data): void
     {
         $this->divisi_role_repository->insertRoles(

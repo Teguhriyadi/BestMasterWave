@@ -5,21 +5,28 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\CreateRequest;
 use App\Http\Requests\Users\UpdateRequest;
+use App\Http\Services\DivisiRoleService;
 use App\Http\Services\DivisiService;
 use App\Http\Services\UsersService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserDivisiRoleController extends Controller
 {
     public function __construct(
         protected UsersService $users_service,
-        protected DivisiService $divisi_service
+        protected DivisiService $divisi_service,
+        protected DivisiRoleService $divisi_role_service
     ) {}
 
     public function index()
     {
-        $data["users"] = $this->users_service->list();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            $data["users"] = $this->users_service->list();
+        } else {
+            $data["users"] = $this->divisi_role_service->list_users();
+        }
 
         return view("pages.modules.users.index", $data);
     }

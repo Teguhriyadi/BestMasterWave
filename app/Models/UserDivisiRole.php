@@ -19,6 +19,11 @@ class UserDivisiRole extends Model
 
     public $incrementing = false;
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, "user_id");
+    }
+
     public function roles()
     {
         return $this->belongsTo(Role::class, "role_id");
