@@ -231,7 +231,6 @@
                                 <div class="form-group">
                                     <label for="rate_ppn" class="form-label">
                                         Rate PPN
-                                        <small class="text-danger">*</small>
                                     </label>
                                     <input type="number" class="form-control @error('rate_ppn') is-invalid @enderror" name="rate_ppn" id="rate_ppn"
                                         placeholder="0" min="0" max="100" value{{ old('rate_ppn') }}>

@@ -39,20 +39,22 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li
-        class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') ? 'active' : '' }}">
+        class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/karyawan*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
             aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-book"></i>
             <span>Master</span>
         </a>
         <div id="collapseTwo"
-            class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') ? 'show' : '' }} "
+            class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') || Request::is('admin-panel/karyawan*') ? 'show' : '' }} "
             aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/platform') }}">Platform</a>
                 <a class="collapse-item {{ Request::is('admin-panel/jabatan') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/jabatan') }}">Jabatan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/karyawan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/karyawan') }}">Karyawan</a>
                 <a class="collapse-item {{ Request::is('admin-panel/seller') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/seller') }}">Seller</a>
                 @if (empty(Auth::user()?->one_divisi_roles))
