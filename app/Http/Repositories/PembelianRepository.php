@@ -48,7 +48,7 @@ class PembelianRepository
             Barang::where("id", $item["barang_id"])->update([
                 "harga_modal"               => $item["harga_satuan"],
                 "tanggal_pembelian_terakhir" => $data["tanggal_invoice"],
-                "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
+                "harga_pembelian_terakhir" => $item["harga_satuan"]
             ]);
         }
 
@@ -89,7 +89,7 @@ class PembelianRepository
                 Barang::where("id", $item["barang_id"])->update([
                     "harga_modal"               => $item["harga_satuan"],
                     "tanggal_pembelian_terakhir" => $pembelian["tanggal_invoice"],
-                    "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
+                    "harga_pembelian_terakhir" => $item["harga_satuan"]
                 ]);
 
                 $existingDetailIds[] = $item['id'];
@@ -111,7 +111,7 @@ class PembelianRepository
                 Barang::where("id", $item["barang_id"])->update([
                     "harga_modal"               => $item["harga_satuan"],
                     "tanggal_pembelian_terakhir" => $pembelian["tanggal_invoice"],
-                    "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
+                    "harga_pembelian_terakhir" => $item["harga_satuan"]
                 ]);
 
                 $existingDetailIds[] = $detail->id;
