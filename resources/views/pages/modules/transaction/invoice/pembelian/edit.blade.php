@@ -276,13 +276,13 @@
                     <td>
                         <input type="text"
                             name="items[${itemIndex}][total_sebelum_ppn]"
-                            class="form-control total_sebelum_ppn rupiah total-auto">
+                            class="form-control total_sebelum_ppn rupiah">
                     </td>
 
                     <td>
                         <input type="text"
                             name="items[${itemIndex}][total_sesudah_ppn]"
-                            class="form-control total_sesudah_ppn rupiah total-auto">
+                            class="form-control total_sesudah_ppn rupiah">
                     </td>
 
                     <td>
