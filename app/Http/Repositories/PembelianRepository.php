@@ -86,6 +86,7 @@ class PembelianRepository
                     ]);
 
                 Barang::where("id", $item["barang_id"])->update([
+                    "harga_modal"               => $item["total_sesudah_ppn"],
                     "tanggal_pembelian_terakhir" => $pembelian["tanggal_invoice"],
                     "harga_pembelian_terakhir" => $item["total_sesudah_ppn"]
                 ]);
