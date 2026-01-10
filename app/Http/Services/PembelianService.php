@@ -4,10 +4,8 @@ namespace App\Http\Services;
 
 use App\Helpers\AuthDivisi;
 use App\Http\Mapper\PembelianMapper;
-use App\Http\Mapper\SupplierMapper;
 use App\Http\Repositories\PembelianRepository;
-use App\Http\Repositories\SupplierRepository;
-use App\Models\Supplier;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,11 +15,11 @@ class PembelianService
         protected PembelianRepository $pembelian_repository
     ) {}
 
-    public function list()
+    public function list(Request $request)
     {
-        $supplier = $this->pembelian_repository->get_all_data();
+        $pembelian = $this->pembelian_repository->get_all_data($request);
 
-        return PembelianMapper::toTable($supplier);
+        return PembelianMapper::toTable($pembelian);
     }
 
     public function create(array $data)

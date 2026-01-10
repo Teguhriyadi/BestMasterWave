@@ -97,14 +97,13 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            // Setup Select2
+
             $('#nama_seller').select2({ theme: 'bootstrap4' });
 
-            // Inisialisasi DataTable Server-Side
             let table = $('#serverSideTable').DataTable({
                 processing: true,
                 serverSide: true,
-                deferRender: true, // Optimasi tambahan untuk ribuan data
+                deferRender: true,
                 ajax: {
                     url: "{{ url()->current() }}",
                     data: function (d) {
@@ -127,7 +126,6 @@
                 ]
             });
 
-            // Handle submit form filter
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
                 table.draw(); // Refresh tabel dengan filter baru

@@ -6,14 +6,42 @@ use App\Helpers\AuthDivisi;
 use App\Models\Barang;
 use App\Models\DetailPembelian;
 use App\Models\Pembelian;
-use App\Models\Supplier;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PembelianRepository
 {
-    public function get_all_data()
+    public function get_all_data(Request $request)
     {
-        return Pembelian::orderBy("created_at", "DESC")->get();
+        $query = Pembelian::query();
+
+        if ($request->filled('supplier_id')) {
+            $query->where('supplier_id', $request->supplier_id);
+        }
+
+        if ($request->filled('tgl_invoice_dari') && $request->filled('tgl_invoice_sampai')) {
+            $query->whereBetween('tanggal_invoice', [
+                $request->tgl_invoice_dari,
+                $request->tgl_invoice_sampai
+            ]);
+        } elseif ($request->filled('tgl_invoice_dari')) {
+            $query->whereDate('tanggal_invoice', '>=', $request->tgl_invoice_dari);
+        } elseif ($request->filled('tgl_invoice_sampai')) {
+            $query->whereDate('tanggal_invoice', '<=', $request->tgl_invoice_sampai);
+        }
+
+        if ($request->filled('tgl_jatuh_tempo_dari') && $request->filled('tgl_jatuh_tempo_sampai')) {
+            $query->whereBetween('tanggal_jatuh_tempo', [
+                $request->tgl_jatuh_tempo_dari,
+                $request->tgl_jatuh_tempo_sampai
+            ]);
+        } elseif ($request->filled('tgl_jatuh_tempo_dari')) {
+            $query->whereDate('tanggal_jatuh_tempo', '>=', $request->tgl_jatuh_tempo_dari);
+        } elseif ($request->filled('tgl_jatuh_tempo_sampai')) {
+            $query->whereDate('tanggal_jatuh_tempo', '<=', $request->tgl_jatuh_tempo_sampai);
+        }
+
+        return $query->orderBy("created_at", "DESC")->get();
     }
 
     public function insert_data(array $data)
@@ -93,8 +121,7 @@ class PembelianRepository
                 ]);
 
                 $existingDetailIds[] = $item['id'];
-            }
-            else {
+            } else {
                 $detail = DetailPembelian::create([
                     'pembelian_id' => $id,
                     'sku_barang'   => $item['barang_id'],

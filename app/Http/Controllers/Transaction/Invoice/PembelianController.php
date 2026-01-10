@@ -17,9 +17,10 @@ class PembelianController extends Controller
         protected PembelianService $pembelian_service
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $data["pembelian"] = $this->pembelian_service->list();
+        $data["pembelian"] = $this->pembelian_service->list($request);
+        $data["supplier"] = $this->supplier_service->list();
 
         return view("pages.modules.transaction.invoice.pembelian.index", $data);
     }
