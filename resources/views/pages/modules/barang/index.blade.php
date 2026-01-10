@@ -41,7 +41,6 @@
                             <th>Divisi</th>
                         @endif
                         <th class="text-center">SKU Barang</th>
-                        <th>Nama Seller</th>
                         <th class="text-center">Harga Modal</th>
                         <th class="text-center">Harga Pembelian Terakhir</th>
                         <th class="text-center">Tanggal Pembelian Terakhir</th>
@@ -62,7 +61,6 @@
                                 <td>{{ $item['divisi'] }}</td>
                             @endif
                             <td class="text-center">{{ $item['sku_barang'] }}</td>
-                            <td>{{ $item['seller_id'] }}</td>
                             <td class="text-center">{{ $item['harga_modal'] }}</td>
                             <td class="text-center">{{ $item['harga_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['tanggal_pembelian_terakhir'] }}</td>
