@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Mapper\PembelianMapper;
 use App\Http\Mapper\SupplierMapper;
 use App\Http\Repositories\PembelianRepository;
@@ -86,6 +87,7 @@ class PembelianService
                     'total_ppn'            => $totalPPN,
                     'total_qty'            => $totalQty,
                     'updated_by'           => Auth::user()->id,
+                    'divisi_id'            => AuthDivisi::id(),
                     'keterangan'           => $data['keterangan'],
                 ],
                 $items

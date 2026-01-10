@@ -82,8 +82,7 @@ class PembelianRepository
                         'diskon'       => $item['diskon'] ?? 0,
                         'ppn'          => $item['ppn'] ?? 0,
                         'total'        => $item['total_sesudah_ppn'],
-                        'keterangan'   => $item['keterangan'] ?? null,
-                        'divisi_id'    => AuthDivisi::id()
+                        'keterangan'   => $item['keterangan'] ?? null
                     ]);
 
                 Barang::where("id", $item["barang_id"])->update([

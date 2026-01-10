@@ -12,6 +12,11 @@
         #tableItem {
             white-space: nowrap;
         }
+
+        .total-auto {
+            pointer-events: none;
+            background-color: #e9ecef;
+        }
     </style>
 @endpush
 
@@ -167,10 +172,10 @@
                                     <input type="number" id="total_ppn" class="form-control" readonly>
                                 </th>
                                 <th>
-                                    <input type="number" id="total_sebelum_ppn" class="form-control" readonly>
+                                    <input type="text" id="total_sebelum_ppn" class="form-control rupiah" readonly>
                                 </th>
                                 <th>
-                                    <input type="number" id="total_setelah_ppn" class="form-control" readonly>
+                                    <input type="text" id="total_setelah_ppn" class="form-control rupiah" readonly>
                                 </th>
                             </tr>
                         </tfoot>
@@ -212,59 +217,58 @@
             });
 
             let row = `
-        <tr id="row-${itemIndex}">
-            <td>
-                <select name="items[${itemIndex}][barang_id]"
-                        class="form-control barang-select" required>
-                    ${options}
-                </select>
-            </td>
-            <td>
-                <input type="number" name="items[${itemIndex}][qty]"
-                       class="form-control qty" min="1" required placeholder="0">
-            </td>
-            <td>
-                <select class="form-control" name="items[${itemIndex}][satuan]">
-                    <option>- Pilih -</option>
-                    <option value="Set">Set</option>
-                </select>
-            </td>
-            <td>
-                <input type="number" name="items[${itemIndex}][harga_satuan]"
-                       class="form-control harga_satuan" required placeholder="0">
-            </td>
-            <td>
-                <input type="number" name="items[${itemIndex}][diskon]"
-                       class="form-control diskon" value="0">
-            </td>
-            <td>
-                <input type="number"
-                       name="items[${itemIndex}][rate_ppn]"
-                       class="form-control rate_ppn" placeholder="0">
-            </td>
-            <td>
-                <input type="number"
-                       name="items[${itemIndex}][total_sebelum_ppn]"
-                       class="form-control total_sebelum_ppn" placeholder="0">
-            </td>
-            <td>
-                <input type="number"
-                       name="items[${itemIndex}][total_sesudah_ppn]"
-                       class="form-control total_sesudah_ppn" placeholder="0">
-            </td>
-            <td>
-                <input type="text"
-                       name="items[${itemIndex}][keterangan]"
-                       class="form-control" placeholder="Masukkan Keterangan">
-            </td>
-            <td class="text-center">
-                <button type="button"
-                        class="btn btn-danger btn-sm"
-                        onclick="removeRow(${itemIndex})">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-        </tr>`;
+                <tr id="row-${itemIndex}">
+                    <td>
+                        <select name="items[${itemIndex}][barang_id]"
+                                class="form-control barang-select" required>
+                            ${options}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" name="items[${itemIndex}][qty]"
+                            class="form-control qty" min="1" required placeholder="0">
+                    </td>
+                    <td>
+                        <select class="form-control" name="items[${itemIndex}][satuan]">
+                            <option>- Pilih -</option>
+                            <option value="Set">Set</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="items[${itemIndex}][harga_satuan]" class="form-control harga_satuan rupiah" required placeholder="0">
+                    </td>
+                    <td>
+                        <input type="number" name="items[${itemIndex}][diskon]"
+                            class="form-control diskon" min="0" value="0">
+                    </td>
+                    <td>
+                        <input type="number"
+                            name="items[${itemIndex}][rate_ppn]"
+                            class="form-control rate_ppn" min="0" placeholder="0">
+                    </td>
+                    <td>
+                        <input type="text"
+            name="items[${itemIndex}][total_sebelum_ppn]"
+            class="form-control total_sebelum_ppn rupiah total-auto">
+                    </td>
+                    <td>
+                        <input type="text"
+            name="items[${itemIndex}][total_sesudah_ppn]"
+            class="form-control total_sesudah_ppn rupiah total-auto">
+                    </td>
+                    <td>
+                        <input type="text"
+                            name="items[${itemIndex}][keterangan]"
+                            class="form-control" placeholder="Masukkan Keterangan">
+                    </td>
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn btn-danger btn-sm"
+                                onclick="removeRow(${itemIndex})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
             $("#itemBody").append(row);
         });
 
@@ -278,36 +282,62 @@
             }
         }
 
+        function formatRupiah(angka) {
+            let numberString = angka.replace(/[^,\d]/g, '').toString();
+            let split = numberString.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            return split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+        }
+
+        $(document).on('input', '.harga_satuan.rupiah', function() {
+            let value = $(this).val();
+            $(this).val(formatRupiah(value));
+        });
+
+
         $(document).on("change", ".barang-select", function() {
             let row = $(this).closest("tr");
             let harga = parseFloat($(this).find(":selected").data("harga")) || 0;
             let satuan = $(this).find(":selected").data("satuan") || "";
 
-            row.find(".harga_satuan").val(harga);
+            setRupiah(row.find(".harga_satuan"), harga);
             row.find(".satuan").val(satuan);
             row.find(".rate_ppn").val(supplierRatePPN);
 
             hitungTotal(row);
         });
 
-        $(document).on("input", ".qty,.harga_satuan,.diskon", function() {
+        $(document).on("input", ".qty,.harga_satuan,.diskon,.rate_ppn", function() {
             hitungTotal($(this).closest("tr"));
         });
 
+        function setRupiah(input, value) {
+            let clean = value.toString().replace(/\D/g, '');
+            input.val(formatRupiah(clean));
+        }
+
         function hitungTotal(row) {
             let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga = parseFloat(row.find(".harga_satuan").val()) || 0;
+            let harga = parseFloat(
+                row.find(".harga_satuan").val().replace(/\./g, '')
+            ) || 0;
             let diskon = parseFloat(row.find(".diskon").val()) || 0;
             let ratePPN = parseFloat(row.find(".rate_ppn").val()) || 0;
 
             let subtotal = qty * harga;
-            let totalSebelumPPN = subtotal - diskon;
-            if (totalSebelumPPN < 0) totalSebelumPPN = 0;
-
+            let totalSebelumPPN = Math.max(subtotal - diskon, 0);
             let ppnNominal = totalSebelumPPN * ratePPN / 100;
 
-            row.find(".total_sebelum_ppn").val(Math.round(totalSebelumPPN));
-            row.find(".total_sesudah_ppn").val(Math.round(ppnNominal)); // 👈 FIX DI SINI
+            setRupiah(row.find(".total_sebelum_ppn"), Math.round(totalSebelumPPN));
+            setRupiah(row.find(".total_sesudah_ppn"), Math.round(totalSebelumPPN + ppnNominal));
 
             hitungTotalAllIn();
         }
@@ -318,16 +348,28 @@
             let totalSetelahPPN = 0;
 
             $("#itemBody tr").each(function() {
-                totalDiskon += parseFloat($(this).find(".diskon").val()) || 0;
-                totalSebelumPPN += parseFloat($(this).find(".total_sebelum_ppn").val()) || 0;
-                totalSetelahPPN += parseFloat($(this).find(".total_sesudah_ppn").val()) || 0;
+                let diskon = parseFloat($(this).find(".diskon").val()) || 0;
+                let sebelum = parseFloat(
+                    $(this).find(".total_sebelum_ppn").val().replace(/\./g, '')
+                ) || 0;
+
+                let sesudah = parseFloat(
+                    $(this).find(".total_sesudah_ppn").val().replace(/\./g, '')
+                ) || 0;
+
+                totalDiskon += diskon;
+                totalSebelumPPN += sebelum;
+                totalSetelahPPN += sesudah;
             });
 
+            let totalPPNNominal = totalSetelahPPN - totalSebelumPPN;
+
             $("#total_diskon").val(Math.round(totalDiskon));
-            $("#total_ppn").val(supplierRatePPN); // 👈 FIX: TETAP 20
-            $("#total_sebelum_ppn").val(Math.round(totalSebelumPPN));
-            $("#total_setelah_ppn").val(Math.round(totalSetelahPPN));
+            setRupiah($("#total_ppn"), Math.round(totalPPNNominal));
+            setRupiah($("#total_sebelum_ppn"), Math.round(totalSebelumPPN));
+            setRupiah($("#total_setelah_ppn"), Math.round(totalSetelahPPN));
         }
+
 
         $("#supplier_id").on("change", function() {
             supplierRatePPN = parseFloat($(this).find(":selected").data("ppn")) || 0;
@@ -335,11 +377,15 @@
 
             $("#itemBody tr").each(function() {
                 $(this).find(".rate_ppn").val(supplierRatePPN);
+
+                let hargaInput = $(this).find(".harga_satuan");
+                let rawHarga = hargaInput.val().replace(/\./g, '');
+                setRupiah(hargaInput, rawHarga);
+
                 hitungTotal($(this));
             });
-
-            $("#total_ppn").val(supplierRatePPN);
         });
+
 
         $("#tanggal_invoice").on("change", function() {
             hitungTanggalJatuhTempo();
@@ -363,6 +409,30 @@
 
             $("#tanggal_jatuh_tempo").val(`${yyyy}-${mm}-${dd}`);
         }
+    </script>
+
+    <script>
+        $("form").on("submit", function() {
+
+            $(".harga_satuan").each(function() {
+                let val = $(this).val();
+                $(this).val(val.replace(/\./g, ""));
+            });
+
+            $(".total_sebelum_ppn").each(function() {
+                let val = $(this).val();
+                $(this).val(val.replace(/\./g, ""));
+            });
+
+            $(".total_sesudah_ppn").each(function() {
+                let val = $(this).val();
+                $(this).val(val.replace(/\./g, ""));
+            });
+
+            $("#total_ppn").val($("#total_ppn").val().replace(/\./g, ""));
+            $("#total_sebelum_ppn").val($("#total_sebelum_ppn").val().replace(/\./g, ""));
+            $("#total_setelah_ppn").val($("#total_setelah_ppn").val().replace(/\./g, ""));
+        });
     </script>
 
 @endpush
