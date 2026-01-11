@@ -76,6 +76,13 @@ class PembelianController extends Controller
         return view("pages.modules.transaction.invoice.pembelian.edit", $data);
     }
 
+    public function detail($id)
+    {
+        $data["detail"] = $this->pembelian_service->show($id);
+
+        return view("pages.modules.transaction.invoice.pembelian.detail", $data);
+    }
+
     public function update(Request $request, $id)
     {
         try {

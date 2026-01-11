@@ -49,6 +49,13 @@ class PembelianService
         });
     }
 
+    public function show(string $id)
+    {
+        return DB::transaction(function() use ($id) {
+            return $this->pembelian_repository->get_data_by_id($id);
+        });
+    }
+
     public function edit(string $id)
     {
         return DB::transaction(function() use ($id) {

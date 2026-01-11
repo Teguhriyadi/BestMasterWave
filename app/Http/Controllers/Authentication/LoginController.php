@@ -35,6 +35,12 @@ class LoginController extends Controller
 
         if (empty($cek)) return back()->with("error", "Akun Tidak Ditemukan");
 
+        if ($cek["one_divisi_roles"]) {
+            if (empty($request->divisi_id)) {
+                return back()->with("error", "Silahkan Pilih Divisi Terlebih Dahulu")->withInput();
+            }
+        }
+
         if ($cek["is_active"] != "1") return back()->with("error", "Akun Anda Tidak Aktif");
 
         if (Auth::attempt($credentials)) {

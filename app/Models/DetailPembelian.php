@@ -16,4 +16,9 @@ class DetailPembelian extends Model
     protected $keyType = "string";
 
     public $primaryKey = "id";
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, "sku_barang", "id");
+    }
 }
