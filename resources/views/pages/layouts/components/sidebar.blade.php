@@ -117,19 +117,27 @@
     </div>
 
     <li
-        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
+        class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
             aria-expanded="true" aria-controls="collapseKelolaMenu">
             <i class="fas fa-fw fa-book"></i>
             <span>Kelola Menu</span>
         </a>
         <div id="collapseKelolaMenu"
-            class="collapse {{ Request::is('admin-panel/menu*') ? 'show' : '' }} "
+            class="collapse {{ Request::is('admin-panel/permissions*') || Request::is('admin-panel/menu*') ? 'show' : '' }} "
             aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('admin-panel/menu*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/menu') }}">
                     Menu
+                </a>
+                <a class="collapse-item {{ Request::is('admin-panel/role-menu*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/role-menu') }}">
+                    Role Menu
+                </a>
+                <a class="collapse-item {{ Request::is('admin-panel/permissions*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/permissions') }}">
+                    Permissions
                 </a>
             </div>
         </div>
