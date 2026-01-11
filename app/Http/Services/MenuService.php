@@ -20,6 +20,11 @@ class MenuService
         return MenuMapper::toTable($menu);
     }
 
+    public function list_grouping()
+    {
+        return $this->menu_repository->get_grouping_menu();
+    }
+
     public function list_menu()
     {
         $menu = $this->menu_repository->get_menu();

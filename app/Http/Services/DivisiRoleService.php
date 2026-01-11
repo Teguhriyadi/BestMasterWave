@@ -26,6 +26,13 @@ class DivisiRoleService
         return DivisiRoleMapper::toListData($divisi_role);
     }
 
+    public function list_akses_role()
+    {
+        $divisi_role = $this->divisi_role_repository->get_akses_role();
+
+        return DivisiRoleMapper::toListRole($divisi_role);
+    }
+
     public function create(array $data): void
     {
         $this->divisi_role_repository->insertRoles(

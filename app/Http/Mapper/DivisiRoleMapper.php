@@ -22,6 +22,16 @@ class DivisiRoleMapper
         });
     }
 
+    public static function toListRole(Collection $divisi_role): Collection
+    {
+        return $divisi_role->map(function (DivisiRole $division) {
+            return [
+                'id'          => $division->role_id,
+                'nama_role'   => $division->role->nama_role
+            ];
+        });
+    }
+
     public static function toListData(Collection $user_divisi_role): Collection
     {
         return $user_divisi_role->map(function (UserDivisiRole $users_role) {

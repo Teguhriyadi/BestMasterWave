@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/pengaturan/profil-saya.php';
                     require __DIR__ . '/../routes/kelola-menu/menu.php';
                     require __DIR__ . '/../routes/kelola-menu/permissions.php';
+                    require __DIR__ . '/../routes/kelola-menu/role-permissions.php';
                 });
             });
         },

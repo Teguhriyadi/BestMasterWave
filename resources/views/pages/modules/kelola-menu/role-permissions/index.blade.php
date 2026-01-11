@@ -1,0 +1,181 @@
+@extends('pages.layouts.app')
+
+@push('title_module', 'Permissions')
+
+@push('css_style')
+    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+@endpush
+
+@push('content_app')
+
+    <h1 class="h3 mb-4 text-gray-800">
+        Data Permissions
+    </h1>
+
+    @if (session('success'))
+        <div class="alert alert-success">
+            <strong>Berhasil,</strong> {{ session('success') }}
+        </div>
+    @elseif(session('error'))
+        <div class="alert alert-danger">
+            <strong>Gagal,</strong> {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <a href="{{ url('/admin-panel/role-permissions/create') }}" class="btn btn-primary btn-sm">
+                <i class="fa fa-plus"></i> Tambah Data
+            </a>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th>Role</th>
+                        <th>Menu</th>
+                        <th>Permissions</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $nomer = 0;
+                    @endphp
+                    @foreach ($grouping as $item)
+                        <tr>
+                            <td class="text-center">{{ ++$nomer }}.</td>
+                            <td>{{ $item['role'] }}</td>
+                            <td>{{ $item['menu'] }}</td>
+                            <td>
+                                @foreach ($item['permissions'] as $perm)
+                                    <span class="badge bg-success text-white me-1 mb-1" style="font-size: 13px">
+                                        {{ $perm }}
+                                    </span>
+                                @endforeach
+                            </td>
+                            <td class="text-center">
+                                <form action="{{ url('/admin-panel/role-permissions') }}" method="POST"
+                                    style="display:inline">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <input type="hidden" name="role_id" value="{{ $item['role_id'] }}">
+                                    <input type="hidden" name="menu_id" value="{{ $item['menu_id'] }}">
+
+                                    <button onclick="return confirm('Yakin ingin menghapus semua permission role ini?')"
+                                        class="btn btn-danger btn-sm">
+                                        <i class="fa fa-trash"></i> Hapus
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Tambah -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-plus"></i> Tambah Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url('/admin-panel/permissions') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="nama" class="form-label">
+                                Nama Modul
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" name="nama"
+                                id="nama" placeholder="Masukkan Nama Modul" value="{{ old('nama') }}">
+                            @error('nama')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="akses" class="form-label">
+                                Akses
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('akses') is-invalid @enderror" name="akses"
+                                id="akses" placeholder="Masukkan Akses" value="{{ old('akses') }}">
+                            @error('akses')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        {{-- <div class="form-group">
+                            <label for="menu_id" class="form-label">
+                                Nama Menu
+                                <small class="text-danger">*</small>
+                            </label>
+                            <select name="menu_id" class="form-control @error('menu_id') is-invalid @enderror" id="menu_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($menu as $item)
+                                    <option value="{{ $item['id'] }}">
+                                        {{ $item["nama_menu"] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-secondary btn-sm" data-dismiss="modal">
+                            <i class="fa fa-times"></i> Batalkan
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Tambah -->
+
+    <!-- Modal Edit -->
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-edit"></i> Edit Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-edit">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Edit -->
+@endpush
+
+@push('js_style')
+    <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                scrollX: true,
+                autoWidth: false,
+                responsive: false
+            });
+        });
+    </script>
+@endpush

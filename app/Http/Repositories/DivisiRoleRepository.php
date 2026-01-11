@@ -31,6 +31,12 @@ class DivisiRoleRepository
             ->get();
     }
 
+    public function get_akses_role()
+    {
+        return DivisiRole::where("divisi_id", AuthDivisi::id())
+            ->get();
+    }
+
     public function insertRoles(string $divisionId, array $roleIds): void
     {
         DB::transaction(function () use ($divisionId, $roleIds) {

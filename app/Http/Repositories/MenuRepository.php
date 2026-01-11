@@ -18,6 +18,14 @@ class MenuRepository
         return Menu::whereIn("type", ["menu"])->get();
     }
 
+    public function get_grouping_menu()
+    {
+        return Menu::with(["permissions"])
+            ->where("type", "submenu")
+            ->orderBy("order")
+            ->get();
+    }
+
     public function get_menu()
     {
         return Menu::whereIn("type", ["submenu"])->get();

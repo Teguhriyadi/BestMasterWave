@@ -19,6 +19,11 @@ class Role extends Model
 
     public $primaryKey = "id";
 
+    public function rolePermissions()
+    {
+        return $this->hasMany(RolePermission::class, 'role_id');
+    }
+
     public function divisi()
     {
         return $this->belongsTo(Divisi::class, "divisi_id")

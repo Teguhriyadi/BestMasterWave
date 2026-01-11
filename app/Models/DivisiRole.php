@@ -27,6 +27,11 @@ class DivisiRole extends Model
         );
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, "role_id");
+    }
+
     public function users()
     {
         return $this->belongsTo(User::class, "user_id");
