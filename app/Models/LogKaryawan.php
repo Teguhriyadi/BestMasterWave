@@ -11,11 +11,16 @@ class LogKaryawan extends Model
 
     protected $table = "log_karyawan";
 
-    protected $guarded = [""];
+    protected $guarded = [];
 
     public $incrementing = false;
 
     public $primaryKey = "id";
 
     protected $keyType = "string";
+
+    public function users()
+    {
+        return $this->belongsTo(User::class, "created_by", "id");
+    }
 }

@@ -30,6 +30,7 @@ class CreateRequest extends FormRequest
             'nama_panggilan.required'    => 'Nama Panggilan Wajib Diisi',
             'no_hp.required'             => 'Nomor Handphone Wajib Diisi',
             'no_hp_darurat.required'     => 'Nomor Handphone Darurat Wajib Diisi',
+            'tanggal_masuk.required'     => 'Tanggal Masuk Wajib Diisi',
             'tempat_lahir.required'      => 'Tempat Lahir Wajib Diisi',
             'tanggal_lahir.required'     => 'Tanggal Lahir Wajib Diisi',
             'jenis_kelamin.required'     => 'Jenis Kelamin Wajib Diisi',

@@ -36,6 +36,15 @@ class KaryawanService
         });
     }
 
+    public function show_log(string $id)
+    {
+        return DB::transaction(function() use ($id) {
+            $log = $this->karyawan_repository->get_log_karyawan($id);
+
+            return KaryawanMapper::toListLogKaryawan($log);
+        });
+    }
+
     public function update(string $id, array $data)
     {
         return DB::transaction(function () use ($id, $data) {

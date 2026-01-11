@@ -11,11 +11,23 @@ class Karyawan extends Model
 
     protected $table = "karyawan";
 
-    protected $guarded = [""];
+    protected $guarded = [];
 
     public $incrementing = false;
 
     protected $keyType = "string";
 
     public $primaryKey = "id";
+
+    protected $casts = [
+        "tanggal_masuk" => 'date'
+    ];
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id")
+            ->withDefault([
+                "nama_divisi" => "-"
+            ]);
+    }
 }

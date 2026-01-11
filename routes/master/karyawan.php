@@ -9,6 +9,7 @@ Route::prefix("karyawan")->group(function() {
     Route::post("/", [KaryawanController::class, "store"]);
     Route::get("/{id}/show", [KaryawanController::class, "show"]);
     Route::get("/{id}/edit", [KaryawanController::class, "edit"]);
+    Route::get("/{id}/lihat-log", [KaryawanController::class, "lihat_log"]);
     Route::put("/{id}", [KaryawanController::class, "update"]);
     Route::delete("/{id}", [KaryawanController::class, "destroy"]);
 });

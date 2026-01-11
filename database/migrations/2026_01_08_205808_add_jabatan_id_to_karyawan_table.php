@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreign('jabatan_id')->references('id')->on('jabatan')->cascadeOnDelete();
 
             $table->uuid("divisi_id")->nullable()->after("jabatan_id");
-            $table->foreign('divisi_id')->references('id')->on('jabatan')->cascadeOnDelete();
+            $table->foreign('divisi_id')->references('id')->on('divisi')->cascadeOnDelete();
         });
     }
 

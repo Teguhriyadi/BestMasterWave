@@ -29,6 +29,7 @@ class UpdateRequest extends FormRequest
             'nama.required'              => 'Nama Wajib Diisi',
             'nama_panggilan.required'    => 'Nama Panggilan Wajib Diisi',
             'no_hp.required'             => 'Nomor Handphone Wajib Diisi',
+            'tanggal_masuk.required'     => 'Tanggal Masuk Wajib Diisi',
             'no_hp_darurat.required'     => 'Nomor Handphone Darurat Wajib Diisi',
             'tempat_lahir.required'      => 'Tempat Lahir Wajib Diisi',
             'tanggal_lahir.required'     => 'Tanggal Lahir Wajib Diisi',

@@ -34,6 +34,8 @@ return new class extends Migration
             $table->string("acc_name", 50)->index()->nullable();
             $table->uuid("created_by");
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();
+            $table->uuid("updated_by")->nullable();
+            $table->foreign('updated_by')->references('id')->on('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }

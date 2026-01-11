@@ -40,7 +40,7 @@
                                 ID Sidik Jari
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="id_sidik_jari" class="form-control" id="id_sidik_jari"
+                                <input type="text" name="id_sidik_jari" class="form-control @error('id_sidik_jari') is-invalid @enderror" id="id_sidik_jari"
                                     placeholder="Masukkan ID Sidik Jari"
                                     value="{{ old('id_sidik_jari', $edit['id_sidik_jari']) }}">
 
@@ -54,7 +54,7 @@
                                 Nomor KTP
                             </label>
                             <div class="col-sm-3">
-                                <input type="text" name="no_ktp" class="form-control" id="no_ktp"
+                                <input type="text" name="no_ktp" class="form-control @error('no_ktp') is-invalid @enderror" id="no_ktp"
                                     placeholder="Masukkan Nomor KTP" value="{{ old('no_ktp', $edit['no_ktp']) }}">
 
                                 @error('no_ktp')
@@ -67,7 +67,7 @@
                                 Nomor Kartu Keluarga
                             </label>
                             <div class="col-sm-3">
-                                <input type="text" name="no_kk" class="form-control" id="no_kk"
+                                <input type="text" name="no_kk" class="form-control @error('no_kk') is-invalid @enderror" id="no_kk"
                                     placeholder="Masukkan Nomor Kartu Keluarga" value="{{ old('no_kk', $edit['no_kk']) }}">
 
                                 @error('no_kk')
@@ -80,7 +80,7 @@
                                 Nomor BPJS Kesehatan
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="no_bpjs_kesehatan" class="form-control" id="no_bpjs_kesehatan"
+                                <input type="text" name="no_bpjs_kesehatan" class="form-control @error('no_bpjs_kesehatan') is-invalid @enderror" id="no_bpjs_kesehatan"
                                     placeholder="Masukkan Nomor BPJS Kesehatan"
                                     value="{{ old('no_bpjs_kesehatan', $edit['no_bpjs_kesehatan']) }}">
 
@@ -95,7 +95,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-5">
-                                <input type="text" name="nama" class="form-control" id="nama"
+                                <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror" id="nama"
                                     placeholder="Masukkan Nama Lengkap" value="{{ old('nama', $edit['nama']) }}">
 
                                 @error('nama')
@@ -109,7 +109,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="nama_panggilan" class="form-control" id="nama_panggilan"
+                                <input type="text" name="nama_panggilan" class="form-control @error('nama_panggilan') is-invalid @enderror" id="nama_panggilan"
                                     placeholder="Masukkan Nama Panggilan"
                                     value="{{ old('nama_panggilan', $edit['nama_panggilan']) }}">
 
@@ -124,7 +124,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="date" name="tanggal_masuk" class="form-control" id="tanggal_masuk"
+                                <input type="date" name="tanggal_masuk" class="form-control @error('tanggal_masuk') is-invalid @enderror" id="tanggal_masuk"
                                     value="{{ old('tanggal_masuk', $edit['tanggal_masuk']) }}">
 
                                 @error('tanggal_masuk')
@@ -137,7 +137,7 @@
                                 Tanggal Keluar
                             </label>
                             <div class="col-sm-4">
-                                <input type="date" name="tanggal_keluar" class="form-control" id="tanggal_keluar"
+                                <input type="date" name="tanggal_keluar" class="form-control @error('tanggal_keluar') is-invalid @enderror" id="tanggal_keluar"
                                     value="{{ old('tanggal_keluar', $edit['tanggal_keluar']) }}">
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="no_hp" class="form-control" id="no_hp"
+                                <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror" id="no_hp"
                                     placeholder="Masukkan Nomor Handphone" value="{{ old('no_hp', $edit['no_hp']) }}">
 
                                 @error('no_hp')
@@ -161,7 +161,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="no_hp_darurat" class="form-control" id="no_hp_darurat"
+                                <input type="text" name="no_hp_darurat" class="form-control @error('no_hp_darurat') is-invalid @enderror" id="no_hp_darurat"
                                     placeholder="Masukkan Nomor Handphone Darurat"
                                     value="{{ old('no_hp_darurat', $edit['no_hp_darurat']) }}">
 
@@ -176,7 +176,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="tempat_lahir" class="form-control" id="tempat_lahir"
+                                <input type="text" name="tempat_lahir" class="form-control @error('tempat_lahir') is-invalid @enderror" id="tempat_lahir"
                                     placeholder="Masukkan Tempat Lahir"
                                     value="{{ old('tempat_lahir', $edit['tempat_lahir']) }}">
 
@@ -191,7 +191,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="date" name="tanggal_lahir" class="form-control" id="tanggal_lahir"
+                                <input type="date" name="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror" id="tanggal_lahir"
                                     value="{{ old('tanggal_lahir', $edit['tanggal_lahir']) }}">
 
                                 @error('tanggal_lahir')
@@ -205,7 +205,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <select name="jenis_kelamin" class="form-control" id="jenis_kelamin">
+                                <select name="jenis_kelamin" class="form-control @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin">
                                     <option value="">- Pilih -</option>
                                     <option
                                         {{ old('jenis_kelamin', $edit['jenis_kelamin'] ?? '') == 'L' ? 'selected' : '' }}
@@ -227,7 +227,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-6">
-                                <textarea name="alamat" class="form-control" id="alamat" rows="5" placeholder="Masukkan Alamat">{{ old('alamat', $edit['alamat']) }}</textarea>
+                                <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5" placeholder="Masukkan Alamat">{{ old('alamat', $edit['alamat']) }}</textarea>
 
                                 @error('alamat')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -240,7 +240,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <select name="status_pernikahan" class="form-control" id="status_pernikahan">
+                                <select name="status_pernikahan" class="form-control @error('status_pernikahan') is-invalid @enderror" id="status_pernikahan">
                                     <option value="">- Pilih -</option>
                                     <option value="Sudah Menikah"
                                         {{ old('status_pernikahan', $edit['status_pernikahan'] ?? '') == 'Sudah Menikah' ? 'selected' : '' }}>
@@ -264,7 +264,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <select name="jabatan_id" class="form-control" id="jabatan_id">
+                                <select name="jabatan_id" class="form-control @error('jabatan_id') is-invalid @enderror" id="jabatan_id">
                                     <option value="">- Pilih -</option>
                                     @foreach ($jabatan as $item)
                                         <option value="{{ $item['id'] }}"
@@ -285,7 +285,7 @@
                                 Nama Bank
                             </label>
                             <div class="col-sm-4">
-                                <select name="bank_id" class="form-control" id="bank_id">
+                                <select name="bank_id" class="form-control @error('bank_id') is-invalid @enderror" id="bank_id">
                                     <option value="">- Pilih -</option>
                                     @foreach ($bank as $edit)
                                         <option
@@ -306,7 +306,7 @@
                                 Nomor Rekening
                             </label>
                             <div class="col-sm-3">
-                                <input type="text" name="acc_no" class="form-control" id="acc_no"
+                                <input type="text" name="acc_no" class="form-control @error('acc_no') is-invalid @enderror" id="acc_no"
                                     placeholder="Masukkan Nomor Rekening"
                                     value="{{ old('acc_no', $edit['acc_no'] ?? '') }}">
 
@@ -320,7 +320,7 @@
                                 Nama Rekening
                             </label>
                             <div class="col-sm-5">
-                                <input type="text" name="acc_name" class="form-control" id="acc_name"
+                                <input type="text" name="acc_name" class="form-control @error('acc_name') is-invalid @enderror" id="acc_name"
                                     placeholder="Masukkan Nama Rekening"
                                     value="{{ old('acc_name', $edit['acc_name'] ?? '') }}">
 

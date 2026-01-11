@@ -2,8 +2,10 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Jabatan;
 use App\Models\Karyawan;
+use App\Models\LogKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -35,15 +37,50 @@ class KaryawanRepository
             "acc_no" => $data["acc_no"],
             "acc_name" => $data["acc_name"],
             "created_by" => Auth::user()->id,
-            "jabatan_id" => $data["jabatan_id"]
+            "jabatan_id" => $data["jabatan_id"],
+            "divisi_id" => AuthDivisi::id()
         ]);
 
+        $fields = [
+            'id_fp',
+            'no_ktp',
+            'no_kk',
+            'no_bpjs_kesehatan',
+            'bank_id',
+            'acc_no',
+            'acc_name',
+        ];
+
+        foreach ($fields as $field) {
+            if ($karyawan->$field !== null && $karyawan->$field !== '') {
+                $this->simpanLog(
+                    $karyawan->id,
+                    "Mengisi {$field}"
+                );
+            }
+        }
+
         return $karyawan;
+    }
+
+    private function simpanLog(string $karyawanId, string $deskripsi): void
+    {
+        LogKaryawan::create([
+            'karyawan_id' => $karyawanId,
+            'deskripsi'   => $deskripsi,
+            'created_by' => Auth::id() ?? Auth::user()->id
+        ]);
     }
 
     public function get_data_by_id(string $id)
     {
         return Karyawan::where("id", $id)->first();
+    }
+
+    public function get_log_karyawan(string $id)
+    {
+        return LogKaryawan::where("karyawan_id", $id)
+            ->orderBy("created_at", "DESC")->get();
     }
 
     public function update_by_id(string $id, array $data)
@@ -71,6 +108,28 @@ class KaryawanRepository
             "updated_by" => Auth::user()->id,
             "jabatan_id" => $data["jabatan_id"]
         ]);
+
+        $fields = [
+            'id_fp',
+            'no_ktp',
+            'no_kk',
+            'no_bpjs_kesehatan',
+            'bank_id',
+            'acc_no',
+            'acc_name',
+        ];
+
+        foreach ($fields as $field) {
+            $lama = $before[$field] ?? null;
+            $baru = $karyawan->$field;
+
+            if ($lama !== $baru) {
+                $this->simpanLog(
+                    $karyawan->id,
+                    "Mengisi {$field}"
+                );
+            }
+        }
 
         return $karyawan;
     }

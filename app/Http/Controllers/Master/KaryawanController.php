@@ -64,6 +64,19 @@ class KaryawanController extends Controller
         }
     }
 
+    public function lihat_log($id)
+    {
+        try {
+            $data["log"] = $this->karyawan_service->show_log($id);
+
+            return view("pages.modules.karyawan.lihat-log", $data);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
     public function edit($id)
     {
         try {
