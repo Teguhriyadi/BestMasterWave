@@ -113,6 +113,31 @@
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
+        Master Menu
+    </div>
+
+    <li
+        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
+            aria-expanded="true" aria-controls="collapseKelolaMenu">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Kelola Menu</span>
+        </a>
+        <div id="collapseKelolaMenu"
+            class="collapse {{ Request::is('admin-panel/menu*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/menu*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/menu') }}">
+                    Menu
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
         Master User
     </div>
 

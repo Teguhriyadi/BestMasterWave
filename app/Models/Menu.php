@@ -5,17 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
-class LogKaryawan extends Model
+class Menu extends Model
 {
     use HasUuids;
 
-    protected $table = "log_karyawan";
+    protected $table = "menu";
 
     protected $guarded = [""];
-
-    public $incrementing = false;
 
     public $primaryKey = "id";
 
     protected $keyType = "string";
+
+    public $incrementing = false;
+
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'parent_id');
+    }
 }

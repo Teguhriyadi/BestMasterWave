@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/master/jabatan.php';
                     require __DIR__ . '/../routes/master/karyawan.php';
                     require __DIR__ . '/../routes/pengaturan/profil-saya.php';
+                    require __DIR__ . '/../routes/kelola-menu/menu.php';
                 });
             });
         },
