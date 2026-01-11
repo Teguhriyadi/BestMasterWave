@@ -117,14 +117,14 @@
     </div>
 
     <li
-        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'active' : '' }}">
+        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengaturan"
             aria-expanded="true" aria-controls="collapsePengaturan">
             <i class="fas fa-fw fa-book"></i>
             <span>Pengaturan</span>
         </a>
         <div id="collapsePengaturan"
-            class="collapse {{ Request::is('admin-panel/role*') || Request::is('admin-panel/divisi*') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') ? 'show' : '' }} "
+            class="collapse {{ Request::is('admin-panel/role*') || Request::is('admin-panel/divisi*') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'show' : '' }} "
             aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ Request::is('admin-panel/role*') ? 'active' : '' }}"
@@ -138,6 +138,8 @@
                     href="{{ url('/admin-panel/divisi-role') }}">Role Divisi</a>
                 <a class="collapse-item {{ Request::is('admin-panel/users*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/users') }}">Users</a>
+                <a class="collapse-item {{ Request::is('admin-panel/profil-saya*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/profil-saya/' . Auth::id()) }}">Profil saya</a>
             </div>
         </div>
     </li>
