@@ -7,7 +7,7 @@ use App\Http\Repositories\MenuRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class MenuService
+class RoleMenuService
 {
     public function __construct(
         protected MenuRepository $menu_repository
@@ -15,16 +15,9 @@ class MenuService
 
     public function list()
     {
-        $menu = $this->menu_repository->get_all_data();
+        $supplier = $this->menu_repository->get_all_data();
 
-        return MenuMapper::toTable($menu);
-    }
-
-    public function list_menu()
-    {
-        $menu = $this->menu_repository->get_menu();
-
-        return MenuMapper::toTable($menu);
+        return MenuMapper::toTable($supplier);
     }
 
     public function list_parent()

@@ -4,23 +4,19 @@ namespace App\Http\Repositories;
 
 use App\Models\Bank;
 use App\Models\Menu;
+use App\Models\RoleMenu;
 use Illuminate\Support\Str;
 
-class MenuRepository
+class RoleMenuRepository
 {
     public function get_all_data()
     {
-        return Menu::orderBy("created_at", "DESC")->get();
+        return RoleMenu::orderBy("created_at", "DESC")->get();
     }
 
     public function get_parent()
     {
         return Menu::whereIn("type", ["menu"])->get();
-    }
-
-    public function get_menu()
-    {
-        return Menu::whereIn("type", ["submenu"])->get();
     }
 
     public function insert_data(array $data)
