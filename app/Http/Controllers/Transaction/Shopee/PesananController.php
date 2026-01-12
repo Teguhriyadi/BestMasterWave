@@ -435,7 +435,8 @@ class PesananController extends Controller
                     $saveData = [
                         'seller_id'       => $file->seller_id,
                         'invoice_file_id' => $file->id,
-                        'nama_seller'     => $nama_seller
+                        'nama_seller'     => $nama_seller,
+                        'divisi_id' => AuthDivisi::id()
                     ];
 
                     foreach ($mapping as $dbColumn => $excelHeader) {
