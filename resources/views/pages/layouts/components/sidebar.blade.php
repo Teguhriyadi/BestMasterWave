@@ -207,8 +207,8 @@
                     <div id="menu-{{ $menu->id }}" class="collapse">
                         <div class="bg-white py-2 collapse-inner rounded">
                             @foreach ($menu->children as $sub)
-                                <a class="collapse-item {{ Request::is($sub->url_menu . '*') ? 'active' : '' }}"
-                                    href="{{ url($sub->url_menu) }}">
+                                <a class="collapse-item {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
+                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
                                     {{ $sub->nama_menu }}
                                 </a>
                             @endforeach
@@ -216,8 +216,8 @@
                     </div>
                 </li>
             @else
-                <li class="nav-item {{ Request::is($menu->url_menu . '*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url($menu->url_menu) }}">
+                <li class="nav-item {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
                         <i class="{{ $menu->icon }}"></i>
                         <span>{{ $menu->nama_menu }}</span>
                     </a>
@@ -228,7 +228,6 @@
 
     <hr class="sidebar-divider">
 
-    <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
