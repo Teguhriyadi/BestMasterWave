@@ -63,14 +63,38 @@
                         @foreach ($menu as $item)
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
-                                <td>{{ $item['type'] }}</td>
+                                <td>
+                                    @if ($item["type"] == "header")
+                                        <span class="badge bg-success text-white text-uppercase">
+                                            Header
+                                        </span>
+                                    @elseif($item["type"] == "menu")
+                                        <span class="badge bg-primary text-white text-uppercase">
+                                            Menu
+                                        </span>
+                                    @elseif ($item["type"] == "submenu")
+                                        <span class="badge bg-warning text-white text-uppercase">
+                                            Sub Menu
+                                        </span>
+                                    @endif
+                                </td>
                                 <td>{{ $item['nama_menu'] }}</td>
                                 <td>{{ $item['slug'] }}</td>
                                 <td>{{ $item['url_menu'] }}</td>
                                 <td>{{ $item['ikon'] }}</td>
                                 <td>{{ $item['parent_menu'] }}</td>
                                 <td class="text-center">{{ $item['order'] }}</td>
-                                <td class="text-center">{{ $item['status'] }}</td>
+                                <td class="text-center">
+                                    @if ($item["status"] == "Aktif")
+                                        <span class="badge bg-success text-white text-uppercase">
+                                            Aktif
+                                        </span>
+                                    @elseif($item["status"] == "Tidak Aktif")
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Tidak Aktif
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <button onclick="editMenu(`{{ $item['id'] }}`)" type="button" class="btn btn-warning btn-sm" data-toggle="modal"
                                         data-target="#exampleModalEdit">
