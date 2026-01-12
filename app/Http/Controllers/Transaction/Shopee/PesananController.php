@@ -409,7 +409,8 @@ class PesananController extends Controller
             $schema = InvoiceSchemaPesanan::updateOrCreate(
                 ['header_hash' => $file->header_hash],
                 [
-                    'columns_mapping' => $mapping
+                    'columns_mapping' => $mapping,
+                    'divisi_id' => AuthDivisi::id()
                 ]
             );
 

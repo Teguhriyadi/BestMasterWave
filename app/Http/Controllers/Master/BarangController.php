@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Barang\CreateRequest;
+use App\Http\Requests\Barang\UpdateRequest;
 use App\Http\Services\BarangService;
 use App\Http\Services\SellerService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -64,7 +65,7 @@ class BarangController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         try {
             $this->barang_service->update($id, $request->all());
