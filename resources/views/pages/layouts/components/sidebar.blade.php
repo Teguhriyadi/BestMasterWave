@@ -115,7 +115,7 @@
     </div>
 
     <li
-        class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') || Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
+        class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
             aria-expanded="true" aria-controls="collapseKelolaMenu">
             <i class="fas fa-fw fa-book"></i>
