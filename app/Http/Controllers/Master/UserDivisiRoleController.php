@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\CreateRequest;
 use App\Http\Requests\Users\UpdateRequest;
@@ -61,8 +62,13 @@ class UserDivisiRoleController extends Controller
             $data["divisi"] = $this->divisi_service->list();
             $users = $this->users_service->edit($id);
             $data["edit"] = $users;
-            $data["selectedRoles"] = $users->divisiRoles->pluck("role_id")->toArray();
-            $data["selectedDivisi"] = $users->divisiRoles->first()?->divisi_id;
+
+            if (empty(Auth::user()->one_divisi_roles)) {
+                $data["selectedRoles"] = $users->divisiRoles->pluck("role_id")->toArray();
+                $data["selectedDivisi"] = $users->divisiRoles->first()?->divisi_id;
+            } else {
+                $data["selectedDivisi"] = AuthDivisi::id();
+            }
 
             return view("pages.modules.users.edit", $data);
         } catch (\Throwable $e) {

@@ -2,8 +2,10 @@
 
 namespace App\Http\Services;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Mapper\MenuMapper;
 use App\Http\Repositories\MenuRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -67,5 +69,10 @@ class MenuService
         return DB::transaction(function () use ($id) {
             $this->menu_repository->delete_by_id($id);
         });
+    }
+
+    public function sidebar(string $roleId, string $divisiId)
+    {
+        return $this->menu_repository->sidebarMenu($roleId, $divisiId);
     }
 }

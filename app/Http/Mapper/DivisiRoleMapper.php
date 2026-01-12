@@ -4,7 +4,7 @@ namespace App\Http\Mapper;
 
 use App\Models\Divisi;
 use App\Models\DivisiRole;
-use App\Models\User;
+use App\Models\Role;
 use App\Models\UserDivisiRole;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -32,11 +32,22 @@ class DivisiRoleMapper
         });
     }
 
+    public static function toPermissionsRole(Collection $role_permissions): Collection
+    {
+        return $role_permissions->map(function (Role $role) {
+            return [
+                'id'          => $role->id,
+                'nama_role'   => $role->nama_role
+            ];
+        });
+    }
+
     public static function toListData(Collection $user_divisi_role): Collection
     {
         return $user_divisi_role->map(function (UserDivisiRole $users_role) {
             return [
                 'id'        => $users_role["id"],
+                "user_id"      => empty(Auth::user()->one_divisi_roles) ? null : $users_role["user"]["id"],
                 'nama'      => empty(Auth::user()->one_divisi_roles) ? null : $users_role["user"]["nama"],
                 'username'  => empty(Auth::user()->one_divisi_roles) ? null : $users_role["user"]["username"],
                 'email'  => empty(Auth::user()->one_divisi_roles) ? null : $users_role["user"]["email"],

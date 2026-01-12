@@ -3,10 +3,6 @@
 @push('title_module', 'Users')
 
 @push('css_style')
-    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
-        rel="stylesheet">
 
     <style>
         .spacing-title {
@@ -54,46 +50,46 @@
                                 <td class="spacing-title">Nama</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    {{ $detail["nama"] }}
+                                    {{ $detail['nama'] }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="spacing-title">Username</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    {{ $detail["username"] }}
+                                    {{ $detail['username'] }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="spacing-title">Email</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    {{ $detail["email"] }}
+                                    {{ $detail['email'] }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="spacing-title">Nomor Handphone</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    {{ $detail["nomor_handphone"] }}
+                                    {{ $detail['nomor_handphone'] }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="spacing-title">Alamat</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    {{ $detail["alamat"] }}
+                                    {{ $detail['alamat'] }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="spacing-title">Status Akun</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    @if ($detail["is_active"] == "1")
+                                    @if ($detail['status'] == 'Aktif')
                                         <span class="badge bg-success text-white">
                                             Aktif
                                         </span>
-                                    @elseif ($detail["is_active"] == "0")
+                                    @elseif ($detail['status'] == 'Tidak Aktif')
                                         <span class="badge bg-danger text-white">
                                             Tidak Aktif
                                         </span>
@@ -104,11 +100,9 @@
                                 <td class="spacing-title">Role Akun</td>
                                 <td class="spacing">:</td>
                                 <td>
-                                    @foreach ($detail["divisiRoles"] as $item)
-                                        <span class="badge bg-success text-white">
-                                            {{ $item['divisi']["nama_divisi"] }} - {{ $item["roles"]["nama_role"] }}
-                                        </span>
-                                    @endforeach
+                                    <span class="badge bg-success text-white">
+                                        {{ $detail['role'] }}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>

@@ -32,7 +32,9 @@ class UsersService
     public function edit(string $id)
     {
         return DB::transaction(function() use ($id) {
-            return $this->users_repository->get_data_by_id($id);
+            $edit = $this->users_repository->get_data_by_id($id);
+
+            return UsersMapper::toEditTable($edit);
         });
     }
 

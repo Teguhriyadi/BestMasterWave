@@ -5,6 +5,7 @@ namespace App\Http\Repositories;
 use App\Helpers\AuthDivisi;
 use App\Models\Divisi;
 use App\Models\DivisiRole;
+use App\Models\Role;
 use App\Models\UserDivisiRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,13 @@ class DivisiRoleRepository
     public function get_akses_role()
     {
         return DivisiRole::where("divisi_id", AuthDivisi::id())
+            ->get();
+    }
+
+    public function get_akses_role_no_admin()
+    {
+        return Role::where("divisi_id", AuthDivisi::id())
+            ->where('nama_role', '!=', 'Super Admin')
             ->get();
     }
 

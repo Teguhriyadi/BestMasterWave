@@ -73,4 +73,28 @@ class MenuRepository
         $menu = Menu::findOrFail($id);
         $menu->delete();
     }
+
+    public function sidebarMenu(string $roleId, string $divisiId)
+    {
+        return Menu::with([
+            'children' => function ($q) use ($roleId, $divisiId) {
+                $q->where('is_active', true)
+                    ->with([
+                        'children' => function ($qq) use ($roleId, $divisiId) {
+                            $qq->where('is_active', true)
+                                ->whereHas('permissions.rolePermissions', function ($qr) use ($roleId, $divisiId) {
+                                    $qr->where('role_id', $roleId)
+                                        ->where('divisi_id', $divisiId);
+                                })
+                                ->orderBy('order');
+                        }
+                    ])
+                    ->orderBy('order');
+            }
+        ])
+            ->where('is_active', true)
+            ->whereIn('type', ['header', 'menu'])
+            ->orderBy('order')
+            ->get();
+    }
 }

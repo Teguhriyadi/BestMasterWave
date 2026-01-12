@@ -28,4 +28,9 @@ class Menu extends Model
     {
         return $this->hasMany(Permission::class, 'menu_id');
     }
+
+    public function children()
+    {
+        return $this->hasMany(Menu::class, 'parent_id');
+    }
 }

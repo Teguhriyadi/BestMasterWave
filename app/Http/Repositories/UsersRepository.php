@@ -7,6 +7,7 @@ use App\Models\DivisiRole;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserDivisiRole;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -43,20 +44,16 @@ class UsersRepository
             "is_admin" => $data["role_id"] == $cek["id"] ? "1" : "0"
         ]);
 
-        // foreach ($data["role_id"] as $item) {
-        //     UserDivisiRole::create([
-        //         "user_id" => $users["id"],
-        //         "divisi_id" => $data["divisi_id"],
-        //         "role_id" => $item
-        //     ]);
-        // }
-
         return $users;
     }
 
     public function get_data_by_id(string $id)
     {
-        return User::where("id", $id)->first();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return User::where("id", $id)->first();
+        } else {
+            return UserDivisiRole::where("id", $id)->first();
+        }
     }
 
     public function update_by_id(string $id, array $data)

@@ -2,14 +2,20 @@
 
 namespace App\Http\Repositories;
 
+use App\Helpers\AuthDivisi;
 use App\Models\Divisi;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class DivisiRepository
 {
     public function get_all_data()
     {
-        return Divisi::orderBy("created_at", "DESC")->get();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Divisi::orderBy("created_at", "DESC")->get();
+        } else {
+            return Divisi::where("id", AuthDivisi::id())->get();
+        }
     }
 
     public function insert_data(array $data)

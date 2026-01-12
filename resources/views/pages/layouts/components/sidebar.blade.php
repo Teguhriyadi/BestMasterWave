@@ -37,7 +37,6 @@
         Master Data
     </div>
 
-    <!-- Nav Item - Pages Collapse Menu -->
     <li
         class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/karyawan*') ? 'active' : '' }}">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -69,7 +68,6 @@
         </div>
     </li>
 
-    <!-- Divider -->
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
@@ -131,10 +129,10 @@
                     href="{{ url('/admin-panel/menu') }}">
                     Menu
                 </a>
-                <a class="collapse-item {{ Request::is('admin-panel/role-menu*') ? 'active' : '' }}"
+                {{-- <a class="collapse-item {{ Request::is('admin-panel/role-menu*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/role-menu') }}">
                     Role Menu
-                </a>
+                </a> --}}
                 <a class="collapse-item {{ Request::is('admin-panel/permissions*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/permissions') }}">
                     Permissions
@@ -183,6 +181,50 @@
             </div>
         </div>
     </li>
+
+    @foreach ($sidebarMenus->where('type', 'menu')->whereNull('parent_id') as $menu)
+        <li class="nav-item {{ Request::is($menu->url_menu . '*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ url($menu->url_menu) }}">
+                <i class="{{ $menu->icon }}"></i>
+                <span>{{ $menu->nama_menu }}</span>
+            </a>
+        </li>
+    @endforeach
+
+    @foreach ($sidebarMenus->where('type', 'header') as $header)
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">{{ $header->nama_menu }}</div>
+
+        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
+            @if ($menu->children->count())
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse"
+                        data-target="#menu-{{ $menu->id }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+
+                    <div id="menu-{{ $menu->id }}" class="collapse">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @foreach ($menu->children as $sub)
+                                <a class="collapse-item {{ Request::is($sub->url_menu . '*') ? 'active' : '' }}"
+                                    href="{{ url($sub->url_menu) }}">
+                                    {{ $sub->nama_menu }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
+            @else
+                <li class="nav-item {{ Request::is($menu->url_menu . '*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url($menu->url_menu) }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+                </li>
+            @endif
+        @endforeach
+    @endforeach
 
     <hr class="sidebar-divider">
 
