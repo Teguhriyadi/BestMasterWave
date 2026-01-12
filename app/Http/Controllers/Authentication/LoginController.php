@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Services\DivisiService;
 use App\Models\User;
+use App\Models\UserDivisiRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,9 +40,15 @@ class LoginController extends Controller
             if (empty($request->divisi_id)) {
                 return back()->with("error", "Silahkan Pilih Divisi Terlebih Dahulu")->withInput();
             }
+
+            $user_divisi_role = UserDivisiRole::where("divisi_id", $request->divisi_id)->first();
+
+            if (empty($user_divisi_role)) {
+                return back()->with("error", "Akun Tidak Ditemukan")->withInput();
+            }
         }
 
-        if ($cek["is_active"] != "1") return back()->with("error", "Akun Anda Tidak Aktif");
+        if ($cek["is_active"] != "1") return back()->with("error", "Akun Anda Tidak Aktif")->withInput();
 
         if (Auth::attempt($credentials)) {
 
