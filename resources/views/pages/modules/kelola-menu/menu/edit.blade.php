@@ -17,30 +17,42 @@
             <select name="tipe_menu"
                 class="form-control tipe-menu @error('tipe_menu') is-invalid @enderror">
                 <option value="">- Pilih -</option>
-                <option value="header" {{ $edit['type']=='header' ? 'selected' : '' }}>Header</option>
-                <option value="menu" {{ $edit['type']=='menu' ? 'selected' : '' }}>Menu</option>
-                <option value="submenu" {{ $edit['type']=='submenu' ? 'selected' : '' }}>Sub Menu</option>
+                <option value="header" {{ $edit['type'] == 'header' ? 'selected' : '' }}>Header</option>
+                <option value="menu" {{ $edit['type'] == 'menu' ? 'selected' : '' }}>Menu</option>
+                <option value="submenu" {{ $edit['type'] == 'submenu' ? 'selected' : '' }}>Sub Menu</option>
             </select>
             @error('tipe_menu')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
+
+        <div class="parent-headers-wrap" style="display:none">
+            <div class="form-group">
+                <label class="form-label">Nama Header Menu <small class="text-danger">*</small></label>
+                <select class="form-control" id="select_header">
+                    <option value="">- Pilih Header -</option>
+                    @foreach ($headers as $header)
+                        <option value="{{ $header['id'] }}"
+                            {{ $edit['parent_id'] == $header['id'] ? 'selected' : '' }}>
+                            {{ $header['nama_menu'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
         <div class="parent-wrap" style="display:none">
             <div class="form-group">
-                <label>Nama Parent Menu <small class="text-danger">*</small></label>
-                <select name="parent_id"
-                    class="form-control @error('parent_id') is-invalid @enderror">
+                <label class="form-label">Nama Parent Menu <small class="text-danger">*</small></label>
+                <select class="form-control" id="select_menu">
                     <option value="">- Pilih Parent -</option>
                     @foreach ($parents as $parent)
                         <option value="{{ $parent['id'] }}"
-                            {{ old('parent_id', $edit['parent_id']) == $parent['id'] ? 'selected' : '' }}>
+                            {{ $edit['parent_id'] == $parent['id'] ? 'selected' : '' }}>
                             {{ $parent['nama_menu'] }}
                         </option>
                     @endforeach
                 </select>
-                @error('parent_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
             </div>
         </div>
         <div class="form-group url-wrap">

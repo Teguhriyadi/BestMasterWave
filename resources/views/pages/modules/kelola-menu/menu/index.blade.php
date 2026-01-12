@@ -13,15 +13,15 @@
     </h1>
 
     @if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>Gagal!</strong>
-        <ul class="mb-0 mt-2">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+        <div class="alert alert-danger">
+            <strong>Gagal!</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     @if (session('success'))
         <div class="alert alert-success">
@@ -64,15 +64,15 @@
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
                                 <td>
-                                    @if ($item["type"] == "header")
+                                    @if ($item['type'] == 'header')
                                         <span class="badge bg-success text-white text-uppercase">
                                             Header
                                         </span>
-                                    @elseif($item["type"] == "menu")
+                                    @elseif($item['type'] == 'menu')
                                         <span class="badge bg-primary text-white text-uppercase">
                                             Menu
                                         </span>
-                                    @elseif ($item["type"] == "submenu")
+                                    @elseif ($item['type'] == 'submenu')
                                         <span class="badge bg-warning text-white text-uppercase">
                                             Sub Menu
                                         </span>
@@ -85,25 +85,27 @@
                                 <td>{{ $item['parent_menu'] }}</td>
                                 <td class="text-center">{{ $item['order'] }}</td>
                                 <td class="text-center">
-                                    @if ($item["status"] == "Aktif")
+                                    @if ($item['status'] == 'Aktif')
                                         <span class="badge bg-success text-white text-uppercase">
                                             Aktif
                                         </span>
-                                    @elseif($item["status"] == "Tidak Aktif")
+                                    @elseif($item['status'] == 'Tidak Aktif')
                                         <span class="badge bg-danger text-white text-uppercase">
                                             Tidak Aktif
                                         </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button onclick="editMenu(`{{ $item['id'] }}`)" type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                                        data-target="#exampleModalEdit">
+                                    <button onclick="editMenu(`{{ $item['id'] }}`)" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                         <i class="fa fa-edit"></i> Edit
                                     </button>
-                                    <form action="{{ url('/admin-panel/menu/' . $item['id']) }}" method="POST" style="display: inline">
+                                    <form action="{{ url('/admin-panel/menu/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit" class="btn btn-danger btn-sm">
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
                                             <i class="fa fa-trash"></i> Hapus
                                         </button>
                                     </form>
@@ -149,24 +151,33 @@
                                 Tipe Menu
                                 <small class="text-danger">*</small>
                             </label>
-                            <select name="tipe_menu" class="form-control tipe-menu">
+                            <select name="tipe_menu" class="form-control tipe-menu @error("tipe_menu") is-invalid @enderror">
                                 <option value="">- Pilih -</option>
-                                <option value="header">Header</option>
-                                <option value="menu">Menu</option>
-                                <option value="submenu">Sub Menu</option>
+                                <option {{ old('tipe_menu') == "header" ? 'selected' : '' }} value="header">Header</option>
+                                <option {{ old('tipe_menu') == "menu" ? 'selected' : '' }} value="menu">Menu</option>
+                                <option {{ old('tipe_menu') == "submenu" ? 'selected' : '' }} value="submenu">Sub Menu</option>
                             </select>
                             @error('tipe_menu')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
+                        <div class="parent-headers-wrap" style="display:none">
+                            <div class="form-group">
+                                <label class="form-label">Nama Header Menu <small class="text-danger">*</small></label>
+                                <select name="parent_id_header" class="form-control select-parent" id="select_header">
+                                    <option value="">- Pilih Header -</option>
+                                    @foreach ($headers as $header)
+                                        <option value="{{ $header['id'] }}">{{ $header['nama_menu'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="parent-wrap" style="display:none">
                             <div class="form-group">
-                                <label for="parent_id" class="form-label">
-                                    Nama Parent Menu
-                                    <small class="text-danger">*</small>
-                                </label>
-                                <select name="parent_id" class="form-control">
+                                <label class="form-label">Nama Parent Menu <small class="text-danger">*</small></label>
+                                <select name="parent_id_menu" class="form-control select-parent" id="select_menu">
                                     <option value="">- Pilih Parent -</option>
                                     @foreach ($parents as $parent)
                                         <option value="{{ $parent['id'] }}">{{ $parent['nama_menu'] }}</option>
@@ -248,6 +259,7 @@
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+                    toggleMenuField(document.getElementById('modal-content-edit'));
                 },
                 error: function(error) {
                     console.log(error);
@@ -258,18 +270,37 @@
         function toggleMenuField(container) {
             const typeSelect = container.querySelector('.tipe-menu');
             const parentWrap = container.querySelector('.parent-wrap');
+            const parentHeadersWrap = container.querySelector('.parent-headers-wrap');
             const urlWrap = container.querySelector('.url-wrap');
+
+            const selectHeader = container.querySelector('#select_header');
+            const selectMenu = container.querySelector('#select_menu');
 
             if (!typeSelect) return;
 
             function toggle() {
                 const type = typeSelect.value;
 
-                if (parentWrap)
-                    parentWrap.style.display = (type === 'submenu') ? 'block' : 'none';
+                if (parentWrap) parentWrap.style.display = 'none';
+                if (parentHeadersWrap) parentHeadersWrap.style.display = 'none';
+                if (urlWrap) urlWrap.style.display = 'block';
 
-                if (urlWrap)
-                    urlWrap.style.display = (type === 'header') ? 'none' : 'block';
+                if (selectHeader) selectHeader.removeAttribute('name');
+                if (selectMenu) selectMenu.removeAttribute('name');
+
+                if (type === 'header') {
+                    if (urlWrap) urlWrap.style.display = 'none';
+                }
+
+                if (type === 'menu') {
+                    if (parentHeadersWrap) parentHeadersWrap.style.display = 'block';
+                    if (selectHeader) selectHeader.setAttribute('name', 'parent_id');
+                }
+
+                if (type === 'submenu') {
+                    if (parentWrap) parentWrap.style.display = 'block';
+                    if (selectMenu) selectMenu.setAttribute('name', 'parent_id');
+                }
             }
 
             toggle();
@@ -278,8 +309,8 @@
 
         toggleMenuField(document);
 
-        $(document).on('shown.bs.modal', '#exampleModalEdit', function () {
-            toggleMenuField(this);
-        });
+        // $(document).on('shown.bs.modal', '#exampleModalEdit', function() {
+        //     toggleMenuField(this);
+        // });
     </script>
 @endpush

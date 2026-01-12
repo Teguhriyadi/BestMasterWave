@@ -18,6 +18,7 @@ class MenuController extends Controller
     public function index()
     {
         $data["menu"] = $this->menu_service->list();
+        $data["headers"] = $this->menu_service->list_parent_header();
         $data["parents"] = $this->menu_service->list_parent();
 
         return view("pages.modules.kelola-menu.menu.index", $data);
@@ -43,6 +44,7 @@ class MenuController extends Controller
     public function edit($id)
     {
         try {
+            $data["headers"] = $this->menu_service->list_parent_header();
             $data["parents"] = $this->menu_service->list_parent();
             $data["edit"] = $this->menu_service->edit($id);
 

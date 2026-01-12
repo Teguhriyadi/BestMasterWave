@@ -18,6 +18,12 @@ class MenuRepository
         return Menu::whereIn("type", ["menu"])->get();
     }
 
+    public function get_parent_header()
+    {
+        return Menu::whereIn("type", ["header"])
+            ->orderBy("order", "ASC")->get();
+    }
+
     public function get_grouping_menu()
     {
         return Menu::with(["permissions"])
@@ -33,6 +39,17 @@ class MenuRepository
 
     public function insert_data(array $data)
     {
+        $query = Menu::query();
+
+        if ($data['tipe_menu'] == 'header') {
+            $query->where('type', 'header');
+        } else {
+            $query->where('parent_id', $data['parent_id']);
+        }
+
+        $lastOrder = $query->max('order');
+        $nextOrder = $lastOrder ? $lastOrder + 1 : 1;
+
         $menu = Menu::create([
             "type" => $data["tipe_menu"],
             "nama_menu" => $data["nama_menu"],
@@ -40,7 +57,7 @@ class MenuRepository
             "url_menu" => $data['url'] ?? null,
             "icon" => $data['icon'] ?? null,
             "parent_id" => $data['parent_id'] ?? null,
-            "order" => $data['order'] ?? 0
+            "order" => $nextOrder
         ]);
 
         return $menu;

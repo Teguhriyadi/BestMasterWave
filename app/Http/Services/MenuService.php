@@ -41,6 +41,13 @@ class MenuService
         });
     }
 
+    public function list_parent_header()
+    {
+        return DB::transaction(function() {
+            return $this->menu_repository->get_parent_header();
+        });
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
