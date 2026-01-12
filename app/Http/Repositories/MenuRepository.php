@@ -93,25 +93,64 @@ class MenuRepository
 
     public function sidebarMenu(string $roleId, string $divisiId)
     {
-        return Menu::with([
-            'children' => function ($q) use ($roleId, $divisiId) {
-                $q->where('is_active', true)
-                    ->with([
-                        'children' => function ($qq) use ($roleId, $divisiId) {
-                            $qq->where('is_active', true)
-                                ->whereHas('permissions.rolePermissions', function ($qr) use ($roleId, $divisiId) {
-                                    $qr->where('role_id', $roleId)
-                                        ->where('divisi_id', $divisiId);
-                                })
-                                ->orderBy('order');
-                        }
-                    ])
-                    ->orderBy('order');
+        $globalHeaders = ['app'];
+        $globalMenus   = ['dashboard'];
+
+        $menus = Menu::with([
+            'children.children.permissions.rolePermissions' => function ($q) use ($roleId, $divisiId) {
+                $q->where('role_id', $roleId)
+                    ->where('divisi_id', $divisiId);
             }
         ])
             ->where('is_active', true)
-            ->whereIn('type', ['header', 'menu'])
             ->orderBy('order')
             ->get();
+
+        $allowedSubmenus = $menus->filter(function ($menu) use ($globalMenus, $menus) {
+
+            if ($menu->type !== 'submenu') {
+                return false;
+            }
+
+            if ($menu->permissions->flatMap->rolePermissions->isEmpty()) {
+                return false;
+            }
+
+            $parent = $menus->firstWhere('id', $menu->parent_id);
+
+            return $parent && !in_array($parent->slug, $globalMenus);
+        });
+
+        $allowedMenus = $menus->filter(function ($menu) use ($allowedSubmenus, $globalMenus) {
+
+            if ($menu->type !== 'menu') {
+                return false;
+            }
+
+            if (in_array($menu->slug, $globalMenus)) {
+                return true;
+            }
+
+            return $allowedSubmenus->where('parent_id', $menu->id)->isNotEmpty();
+        });
+
+        $allowedHeaders = $menus->filter(function ($menu) use ($allowedMenus, $globalHeaders) {
+
+            if ($menu->type !== 'header') {
+                return false;
+            }
+
+            if (in_array($menu->slug, $globalHeaders)) {
+                return true;
+            }
+
+            return $allowedMenus->where('parent_id', $menu->id)->isNotEmpty();
+        });
+
+        return $allowedHeaders
+            ->merge($allowedMenus)
+            ->merge($allowedSubmenus)
+            ->sortBy('order')
+            ->values();
     }
 }

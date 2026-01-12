@@ -182,7 +182,7 @@
         </div>
     </li>
 
-    @foreach ($sidebarMenus->where('type', 'menu')->whereNull('parent_id') as $menu)
+    {{-- @foreach ($sidebarMenus->where('type', 'menu')->whereNull('parent_id') as $menu)
         <li class="nav-item {{ Request::is($menu->url_menu . '*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ url($menu->url_menu) }}">
                 <i class="{{ $menu->icon }}"></i>
@@ -217,6 +217,50 @@
                 </li>
             @else
                 <li class="nav-item {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+                </li>
+            @endif
+        @endforeach
+    @endforeach --}}
+
+    @foreach ($sidebarMenus->where('type', 'header') as $header)
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">
+            {{ $header->nama_menu }}
+        </div>
+
+        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
+            @php
+                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
+            @endphp
+
+            @if ($submenus->count() > 0)
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse"
+                        data-target="#menu-{{ $menu->id }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+
+                    <div id="menu-{{ $menu->id }}" class="collapse">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @foreach ($submenus as $sub)
+                                <a class="collapse-item
+                                {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
+                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
+                                    {{ $sub->nama_menu }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
+            @else
+                <li
+                    class="nav-item
+                {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
                         <i class="{{ $menu->icon }}"></i>
                         <span>{{ $menu->nama_menu }}</span>
