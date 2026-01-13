@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Barang\CreateRequest;
 use App\Http\Requests\Barang\UpdateRequest;
 use App\Http\Services\BarangService;
 use App\Http\Services\SellerService;
+use App\Models\Barang;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Str;
 
 class BarangController extends Controller
 {
@@ -40,7 +45,6 @@ class BarangController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
-
         } catch (\Throwable $e) {
 
             return redirect()
@@ -71,15 +75,94 @@ class BarangController extends Controller
             $this->barang_service->update($id, $request->all());
 
             return back()->with('success', 'Data berhasil diperbarui');
-
         } catch (ModelNotFoundException $e) {
 
             return back()->with('error', 'Supplier tidak ditemukan');
-
         } catch (\Throwable $e) {
 
             return back()->withInput()->with('error', $e->getMessage());
         }
+    }
+
+    public function upload()
+    {
+        return view("pages.modules.barang.upload");
+    }
+
+    public function process_upload(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'mimes:xlsx,xls']
+        ]);
+
+        $spreadsheet = IOFactory::load($request->file('file')->getPathname());
+        $sheet = $spreadsheet->getSheetByName('Modal SKU Tunggal');
+
+        if (!$sheet) {
+            return back()->withErrors('Sheet "Modal SKU Tunggal" tidak ditemukan');
+        }
+
+        $rows = $sheet->toArray(null, true, true, false);
+
+        $headerRow = null;
+        for ($i = 0; $i < 10; $i++) {
+            foreach ($rows[$i] ?? [] as $cell) {
+                if (stripos((string) $cell, 'sku') !== false) {
+                    $headerRow = $i;
+                    break 2;
+                }
+            }
+        }
+
+        if ($headerRow === null) {
+            return back()->withErrors('Header SKU tidak ditemukan');
+        }
+
+        $headers = array_map(
+            fn($h) => strtolower(trim((string) $h)),
+            $rows[$headerRow]
+        );
+
+        $skuIndex = array_search(
+            true,
+            array_map(fn($h) => str_contains($h, 'sku'), $headers),
+            true
+        );
+
+        if ($skuIndex === false) {
+            return back()->withErrors('Kolom SKU tidak ditemukan');
+        }
+
+        $data = [];
+        $seenSku = [];
+
+        foreach (array_slice($rows, $headerRow + 1) as $row) {
+            $sku = trim((string) ($row[$skuIndex] ?? ''));
+
+            if ($sku === '' || isset($seenSku[$sku])) {
+                continue;
+            }
+
+            $seenSku[$sku] = true;
+
+            $data[] = [
+                'id' => \Illuminate\Support\Str::uuid(),
+                'sku_barang' => $sku,
+                'harga_modal' => 0,
+                'created_by' => Auth::id(),
+                'divisi_id' => AuthDivisi::id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Barang::upsert(
+            $data,
+            ['sku_barang'],
+            []
+        );
+
+        return back()->with('success', 'Import SKU berhasil');
     }
 
     public function destroy($id)
@@ -89,7 +172,6 @@ class BarangController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil dihapus');
-
         } catch (\Throwable $e) {
 
             return redirect()

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('barang', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string('sku_barang', 50)->index();
+            $table->string('sku_barang', 100)->index();
             $table->unsignedBigInteger('harga_modal');
             $table->unsignedBigInteger('harga_pembelian_terakhir')->nullable();
             $table->dateTime('tanggal_pembelian_terakhir')->nullable();

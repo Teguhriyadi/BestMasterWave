@@ -11,11 +11,18 @@ class Barang extends Model
 
     protected $table = "barang";
 
-    protected $guarded = [''];
+    protected $fillable = [
+        'sku_barang',
+        'harga_modal',
+        'created_by',
+        'divisi_id'
+    ];
 
     protected $keyType = "string";
 
     public $primaryKey = "id";
+
+    public $incrementing = false;
 
     public function seller()
     {
