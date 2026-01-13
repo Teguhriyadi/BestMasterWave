@@ -14,11 +14,11 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            <strong>Berhasil</strong>, {{ session('success') }}
         </div>
-    @elseif(session("error"))
+    @elseif(session('error'))
         <div class="alert alert-danger">
-            {{ session('error') }}
+            <strong>Gagal</strong>, {{ session('error') }}
         </div>
     @endif
 
@@ -42,34 +42,40 @@
                     </thead>
                     <tbody>
                         @php
-                            $nomer = 0
+                            $nomer = 0;
                         @endphp
                         @foreach ($platform as $item)
-                        <tr>
-                            <td class="text-center">{{ ++$nomer }}.</td>
-                            <td>{{ $item->nama }}</td>
-                            <td>{{ $item->slug }}</td>
-                            <td class="text-center">
-                                @if ($item->status == "1")
-                                <span class="badge bg-success text-white">
-                                    Aktif
-                                </span>
-                                @elseif ($item->status == "0")
-                                <span class="badge bg-danger text-white">
-                                    Non - Aktif
-                                </span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <form action="" method="POST" style="display: inline">
-                                    @csrf
-                                    @method("DELETE")
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                            <tr>
+                                <td class="text-center">{{ ++$nomer }}.</td>
+                                <td>{{ $item["nama"] }}</td>
+                                <td>{{ $item["slug"] }}</td>
+                                <td class="text-center">
+                                    @if ($item["status"] == 'Aktif')
+                                        <span class="badge bg-success text-white">
+                                            Aktif
+                                        </span>
+                                    @elseif ($item['status'] == 'Tidak Aktif')
+                                        <span class="badge bg-danger text-white">
+                                            Non - Aktif
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <button onclick="editPlatform(`{{ $item['id'] }}`)" type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                        data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
-                            </td>
-                        </tr>
+                                    <form action="{{ url('/admin-panel/platform/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -92,8 +98,16 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="nama" class="form-label"> Nama Platform </label>
-                            <input type="text" class="form-control" name="platform" id="platform" placeholder="Masukkan Nama Platform">
+                            <label for="nama" class="form-label">
+                                Nama Platform
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="text" class="form-control @error('platform') is-invalid @enderror" name="platform" id="platform"
+                                placeholder="Masukkan Nama Platform" value="{{ old('platform') }}">
+
+                            @error('platform')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -108,6 +122,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Edit -->
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabelEdit" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabelEdit">
+                        <i class="fa fa-edit"></i> Edit Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-edit"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End -->
 @endpush
 
 @push('js_style')
@@ -115,4 +147,19 @@
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
     <script src="{{ asset('templating/js/demo/datatables-demo.js') }}"></script>
+
+    <script type="text/javascript">
+        function editPlatform(id) {
+            $.ajax({
+                url: "{{ url('/admin-panel/platform') }}" + "/" + id + "/edit",
+                type: "GET",
+                success: function(response) {
+                    $("#modal-content-edit").html(response)
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
 @endpush
