@@ -103,6 +103,7 @@
                         <form action="{{ url('/admin-panel/shopee/pesanan/' . $file->id . '/process-database') }}"
                             method="POST">
                             @csrf
+                            <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                             <button type="submit" class="btn btn-success btn-block btn-lg">
                                 <i class="fa fa-upload"></i> Konfirmasi Import
                             </button>
