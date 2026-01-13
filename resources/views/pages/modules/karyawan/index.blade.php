@@ -23,7 +23,7 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
+        @if (canPermission('karyawan.create'))
         <div class="card-header py-3">
             <a href="{{ url('/admin-panel/karyawan/create') }}" class="btn btn-primary btn-sm">
                 <i class="fa fa-plus"></i> Tambah Data

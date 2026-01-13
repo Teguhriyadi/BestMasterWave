@@ -15,7 +15,7 @@ class PermissionsRepository
     {
         $permissions = Permission::create([
             "nama" => $data["nama"],
-            "akses" => $data["akses"],
+            "akses" => $data["akses"] . "." . $data["tipe_akses"],
             "menu_id" => $data["menu_id"]
         ]);
 

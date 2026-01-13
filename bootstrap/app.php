@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckPermissionMiddleware;
 use App\Http\Middleware\IsAutentikasiMiddleware;
 use App\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 use Illuminate\Foundation\Application;
@@ -46,7 +47,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             "autentikasi" => IsAutentikasiMiddleware::class,
-            "guest" => RedirectIfAuthenticatedMiddleware::class
+            "guest" => RedirectIfAuthenticatedMiddleware::class,
+            "permission" => CheckPermissionMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
