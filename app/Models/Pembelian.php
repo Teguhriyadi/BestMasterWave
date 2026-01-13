@@ -24,7 +24,9 @@ class Pembelian extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, "supplier_id");
+        return $this->belongsTo(Supplier::class, "supplier_id")->withDefault([
+            "nama_supplier" => "-"
+        ]);
     }
 
     public function details()
