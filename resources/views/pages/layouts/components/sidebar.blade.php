@@ -28,49 +28,164 @@
         </a>
     </li>
 
-    @foreach ($sidebarMenus->where('type', 'header') as $header)
-        <hr class="sidebar-divider">
-        <div class="sidebar-heading">
-            {{ $header->nama_menu }}
-        </div>
+    @if (!empty(Auth::user()->one_divisi_roles))
+        @foreach ($sidebarMenus->where('type', 'header') as $header)
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+                {{ $header->nama_menu }}
+            </div>
 
-        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
-            @php
-                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
-            @endphp
+            @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
+                @php
+                    $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
+                @endphp
 
-            @if ($submenus->count() > 0)
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse"
-                        data-target="#menu-{{ $menu->id }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
+                @if ($submenus->count() > 0)
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse"
+                            data-target="#menu-{{ $menu->id }}">
+                            <i class="{{ $menu->icon }}"></i>
+                            <span>{{ $menu->nama_menu }}</span>
+                        </a>
 
-                    <div id="menu-{{ $menu->id }}" class="collapse">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            @foreach ($submenus as $sub)
-                                <a class="collapse-item
+                        <div id="menu-{{ $menu->id }}" class="collapse">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                @foreach ($submenus as $sub)
+                                    <a class="collapse-item
                                 {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
-                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
-                                    {{ $sub->nama_menu }}
-                                </a>
-                            @endforeach
+                                        href="{{ url('/admin-panel/' . $sub->url_menu) }}">
+                                        {{ $sub->nama_menu }}
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                </li>
-            @else
-                <li
-                    class="nav-item
+                    </li>
+                @else
+                    <li
+                        class="nav-item
                 {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
-                </li>
-            @endif
+                        <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
+                            <i class="{{ $menu->icon }}"></i>
+                            <span>{{ $menu->nama_menu }}</span>
+                        </a>
+                    </li>
+                @endif
+            @endforeach
         @endforeach
-    @endforeach
+    @else
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        Master Data
+    </div>
+
+    <li
+        class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/karyawan*') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Master</span>
+        </a>
+        <div id="collapseTwo"
+            class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') || Request::is('admin-panel/karyawan*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/platform') }}">Platform</a>
+                <a class="collapse-item {{ Request::is('admin-panel/jabatan') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/jabatan') }}">Jabatan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/karyawan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/karyawan') }}">Karyawan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/seller') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/seller') }}">Seller</a>
+                @if (empty(Auth::user()?->one_divisi_roles))
+                    <a class="collapse-item {{ Request::is('admin-panel/bank') ? 'active' : '' }}"
+                        href="{{ url('/admin-panel/bank') }}">Bank</a>
+                @endif
+                <a class="collapse-item {{ Request::is('admin-panel/supplier') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/supplier') }}">Supplier</a>
+                <a class="collapse-item {{ Request::is('admin-panel/barang') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/barang') }}">Barang</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Master Transaksi
+    </div>
+
+    <li class="nav-item {{ Request::is('admin-panel/pembelian') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePembelian"
+            aria-expanded="true" aria-controls="collapsePembelian">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Transaksi</span>
+        </a>
+        <div id="collapsePembelian" class="collapse {{ Request::is('admin-panel/pembelian*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/pembelian*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/pembelian') }}">Pembelian</a>
+            </div>
+        </div>
+    </li>
+
+    <li
+        class="nav-item {{ Request::is('admin-panel/shopee/pendapatan') || Request::is('admin-panel/shopee/pesanan') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseShopee"
+            aria-expanded="true" aria-controls="collapseShopee">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Shopee</span>
+        </a>
+        <div id="collapseShopee"
+            class="collapse {{ Request::is('admin-panel/shopee/pendapatan*') || Request::is('admin-panel/shopee/pesanan*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pendapatan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/shopee/pendapatan') }}">Pendapatan</a>
+                <a class="collapse-item {{ Request::is('admin-panel/shopee/pesanan*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/shopee/pesanan') }}">Pesanan</a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Master User
+    </div>
+
+    <li
+        class="nav-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/divisi') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePengaturan"
+            aria-expanded="true" aria-controls="collapsePengaturan">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Pengaturan</span>
+        </a>
+        <div id="collapsePengaturan"
+            class="collapse {{ Request::is('admin-panel/role') || Request::is('admin-panel/divisi*') || Request::is('admin-panel/divisi-role*') || Request::is('admin-panel/users*') || Request::is('admin-panel/profil-saya*') ? 'show' : '' }} "
+            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('admin-panel/role') || Request::is('admin-panel/role/*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/role') }}">
+                    Role
+                </a>
+
+                @if (!empty(Auth::user()->one_divisi_roles))
+                @else
+                    <a class="collapse-item {{ Request::is('admin-panel/divisi') ? 'active' : '' }}"
+                        href="{{ url('/admin-panel/divisi') }}">Divisi</a>
+                @endif
+                <a class="collapse-item {{ Request::is('admin-panel/divisi-role*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/divisi-role') }}">Role Divisi</a>
+                <a class="collapse-item {{ Request::is('admin-panel/users*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/users') }}">Users</a>
+                <a class="collapse-item {{ Request::is('admin-panel/profil-saya*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/profil-saya/' . Auth::id()) }}">Profil saya</a>
+            </div>
+        </div>
+    </li>
+    @endif
 
     <!-- Nav Item - Dashboard -->
     {{-- <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
@@ -199,33 +314,33 @@
     <hr class="sidebar-divider"> --}}
 
     @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles)
-    <hr class="sidebar-divider">
+        <hr class="sidebar-divider">
 
-    <div class="sidebar-heading">
-        Master Menu
-    </div>
-
-    <li
-        class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') ? 'active' : '' }}">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
-            aria-expanded="true" aria-controls="collapseKelolaMenu">
-            <i class="fas fa-fw fa-book"></i>
-            <span>Kelola Menu</span>
-        </a>
-        <div id="collapseKelolaMenu"
-            class="collapse {{ Request::is('admin-panel/permissions*') || Request::is('admin-panel/role-permissions*') || Request::is('admin-panel/menu*') ? 'show' : '' }} "
-            aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                @if (empty(Auth::user()->one_divisi_roles))
-                    @include("pages.layouts.components.sidebar-admin-global")
-                @endif
-                <a class="collapse-item {{ Request::is('admin-panel/role-permissions*') ? 'active' : '' }}"
-                    href="{{ url('/admin-panel/role-permissions') }}">
-                    Role Permissions
-                </a>
-            </div>
+        <div class="sidebar-heading">
+            Master Menu
         </div>
-    </li>
+
+        <li
+            class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') ? 'active' : '' }}">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
+                aria-expanded="true" aria-controls="collapseKelolaMenu">
+                <i class="fas fa-fw fa-book"></i>
+                <span>Kelola Menu</span>
+            </a>
+            <div id="collapseKelolaMenu"
+                class="collapse {{ Request::is('admin-panel/permissions*') || Request::is('admin-panel/role-permissions*') || Request::is('admin-panel/menu*') ? 'show' : '' }} "
+                aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    @if (empty(Auth::user()->one_divisi_roles))
+                        @include('pages.layouts.components.sidebar-admin-menu')
+                    @endif
+                    <a class="collapse-item {{ Request::is('admin-panel/role-permissions*') ? 'active' : '' }}"
+                        href="{{ url('/admin-panel/role-permissions') }}">
+                        Role Permissions
+                    </a>
+                </div>
+            </div>
+        </li>
     @endif
 
     <hr class="sidebar-divider">

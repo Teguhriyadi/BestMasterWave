@@ -13,18 +13,38 @@ class CheckPermissionMiddleware
     public function handle(Request $request, Closure $next, string $permission)
     {
         $user = $request->user();
-        $role = optional($user->one_divisi_roles)->roles;
 
-        if ($role && $role->nama_role === 'Super Admin') {
+        if (! $user) {
+            abort(403);
+        }
+
+        if ($user->isSuperAdminGlobal() || $user->isSuperAdminCabang()) {
             return $next($request);
         }
 
-        $roleId   = $role->id ?? null;
-        $divisiId = AuthDivisi::id();
+        $userDivisiRole = $user->one_divisi_roles;
+
+        if (!$userDivisiRole) {
+            abort(403, 'Role cabang tidak ditemukan');
+        }
+
+        $roleId   = $userDivisiRole->role_id;
+        $divisiId = $userDivisiRole->divisi_id;
+
+        if (!$divisiId) {
+            abort(403, 'Divisi tidak valid');
+        }
 
         $allowed = RolePermission::where('role_id', $roleId)
-            ->where('divisi_id', $divisiId)
-            ->whereHas('permission', fn ($q) => $q->where('akses', $permission))
+            ->where(function ($q) use ($divisiId) {
+                $q->where('divisi_id', $divisiId)
+                    ->orWhereNull('divisi_id');
+            })
+            ->whereHas(
+                'permission',
+                fn($q) =>
+                $q->where('akses', $permission)
+            )
             ->exists();
 
         if (!$allowed) {

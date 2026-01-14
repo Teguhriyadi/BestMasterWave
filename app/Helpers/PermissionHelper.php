@@ -13,22 +13,26 @@ if (! function_exists('canPermission')) {
             return false;
         }
 
-        $role = optional($user->one_divisi_roles)->roles;
-
-        if ($role && $role->nama_role === 'Super Admin') {
+        if ($user->isSuperAdminGlobal() || $user->isSuperAdminCabang()) {
             return true;
         }
 
-        $roleId   = $role->id ?? null;
-        $divisiId = AuthDivisi::id();
+        $userDivisiRole = $user->one_divisi_roles;
 
-        if (! $roleId || ! $divisiId) {
+        if (! $userDivisiRole) {
             return false;
         }
 
-        return RolePermission::where('role_id', $roleId)
-            ->where('divisi_id', $divisiId)
-            ->whereHas('permission', fn ($q) => $q->where('akses', $permission))
+        return RolePermission::where('role_id', $userDivisiRole->role_id)
+            ->where(function ($q) use ($userDivisiRole) {
+                $q->where('divisi_id', $userDivisiRole->divisi_id)
+                    ->orWhereNull('divisi_id');
+            })
+            ->whereHas(
+                'permission',
+                fn($q) =>
+                $q->where('akses', $permission)
+            )
             ->exists();
     }
 }

@@ -23,21 +23,32 @@ class User extends Authenticatable
 
     public function divisiRoles()
     {
-        return $this->hasMany(UserDivisiRole::class,'user_id','id');
+        return $this->hasMany(UserDivisiRole::class, 'user_id', 'id');
     }
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class,'users_divisi_role','user_id','role_id');
+        return $this->belongsToMany(Role::class, 'users_divisi_role', 'user_id', 'role_id');
     }
 
     public function divisi()
     {
-        return $this->belongsToMany(Divisi::class,'users_divisi_role','user_id','divisi_id');
+        return $this->belongsToMany(Divisi::class, 'users_divisi_role', 'user_id', 'divisi_id');
     }
 
     public function one_divisi_roles()
     {
         return $this->hasOne(UserDivisiRole::class, "user_id", "id");
+    }
+
+    public function isSuperAdminGlobal(): bool
+    {
+        return $this->one_divisi_roles === null;
+    }
+
+    public function isSuperAdminCabang(): bool
+    {
+        return $this->one_divisi_roles !== null
+            && optional($this->one_divisi_roles->role)->nama_role === 'Super Admin';
     }
 }
