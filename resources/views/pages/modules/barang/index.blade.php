@@ -5,7 +5,8 @@
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -25,12 +26,12 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('barang.read'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
         @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
@@ -46,7 +47,7 @@
                         <th class="text-center">Tanggal Pembelian Terakhir</th>
                         <th class="text-center">Status SKU</th>
                         @if (!empty(Auth::user()->one_divisi_roles))
-                        <th class="text-center">Aksi</th>
+                            <th class="text-center">Aksi</th>
                         @endif
                     </tr>
                 </thead>
@@ -65,23 +66,30 @@
                             <td class="text-center">{{ $item['harga_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['tanggal_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['status_sku'] }}</td>
-                            @if (!empty(Auth::user()->one_divisi_roles))
                             <td class="text-center">
-                                <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/barang/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('barang.edit'))
+                                    <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
+                                @endif
+
+                                @if (canPermission('barang.delete'))
+                                    <form action="{{ url('/admin-panel/barang/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('barang.edit') && !canPermission('barang.delete'))
+                                    -
+                                @endif
                             </td>
-                            @endif
                         </tr>
                     @endforeach
                 </tbody>
@@ -111,8 +119,9 @@
                                         SKU Barang
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('sku_barang') is-invalid @enderror" name="sku_barang" id="sku_barang"
-                                        placeholder="Masukkan SKU Barang" value="{{ old('sku_barang') }}">
+                                    <input type="text" class="form-control @error('sku_barang') is-invalid @enderror"
+                                        name="sku_barang" id="sku_barang" placeholder="Masukkan SKU Barang"
+                                        value="{{ old('sku_barang') }}">
                                     @error('sku_barang')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -124,7 +133,8 @@
                                         Harga Modal
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="number" min="1" class="form-control @error('harga_modal') is-invalid @enderror" name="harga_modal"
+                                    <input type="number" min="1"
+                                        class="form-control @error('harga_modal') is-invalid @enderror" name="harga_modal"
                                         id="harga_modal" placeholder="0" value="{{ old('harga_modal') }}">
                                     @error('harga_modal')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -138,10 +148,12 @@
                                     <label for="seller_id" class="form-label">
                                         Nama Seller
                                     </label>
-                                    <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror" id="seller_id">
+                                    <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror"
+                                        id="seller_id">
                                         <option value="">- Pilih -</option>
                                         @foreach ($seller as $item)
-                                            <option value="{{ $item['id'] }}" {{ old('seller_id') == $item['id'] ? 'selected' : '' }}>
+                                            <option value="{{ $item['id'] }}"
+                                                {{ old('seller_id') == $item['id'] ? 'selected' : '' }}>
                                                 {{ $item['nama'] }}
                                             </option>
                                         @endforeach
@@ -196,7 +208,9 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#seller_id').select2({ theme: 'bootstrap4' });
+            $('#seller_id').select2({
+                theme: 'bootstrap4'
+            });
 
             $('#dataTable').DataTable({
                 scrollX: true,

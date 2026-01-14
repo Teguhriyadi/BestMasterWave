@@ -23,12 +23,12 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('supplier.create'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
         @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
@@ -48,9 +48,7 @@
                         <th class="text-center">PKP</th>
                         <th>Bank</th>
                         <th>Alamat</th>
-                        @if (!empty(Auth::user()->one_divisi_roles))
                         <th class="text-center">Aksi</th>
-                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -61,7 +59,7 @@
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
                             @if (empty(Auth::user()->one_divisi_roles))
-                            <td>{{ $item['divisi'] }}</td>
+                                <td>{{ $item['divisi'] }}</td>
                             @endif
                             <td class="text-center">{{ $item['no_npwp'] }}</td>
                             <td>{{ $item['nama_supplier'] }}</td>
@@ -73,23 +71,29 @@
                             <td class="text-center">{{ $item['status_pkp'] }}</td>
                             <td>{{ $item['bank'] }}</td>
                             <td>{{ $item['alamat'] }}</td>
-                            @if (!empty(Auth::user()->one_divisi_roles))
                             <td class="text-center">
-                                <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/supplier/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('supplier.edit'))
+                                    <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('supplier.delete'))
+                                    <form action="{{ url('/admin-panel/supplier/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('supplier.edit') && !canPermission('supplier.delete'))
+                                    -
+                                @endif
                             </td>
-                            @endif
                         </tr>
                     @endforeach
                 </tbody>
@@ -119,8 +123,9 @@
                                         Nama Supplier
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('nama_supplier') is-invalid @enderror" name="nama_supplier" id="nama_supplier"
-                                        placeholder="Masukkan Nama Supplier" value="{{ old('nama_supplier') }}">
+                                    <input type="text" class="form-control @error('nama_supplier') is-invalid @enderror"
+                                        name="nama_supplier" id="nama_supplier" placeholder="Masukkan Nama Supplier"
+                                        value="{{ old('nama_supplier') }}">
                                     @error('nama_supplier')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -131,8 +136,9 @@
                                     <label for="no_npwp" class="form-label">
                                         No. NPWP
                                     </label>
-                                    <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" id="no_npwp"
-                                        placeholder="Masukkan No. NPWP" value="{{ old('no_npwp') }}">
+                                    <input type="text" class="form-control @error('no_npwp') is-invalid @enderror"
+                                        name="no_npwp" id="no_npwp" placeholder="Masukkan No. NPWP"
+                                        value="{{ old('no_npwp') }}">
                                     @error('no_npwp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -146,7 +152,9 @@
                                         Kontak Person
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('kontak_hubungi') is-invalid @enderror" name="kontak_hubungi" id="kontak_hubungi" placeholder="Masukkan Kontak Person" value="{{ old('kontak_hubungi') }}">
+                                    <input type="text" class="form-control @error('kontak_hubungi') is-invalid @enderror"
+                                        name="kontak_hubungi" id="kontak_hubungi" placeholder="Masukkan Kontak Person"
+                                        value="{{ old('kontak_hubungi') }}">
                                     @error('kontak_hubungi')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -158,8 +166,10 @@
                                         Kontak Yang Bisa Dihubungi
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('nomor_kontak') is-invalid @enderror" name="nomor_kontak" id="nomor_kontak"
-                                        placeholder="Contoh : 081214711741 / ex@gmail.com" value="{{ old('nomor_kontak') }}">
+                                    <input type="text" class="form-control @error('nomor_kontak') is-invalid @enderror"
+                                        name="nomor_kontak" id="nomor_kontak"
+                                        placeholder="Contoh : 081214711741 / ex@gmail.com"
+                                        value="{{ old('nomor_kontak') }}">
                                     @error('nomor_kontak')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -173,8 +183,9 @@
                                         No. Rekening
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('no_rekening') is-invalid @enderror" name="no_rekening" id="no_rekening"
-                                        placeholder="Masukkan No. Rekening" value="{{ old('no_rekening') }}">
+                                    <input type="text" class="form-control @error('no_rekening') is-invalid @enderror"
+                                        name="no_rekening" id="no_rekening" placeholder="Masukkan No. Rekening"
+                                        value="{{ old('no_rekening') }}">
                                     @error('no_rekening')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -186,8 +197,10 @@
                                         Nama Rekening
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('nama_rekening') is-invalid @enderror" name="nama_rekening" id="nama_rekening"
-                                        placeholder="Masukkan Nama Rekening" value="{{ old('nama_rekening') }}">
+                                    <input type="text"
+                                        class="form-control @error('nama_rekening') is-invalid @enderror"
+                                        name="nama_rekening" id="nama_rekening" placeholder="Masukkan Nama Rekening"
+                                        value="{{ old('nama_rekening') }}">
                                     @error('nama_rekening')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -199,10 +212,12 @@
                                         Nama Bank
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <select name="bank_id" class="form-control @error('bank_id') is-invalid @enderror" id="bank_id">
+                                    <select name="bank_id" class="form-control @error('bank_id') is-invalid @enderror"
+                                        id="bank_id">
                                         <option value="">- Pilih -</option>
                                         @foreach ($bank as $item)
-                                            <option value="{{ $item['id'] }}" {{ old('bank_id') == $item["id"] ? 'selected' : '' }}>
+                                            <option value="{{ $item['id'] }}"
+                                                {{ old('bank_id') == $item['id'] ? 'selected' : '' }}>
                                                 {{ $item['alias'] }}
                                             </option>
                                         @endforeach
@@ -220,8 +235,11 @@
                                         Ketentuan Tempo Pembayaran
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="text" class="form-control @error('ketentuan_tempo_pembayaran') is-invalid @enderror" name="ketentuan_tempo_pembayaran"
-                                        id="ketentuan_tempo_pembayaran" placeholder="Masukkan Tempo Pembayaran" value="{{ old('ketentuan_tempo_pembayaran') }}">
+                                    <input type="text"
+                                        class="form-control @error('ketentuan_tempo_pembayaran') is-invalid @enderror"
+                                        name="ketentuan_tempo_pembayaran" id="ketentuan_tempo_pembayaran"
+                                        placeholder="Masukkan Tempo Pembayaran"
+                                        value="{{ old('ketentuan_tempo_pembayaran') }}">
                                     @error('ketentuan_tempo_pembayaran')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -232,8 +250,9 @@
                                     <label for="rate_ppn" class="form-label">
                                         Rate PPN
                                     </label>
-                                    <input type="number" class="form-control @error('rate_ppn') is-invalid @enderror" name="rate_ppn" id="rate_ppn"
-                                        placeholder="0" min="0" max="100" value{{ old('rate_ppn') }}>
+                                    <input type="number" class="form-control @error('rate_ppn') is-invalid @enderror"
+                                        name="rate_ppn" id="rate_ppn" placeholder="0" min="0" max="100"
+                                        value{{ old('rate_ppn') }}>
                                     @error('rate_ppn')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -245,10 +264,11 @@
                                 PKP
                                 <small class="text-danger">*</small>
                             </label>
-                            <select name="pkp" class="form-control @error('pkp') is-invalid @enderror" id="pkp">
+                            <select name="pkp" class="form-control @error('pkp') is-invalid @enderror"
+                                id="pkp">
                                 <option value="">- Pilih -</option>
-                                <option {{ old('pkp') == "PKP" ? 'selected' : '' }} value="PKP">PKP</option>
-                                <option {{ old('pkp') == "Non PKP" ? 'selected' : '' }} value="Non PKP">Non PKP</option>
+                                <option {{ old('pkp') == 'PKP' ? 'selected' : '' }} value="PKP">PKP</option>
+                                <option {{ old('pkp') == 'Non PKP' ? 'selected' : '' }} value="Non PKP">Non PKP</option>
                             </select>
                             @error('pkp')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -259,7 +279,8 @@
                                 Alamat
                                 <small class="text-danger">*</small>
                             </label>
-                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5" placeholder="Masukkan Alamat">{{ old('alamat') }}</textarea>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" id="alamat" rows="5"
+                                placeholder="Masukkan Alamat">{{ old('alamat') }}</textarea>
                             @error('alamat')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

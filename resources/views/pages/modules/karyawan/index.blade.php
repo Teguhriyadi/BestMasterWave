@@ -24,11 +24,11 @@
 
     <div class="card shadow mb-4">
         @if (canPermission('karyawan.create'))
-        <div class="card-header py-3">
-            <a href="{{ url('/admin-panel/karyawan/create') }}" class="btn btn-primary btn-sm">
-                <i class="fa fa-plus"></i> Tambah Data
-            </a>
-        </div>
+            <div class="card-header py-3">
+                <a href="{{ url('/admin-panel/karyawan/create') }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </a>
+            </div>
         @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
@@ -50,7 +50,7 @@
                 </thead>
                 <tbody>
                     @php
-                        $nomer = 0
+                        $nomer = 0;
                     @endphp
                     @foreach ($karyawan as $item)
                         <tr>
@@ -66,26 +66,37 @@
                             <td>{{ $item['no_hp_darurat'] }}</td>
                             <td class="text-center">{{ $item['jenis_kelamin'] }}</td>
                             <td class="text-center">
-                                @if (empty(Auth::user()->one_divisi_roles))
+                                @if (canPermission('karyawan.show'))
                                     <button onclick="lihatLog('{{ $item['id'] }}')" type="button"
-                                        class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModalLihatLog">
+                                        class="btn btn-primary btn-sm" data-toggle="modal"
+                                        data-target="#exampleModalLihatLog">
                                         <i class="fa fa-search"></i> Lihat Log
                                     </button>
+                                    <a href="{{ url('/admin-panel/karyawan/' . $item['id'] . '/show') }}"
+                                        class="btn btn-info btn-sm">
+                                        <i class="fa fa-search"></i> Detail
+                                    </a>
                                 @endif
-                                <a href="{{ url('/admin-panel/karyawan/' . $item['id'] . '/show') }}" class="btn btn-info btn-sm">
-                                    <i class="fa fa-search"></i> Detail
-                                </a>
-                                @if (!empty(Auth::user()->one_divisi_roles))
-                                <a href="{{ url('/admin-panel/karyawan/' . $item['id'] . '/edit') }}" class="btn btn-warning btn-sm">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
-                                <form action="{{ url('/admin-panel/karyawan/' . $item['id']) }}" method="POST" style="display: inline">
-                                    @csrf
-                                    @method("DELETE")
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
-                                    </button>
-                                </form>
+                                @if (canPermission('karyawan.edit'))
+                                    <a href="{{ url('/admin-panel/karyawan/' . $item['id'] . '/edit') }}"
+                                        class="btn btn-warning btn-sm">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
+                                @endif
+                                @if (canPermission('karyawan.delete'))
+                                    <form action="{{ url('/admin-panel/karyawan/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('karyawan.edit') && !canPermission('karyawan.delete') && !canPermission('karyawan.show'))
+                                    -
                                 @endif
                             </td>
                         </tr>
@@ -96,8 +107,7 @@
     </div>
 
     <!-- Modal Lihat Log -->
-    <div class="modal fade" id="exampleModalLihatLog" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="exampleModalLihatLog" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

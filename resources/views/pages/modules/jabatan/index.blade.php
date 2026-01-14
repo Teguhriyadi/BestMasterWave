@@ -23,11 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (canPermission('jabatan.create'))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
             </button>
         </div>
+        @endif
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -53,10 +55,13 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
+                                    @if (canPermission('jabatan.edit'))
                                     <button onclick="editJabatan('{{ $item['id'] }}')" type="button"
                                         class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                         <i class="fa fa-edit"></i> Edit
                                     </button>
+                                    @endif
+                                    @if (canPermission('jabatan.delete'))
                                     <form action="{{ url('/admin-panel/jabatan/' . $item['id']) }}" method="POST"
                                         style="display: inline">
                                         @csrf
@@ -66,6 +71,11 @@
                                             <i class="fa fa-trash"></i> Hapus
                                         </button>
                                     </form>
+                                    @endif
+
+                                    @if (!canPermission('jabatan.edit') && !canPermission('jabatan.delete'))
+                                    -
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

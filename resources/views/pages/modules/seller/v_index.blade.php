@@ -23,7 +23,7 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
+        @if (canPermission('seller.read'))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
@@ -66,12 +66,14 @@
                                         {{ $item['status'] }}
                                     </span>
                                 </td>
-                                @if (!empty(Auth::user()->one_divisi_roles))
                                 <td class="text-center">
+                                    @if (canPermission('seller.edit'))
                                     <button onclick="editSeller('{{ $item['id'] }}')" type="button"
                                         class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                         <i class="fa fa-edit"></i> Edit
                                     </button>
+                                    @endif
+                                    @if (canPermission('seller.delete'))
                                     <form action="{{ url('/admin-panel/seller/' . $item['id']) }}" method="POST"
                                         style="display: inline">
                                         @csrf
@@ -81,8 +83,12 @@
                                             <i class="fa fa-trash"></i> Hapus
                                         </button>
                                     </form>
+                                    @endif
+
+                                    @if (!canPermission('seller.edit') && !canPermission('seller.delete'))
+                                        -
+                                    @endif
                                 </td>
-                                @endif
                             </tr>
                         @endforeach
                     </tbody>

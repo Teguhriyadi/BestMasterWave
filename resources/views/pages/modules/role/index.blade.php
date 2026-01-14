@@ -23,12 +23,12 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('role.create'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
         @endif
         <div class="card-body">
             <div class="table-responsive">
@@ -37,13 +37,11 @@
                         <tr>
                             <th class="text-center">No.</th>
                             @if (empty(Auth::user()->one_divisi_roles))
-                            <th>Divisi</th>
+                                <th>Divisi</th>
                             @endif
                             <th>Nama Role</th>
                             <th class="text-center">Status</th>
-                            @if (!empty(Auth::user()->one_divisi_roles))
                             <th class="text-center">Aksi</th>
-                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -54,7 +52,7 @@
                             <tr>
                                 <td class="text-center">{{ ++$nomer }}.</td>
                                 @if (empty(Auth::user()->one_divisi_roles))
-                                <td>{{ $item['divisi'] }}</td>
+                                    <td>{{ $item['divisi'] }}</td>
                                 @endif
                                 <td>{{ $item['nama_role'] }}</td>
                                 <td class="text-center">
@@ -62,23 +60,30 @@
                                         {{ $item['status'] }}
                                     </span>
                                 </td>
-                                @if (!empty(Auth::user()->one_divisi_roles))
                                 <td class="text-center">
-                                    <button onclick="editRole('{{ $item['id'] }}')" type="button"
-                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </button>
-                                    <form action="{{ url('/admin-panel/role/' . $item['id']) }}" method="POST"
-                                        style="display: inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="fa fa-trash"></i> Hapus
+                                    @if (canPermission('role.edit'))
+                                        <button onclick="editRole('{{ $item['id'] }}')" type="button"
+                                            class="btn btn-warning btn-sm" data-toggle="modal"
+                                            data-target="#exampleModalEdit">
+                                            <i class="fa fa-edit"></i> Edit
                                         </button>
-                                    </form>
+                                    @endif
+                                    @if (canPermission('role.delete'))
+                                        <form action="{{ url('/admin-panel/role/' . $item['id']) }}" method="POST"
+                                            style="display: inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')"
+                                                type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @if (!canPermission('role.edit') && !canPermission('role.delete'))
+                                        -
+                                    @endif
                                 </td>
-                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -107,8 +112,9 @@
                                 Nama Role
                                 <small class="text-danger">*</small>
                             </label>
-                            <input type="text" class="form-control @error('nama_role') is-invalid @enderror" name="nama_role"
-                                id="nama_role" placeholder="Masukkan Nama Seller" value="{{ old('nama_role') }}">
+                            <input type="text" class="form-control @error('nama_role') is-invalid @enderror"
+                                name="nama_role" id="nama_role" placeholder="Masukkan Nama Seller"
+                                value="{{ old('nama_role') }}">
                             @error('nama_role')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

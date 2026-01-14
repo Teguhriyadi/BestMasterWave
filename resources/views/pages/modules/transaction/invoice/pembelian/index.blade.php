@@ -23,7 +23,7 @@
     @endif
 
     <div class="card shadow mb-4">
-        @if (!empty(Auth::user()->one_divisi_roles))
+        @if (canPermission('pembelian.create'))
             <div class="card-header py-3">
                 <a href="{{ url('/admin-panel/pembelian/create') }}" class="btn btn-primary btn-sm">
                     <i class="fa fa-plus"></i> Tambah Data
@@ -39,7 +39,8 @@
                             <select name="supplier_id" class="form-control" id="supplier_id">
                                 <option value="">- Pilih Supplier -</option>
                                 @foreach ($supplier as $item)
-                                    <option {{ request('supplier_id') == $item['id'] ? 'selected' : '' }} value="{{ $item['id'] }}">
+                                    <option {{ request('supplier_id') == $item['id'] ? 'selected' : '' }}
+                                        value="{{ $item['id'] }}">
                                         {{ $item['nama_supplier'] }}
                                     </option>
                                 @endforeach
@@ -49,25 +50,29 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="tgl_invoice_dari" class="form-label"> Tgl Invoice Dari </label>
-                            <input type="date" class="form-control" name="tgl_invoice_dari" id="tgl_invoice_dari" value="{{ request('tgl_invoice_dari') }}">
+                            <input type="date" class="form-control" name="tgl_invoice_dari" id="tgl_invoice_dari"
+                                value="{{ request('tgl_invoice_dari') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="tgl_invoice_sampai" class="form-label"> Tgl Invoice Sampai </label>
-                            <input type="date" class="form-control" name="tgl_invoice_sampai" id="tgl_invoice_sampai" value="{{ request('tgl_invoice_sampai') }}">
+                            <input type="date" class="form-control" name="tgl_invoice_sampai" id="tgl_invoice_sampai"
+                                value="{{ request('tgl_invoice_sampai') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="tgl_jatuh_tempo_dari" class="form-label"> Tgl Jatuh Tempo Dari </label>
-                            <input type="date" class="form-control" name="tgl_jatuh_tempo_dari" id="tgl_jatuh_tempo_dari" value="{{ request('tgl_jatuh_tempo_dari') }}">
+                            <input type="date" class="form-control" name="tgl_jatuh_tempo_dari" id="tgl_jatuh_tempo_dari"
+                                value="{{ request('tgl_jatuh_tempo_dari') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="tgl_jatuh_tempo_sampai" class="form-label"> Tgl Jatuh Tempo Sampai </label>
-                            <input type="date" class="form-control" name="tgl_jatuh_tempo_sampai" id="tgl_jatuh_tempo_sampai" value="{{ request('tgl_jatuh_tempo_sampai') }}">
+                            <input type="date" class="form-control" name="tgl_jatuh_tempo_sampai"
+                                id="tgl_jatuh_tempo_sampai" value="{{ request('tgl_jatuh_tempo_sampai') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -96,9 +101,7 @@
                         <th class="text-center">Total Diskon</th>
                         <th class="text-center">Total PPN</th>
                         <th>Keterangan</th>
-                        @if (!empty(Auth::user()->one_divisi_roles))
-                            <th class="text-center">Aksi</th>
-                        @endif
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,15 +122,20 @@
                             <td class="text-center">{{ $item['total_diskon'] }}</td>
                             <td class="text-center">{{ $item['total_ppn'] }}</td>
                             <td>{{ $item['keterangan'] }}</td>
-                            @if (!empty(Auth::user()->one_divisi_roles))
-                                <td class="text-center">
-                                    <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/detail') }}" class="btn btn-info btn-sm">
+                            <td class="text-center">
+                                @if (canPermission('pembelian.show'))
+                                    <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/detail') }}"
+                                        class="btn btn-info btn-sm">
                                         <i class="fa fa-search"></i> Detail
                                     </a>
+                                @endif
+                                @if (canPermission('pembelian.edit'))
                                     <a href="{{ url('/admin-panel/pembelian/' . $item['id'] . '/edit') }}"
                                         class="btn btn-warning btn-sm">
                                         <i class="fa fa-edit"></i> Edit
                                     </a>
+                                @endif
+                                @if (canPermission('pembelian.delete'))
                                     <form action="{{ url('/admin-panel/pembelian/' . $item['id']) }}" method="POST"
                                         style="display: inline">
                                         @csrf
@@ -137,8 +145,12 @@
                                             <i class="fa fa-trash"></i> Hapus
                                         </button>
                                     </form>
-                                </td>
-                            @endif
+                                @endif
+
+                                @if (!canPermission('pembelian.edit') && !canPermission('pembelian.delete') && !canPermission('pembelian.show'))
+                                    -
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
