@@ -18,59 +18,8 @@
                 {{ Auth::user()->one_divisi_roles->divisi->nama_divisi }}
             </span>
         </div>
-        <hr class="sidebar-divider">
+        {{-- <hr class="sidebar-divider"> --}}
     @endif
-
-    <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ url('/admin-panel/dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    @foreach ($sidebarMenus->where('type', 'header') as $header)
-        <hr class="sidebar-divider">
-        <div class="sidebar-heading">
-            {{ $header->nama_menu }}
-        </div>
-
-        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
-            @php
-                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
-            @endphp
-
-            @if ($submenus->count() > 0)
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse"
-                        data-target="#menu-{{ $menu->id }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
-
-                    <div id="menu-{{ $menu->id }}" class="collapse">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            @foreach ($submenus as $sub)
-                                <a class="collapse-item
-                                {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
-                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
-                                    {{ $sub->nama_menu }}
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </li>
-            @else
-                <li
-                    class="nav-item
-                {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
-                </li>
-            @endif
-        @endforeach
-    @endforeach
 
     <!-- Nav Item - Dashboard -->
     {{-- <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
@@ -78,13 +27,13 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
-    </li>
+    </li> --}}
 
     <!-- Divider -->
-    <hr class="sidebar-divider">
+    {{-- <hr class="sidebar-divider"> --}}
 
     <!-- Heading -->
-    <div class="sidebar-heading">
+    {{-- <div class="sidebar-heading">
         Master Data
     </div>
 
@@ -194,11 +143,52 @@
                     href="{{ url('/admin-panel/profil-saya/' . Auth::id()) }}">Profil saya</a>
             </div>
         </div>
-    </li>
+    </li> --}}
 
-    <hr class="sidebar-divider"> --}}
+    @foreach ($sidebarMenus->where('type', 'header') as $header)
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">
+            {{ $header->nama_menu }}
+        </div>
 
-    @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles)
+        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
+            @php
+                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
+            @endphp
+
+            @if ($submenus->count() > 0)
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse"
+                        data-target="#menu-{{ $menu->id }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+
+                    <div id="menu-{{ $menu->id }}" class="collapse">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @foreach ($submenus as $sub)
+                                <a class="collapse-item
+                                {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
+                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
+                                    {{ $sub->nama_menu }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
+            @else
+                <li
+                    class="nav-item
+                {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+                </li>
+            @endif
+        @endforeach
+    @endforeach
+
     <hr class="sidebar-divider">
 
     <div class="sidebar-heading">
@@ -216,9 +206,18 @@
             class="collapse {{ Request::is('admin-panel/permissions*') || Request::is('admin-panel/role-permissions*') || Request::is('admin-panel/menu*') ? 'show' : '' }} "
             aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                @if (empty(Auth::user()->one_divisi_roles))
-                    @include("pages.layouts.components.sidebar-admin-global")
-                @endif
+                <a class="collapse-item {{ Request::is('admin-panel/menu*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/menu') }}">
+                    Menu
+                </a>
+                {{-- <a class="collapse-item {{ Request::is('admin-panel/role-menu*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/role-menu') }}">
+                    Role Menu
+                </a> --}}
+                <a class="collapse-item {{ Request::is('admin-panel/permissions*') ? 'active' : '' }}"
+                    href="{{ url('/admin-panel/permissions') }}">
+                    Permissions
+                </a>
                 <a class="collapse-item {{ Request::is('admin-panel/role-permissions*') ? 'active' : '' }}"
                     href="{{ url('/admin-panel/role-permissions') }}">
                     Role Permissions
@@ -226,7 +225,6 @@
             </div>
         </div>
     </li>
-    @endif
 
     <hr class="sidebar-divider">
 

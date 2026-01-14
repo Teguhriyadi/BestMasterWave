@@ -13,7 +13,13 @@ if (! function_exists('canPermission')) {
             return false;
         }
 
-        $roleId   = optional($user->one_divisi_roles)->role_id;
+        $role = optional($user->one_divisi_roles)->roles;
+
+        if ($role && $role->nama_role === 'Super Admin') {
+            return true;
+        }
+
+        $roleId   = $role->id ?? null;
         $divisiId = AuthDivisi::id();
 
         if (! $roleId || ! $divisiId) {

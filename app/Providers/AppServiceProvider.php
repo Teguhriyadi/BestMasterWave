@@ -29,19 +29,15 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
 
             if (!Auth::check()) {
-                return;
-            }
-
-            $roleId   = optional(Auth::user()->one_divisi_roles)->role_id;
-            $divisiId = AuthDivisi::id();
-
-            if (!$roleId || !$divisiId) {
                 $view->with('sidebarMenus', collect());
                 return;
             }
 
-            $menuService = app(MenuService::class);
-            $sidebarMenus = $menuService->sidebar($roleId, $divisiId);
+            $role = optional(Auth::user()->one_divisi_roles)->role;
+            $isSuperAdmin = $role && $role->nama_role === 'Super Admin';
+
+            $menuService = app(\App\Http\Services\MenuService::class);
+            $sidebarMenus = $menuService->sidebar($isSuperAdmin);
 
             $view->with('sidebarMenus', $sidebarMenus);
         });

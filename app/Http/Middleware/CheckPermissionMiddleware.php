@@ -13,8 +13,13 @@ class CheckPermissionMiddleware
     public function handle(Request $request, Closure $next, string $permission)
     {
         $user = $request->user();
+        $role = optional($user->one_divisi_roles)->roles;
 
-        $roleId   = optional($user->one_divisi_roles)->role_id;
+        if ($role && $role->nama_role === 'Super Admin') {
+            return $next($request);
+        }
+
+        $roleId   = $role->id ?? null;
         $divisiId = AuthDivisi::id();
 
         $allowed = RolePermission::where('role_id', $roleId)

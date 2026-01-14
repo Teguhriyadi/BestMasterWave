@@ -8,12 +8,17 @@ use App\Http\Requests\Menu\UpdateRequest;
 use App\Http\Services\MenuService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MenuController extends Controller
 {
     public function __construct(
         protected MenuService $menu_service
-    ) {}
+    ) {
+        if (!empty(Auth::user()->one_divisi_roles)) {
+            abort(403);
+        }
+    }
 
     public function index()
     {

@@ -33,9 +33,9 @@ class DivisiRoleService
         return DivisiRoleMapper::toListRole($divisi_role);
     }
 
-    public function list_akses_role_no_admin()
+    public function list_akses_role_all()
     {
-        $divisi_role = $this->divisi_role_repository->get_akses_role_no_admin();
+        $divisi_role = $this->divisi_role_repository->get_akses_role_all();
 
         return DivisiRoleMapper::toPermissionsRole($divisi_role);
     }

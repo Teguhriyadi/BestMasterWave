@@ -8,13 +8,18 @@ use App\Http\Requests\Permissions\UpdateRequest;
 use App\Http\Services\MenuService;
 use App\Http\Services\PermissionsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionsController extends Controller
 {
     public function __construct(
         protected MenuService $menu_service,
         protected PermissionsService $permissions_service
-    ) {}
+    ) {
+        if (!empty(Auth::user()->one_divisi_roles)) {
+            abort(403);
+        }
+    }
 
     public function index()
     {

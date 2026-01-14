@@ -20,3 +20,16 @@ if (!function_exists('isOpen')) {
         return '';
     }
 }
+
+if (!function_exists('menuReadPermission')) {
+    function menuReadPermission($menu): ?string
+    {
+        if (!$menu->url_menu) {
+            return null;
+        }
+
+        // contoh: jabatan → jabatan.read
+        return $menu->url_menu . '.read';
+    }
+
+}

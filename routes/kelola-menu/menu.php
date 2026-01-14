@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PengaturanMenu\MenuController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("menu")->group(function() {

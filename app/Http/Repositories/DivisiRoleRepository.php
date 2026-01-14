@@ -38,11 +38,16 @@ class DivisiRoleRepository
             ->get();
     }
 
-    public function get_akses_role_no_admin()
+    public function get_akses_role_all()
     {
-        return Role::where("divisi_id", AuthDivisi::id())
-            ->where('nama_role', '!=', 'Super Admin')
-            ->get();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Role::where('nama_role', '=', 'Super Admin')
+                ->get();
+        } else {
+            return Role::where("divisi_id", AuthDivisi::id())
+                ->where('nama_role', '!=', 'Super Admin')
+                ->get();
+        }
     }
 
     public function insertRoles(string $divisionId, array $roleIds): void

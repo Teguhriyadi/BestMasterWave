@@ -5,6 +5,8 @@ namespace App\Http\Services;
 use App\Helpers\AuthDivisi;
 use App\Http\Mapper\MenuMapper;
 use App\Http\Repositories\MenuRepository;
+use App\Models\Menu;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -78,8 +80,46 @@ class MenuService
         });
     }
 
-    public function sidebar(string $roleId, string $divisiId)
+    public function sidebar(bool $isSuperAdmin): Collection
     {
-        return $this->menu_repository->sidebarMenu($roleId, $divisiId);
+        $menus = Menu::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        if ($isSuperAdmin) {
+            return $menus;
+        }
+
+        $allowedSubmenus = $menus->filter(function ($menu) {
+            if ($menu->type !== 'submenu') return false;
+
+            $permission = menuReadPermission($menu);
+            if (!$permission) return false;
+
+            return canPermission($permission);
+        });
+
+        $allowedMenus = $menus->filter(function ($menu) use ($allowedSubmenus) {
+            if ($menu->type !== 'menu') return false;
+
+            return $allowedSubmenus
+                ->where('parent_id', $menu->id)
+                ->isNotEmpty();
+        });
+
+        $allowedHeaders = $menus->filter(function ($menu) use ($allowedMenus) {
+            if ($menu->type !== 'header') return false;
+
+            return $allowedMenus
+                ->where('parent_id', $menu->id)
+                ->isNotEmpty();
+        });
+
+        return collect()
+            ->merge($allowedHeaders)
+            ->merge($allowedMenus)
+            ->merge($allowedSubmenus)
+            ->sortBy('order')
+            ->values();
     }
 }
