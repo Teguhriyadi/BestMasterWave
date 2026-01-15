@@ -314,7 +314,7 @@
     <hr class="sidebar-divider"> --}}
 
     @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles)
-        @if (Auth::user()->one_divisi_roles->roles->nama_role == 'Super Admin')
+        @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles->roles->nama_role == 'Super Admin')
             <hr class="sidebar-divider">
 
             <div class="sidebar-heading">
