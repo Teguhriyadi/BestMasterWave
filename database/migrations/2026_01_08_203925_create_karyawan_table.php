@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('karyawan', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string("id_fp", 50)->unique()->index()->nullable();
+            $table->unsignedBigInteger("id_fp")->unique()->nullable();
             $table->string("no_ktp", 100)->index()->unique()->nullable();
             $table->string("no_kk", 100)->index()->nullable();
             $table->string("no_bpjs_kesehatan", 100)->index()->nullable();
