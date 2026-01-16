@@ -132,6 +132,7 @@ class LogAbsensiController extends Controller
                     'divisi_id'      => AuthDivisi::id(),
                     'id_fp'          => $idFp,
                     'tanggal_waktu'  => $tanggal,
+                    'kode_lokasi'    => (int) preg_replace('/[^0-9]/', '', $row[4]),
                     'created_by'     => Auth::id(),
                     'updated_by'     => Auth::id(),
                 ]);

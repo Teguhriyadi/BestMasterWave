@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('lokasi', function (Blueprint $table) {
             $table->uuid("id", 50)->primary();
-            $table->unsignedBigInteger("kode_lokasi")->default(0)->nullable(); // Ex : 1, 2, 3, 4, 5
+            $table->unsignedBigInteger("kode_lokasi")->nullable()->unique(); // Ex : 1, 2, 3, 4, 5
             $table->string("nama_lokasi", 100)->index();
             $table->enum("is_active", ["1", "0"])->default("1");
             $table->uuid('divisi_id');

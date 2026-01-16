@@ -37,6 +37,7 @@
                             <th>Divisi</th>
                         @endif
                         <th>Nama Karyawan</th>
+                        <th>Lokasi</th>
                         <th class="text-center">Tanggal Absensi</th>
                         <th class="text-center">Status Absen</th>
                         <th class="text-center">Tanggal Publish</th>
@@ -55,6 +56,7 @@
                                 <td>{{ $item['divisi'] }}</td>
                             @endif
                             <td>{{ $item['nama_karyawan'] }}</td>
+                            <td>{{ $item['lokasi'] }}</td>
                             <td class="text-center">{{ $item['tanggal_waktu'] }}</td>
                             <td class="text-center">
                                 @if ($item["status"] == "Tepat Waktu")
@@ -62,7 +64,7 @@
                                         Tepat Waktu
                                     </span>
                                 @elseif ($item["status"] == "Terlambat")
-                                    <span class="badge bg-warning text-white text-uppercase">
+                                    <span class="badge bg-danger text-white text-uppercase">
                                         Terlambat
                                     </span>
                                 @elseif ($item["status"] == "Pulang")

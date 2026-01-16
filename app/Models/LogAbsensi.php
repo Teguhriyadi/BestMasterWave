@@ -28,6 +28,11 @@ class LogAbsensi extends Model
         return $this->belongsTo(Divisi::class, "divisi_id");
     }
 
+    public function lokasi()
+    {
+        return $this->belongsTo(Lokasi::class, "kode_lokasi", "kode_lokasi");
+    }
+
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class, "id_fp", "id_fp");

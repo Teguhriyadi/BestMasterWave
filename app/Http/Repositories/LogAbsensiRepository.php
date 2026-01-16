@@ -37,8 +37,9 @@ class LogAbsensiRepository
                 'id'             => $item->id,
                 'divisi'         => $item->divisi->nama ?? '-',
                 'nama_karyawan'  => $item->karyawan->nama ?? '-',
-                'tanggal_waktu'  => $tanggal->format('d-m-Y H:i'),
+                'tanggal_waktu'  => $this->formatTanggalIndo($item->tanggal_waktu),
                 'status'         => $status,
+                'lokasi'         => $item->lokasi->nama_lokasi,
                 'upload'         => $this->formatTanggalIndo($item->created_at),
                 'modif'          => $this->formatTanggalIndo($item->updated_at),
             ];
