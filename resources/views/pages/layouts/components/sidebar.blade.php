@@ -79,14 +79,14 @@
         </div>
 
         <li
-            class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/karyawan*') ? 'active' : '' }}">
+            class="nav-item {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/karyawan*') || Request::is('admin-panel/lokasi*') ? 'active' : '' }}">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                 aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-fw fa-book"></i>
                 <span>Master</span>
             </a>
             <div id="collapseTwo"
-                class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') || Request::is('admin-panel/karyawan*') ? 'show' : '' }} "
+                class="collapse {{ Request::is('admin-panel/platform') || Request::is('admin-panel/seller') || Request::is('admin-panel/supplier') || Request::is('admin-panel/bank') || Request::is('admin-panel/barang') || Request::is('admin-panel/jabatan') || Request::is('admin-panel/karyawan*') || Request::is('admin-panel/lokasi*') ? 'show' : '' }} "
                 aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item {{ Request::is('admin-panel/platform') ? 'active' : '' }}"
@@ -104,7 +104,13 @@
                     <a class="collapse-item {{ Request::is('admin-panel/supplier') ? 'active' : '' }}"
                         href="{{ url('/admin-panel/supplier') }}">Supplier</a>
                     <a class="collapse-item {{ Request::is('admin-panel/barang') ? 'active' : '' }}"
-                        href="{{ url('/admin-panel/barang') }}">Barang</a>
+                        href="{{ url('/admin-panel/barang') }}">
+                        Barang
+                    </a>
+                    <a class="collapse-item {{ Request::is('admin-panel/lokasi') ? 'active' : '' }}"
+                        href="{{ url('/admin-panel/lokasi') }}">
+                        Lokasi
+                    </a>
                 </div>
             </div>
         </li>

@@ -1,6 +1,6 @@
 @extends('pages.layouts.app')
 
-@push('title_module', 'Lokasi')
+@push('title_module', 'Absensi')
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
@@ -9,7 +9,7 @@
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
-        Data Lokasi
+        Data Absensi
     </h1>
 
     @if (session('success'))
@@ -24,18 +24,23 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+            <a href="{{ url('/admin-panel/absensi/create') }}" class="btn btn-primary btn-sm">
                 <i class="fa fa-plus"></i> Tambah Data
-            </button>
+            </a>
         </div>
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
-                        <th>Kode Lokasi</th>
-                        <th>Nama Lokasi</th>
-                        <th class="text-center">Status</th>
+                        @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                        @endif
+                        <th>Nama Karyawan</th>
+                        <th class="text-center">Tanggal Absensi</th>
+                        <th class="text-center">Status Absen</th>
+                        <th class="text-center">Tanggal Publish</th>
+                        <th class="text-center">Tanggal Modifikasi</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -43,22 +48,37 @@
                     @php
                         $nomer = 0;
                     @endphp
-                    @foreach ($lokasi as $item)
+                    @foreach ($log_absensi as $item)
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
-                            <td>{{ $item['kode_lokasi'] }}</td>
-                            <td>{{ $item['nama_lokasi'] }}</td>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                                <td>{{ $item['divisi'] }}</td>
+                            @endif
+                            <td>{{ $item['nama_karyawan'] }}</td>
+                            <td class="text-center">{{ $item['tanggal_waktu'] }}</td>
                             <td class="text-center">
-                                <span class="badge bg-success text-white">
-                                    {{ $item['status'] }}
-                                </span>
+                                @if ($item["status"] == "Tepat Waktu")
+                                    <span class="badge bg-success text-white text-uppercase">
+                                        Tepat Waktu
+                                    </span>
+                                @elseif ($item["status"] == "Terlambat")
+                                    <span class="badge bg-warning text-white text-uppercase">
+                                        Terlambat
+                                    </span>
+                                @elseif ($item["status"] == "Pulang")
+                                    <span class="badge bg-success text-white text-uppercase">
+                                        Pulang
+                                    </span>
+                                @endif
                             </td>
+                            <td class="text-center">{{ $item['upload'] }}</td>
+                            <td class="text-center">{{ $item['modif'] }}</td>
                             <td class="text-center">
-                                <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
+                                <button onclick="editLogAbsensi('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                     <i class="fa fa-edit"></i> Edit
                                 </button>
-                                <form action="{{ url('/admin-panel/lokasi/' . $item['id']) }}" method="POST"
+                                <form action="{{ url('/admin-panel/absensi/' . $item['id']) }}" method="POST"
                                     style="display: inline">
                                     @csrf
                                     @method('DELETE')
@@ -74,56 +94,6 @@
             </table>
         </div>
     </div>
-
-    <!-- Modal Tambah -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fs-5" id="exampleModalLabel">
-                        <i class="fa fa-plus"></i> Tambah Data
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ url('/admin-panel/lokasi') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="kode_lokasi" class="form-label">
-                                Kode Lokasi
-                                <small class="text-danger">*</small>
-                            </label>
-                            <input type="number" class="form-control @error('kode_lokasi') is-invalid @enderror" name="kode_lokasi" id="kode_lokasi" placeholder="Masukkan Nama Lokasi" value="{{ old('kode_lokasi') }}" min="1">
-                            @error('kode_lokasi')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="nama_lokasi" class="form-label">
-                                Nama Lokasi
-                                <small class="text-danger">*</small>
-                            </label>
-                            <input type="text" class="form-control @error('nama_lokasi') is-invalid @enderror" name="nama_lokasi" id="nama_lokasi" placeholder="Masukkan Nama Lokasi" value="{{ old('nama_lokasi') }}">
-                            @error('nama_lokasi')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="reset" class="btn btn-secondary btn-sm" data-dismiss="modal">
-                            <i class="fa fa-times"></i> Batalkan
-                        </button>
-                        <button type="submit" class="btn btn-success btn-sm">
-                            <i class="fa fa-save"></i> Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal Tambah -->
 
     <!-- Modal Edit -->
     <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -160,9 +130,9 @@
             });
         });
 
-        function editSupplier(id) {
+        function editLogAbsensi(id) {
             $.ajax({
-                url: "{{ url('/admin-panel/lokasi') }}" + "/" + id + "/edit",
+                url: "{{ url('/admin-panel/absensi') }}" + "/" + id + "/edit",
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)

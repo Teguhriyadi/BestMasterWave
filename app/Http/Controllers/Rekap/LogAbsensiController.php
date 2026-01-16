@@ -2,10 +2,236 @@
 
 namespace App\Http\Controllers\Rekap;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
+use App\Http\Services\LogAbsensiService;
+use App\Models\Karyawan;
+use App\Models\LogAbsensi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class LogAbsensiController extends Controller
 {
-    //
+    public function __construct(
+        protected LogAbsensiService $log_absensi_service
+    ) {}
+
+    public function index()
+    {
+        $data["log_absensi"] = $this->log_absensi_service->list();
+
+        return view("pages.modules.rekap.absensi.index", $data);
+    }
+
+    public function create()
+    {
+        return view("pages.modules.rekap.absensi.create");
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file']
+        ]);
+
+        $sofficeMac   = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
+        $sofficeLinux = '/usr/bin/libreoffice';
+
+        $soffice = file_exists($sofficeMac)
+            ? $sofficeMac
+            : (file_exists($sofficeLinux) ? $sofficeLinux : null);
+
+        if (!$soffice) {
+            return back()->with('error', 'LibreOffice tidak ditemukan');
+        }
+
+        $uploadedPath = $request->file('file')->getPathname();
+
+        $tempOutDir = sys_get_temp_dir() . '/fp_' . uniqid();
+        mkdir($tempOutDir, 0777, true);
+
+        $cmd = "\"$soffice\" --headless --nologo --nolockcheck --convert-to csv \"$uploadedPath\" --outdir \"$tempOutDir\"";
+        exec($cmd, $out, $exitCode);
+
+        if ($exitCode !== 0) {
+            return back()->with('error', 'Gagal convert fingerprint');
+        }
+
+        $csvFiles = glob($tempOutDir . '/*.csv');
+        if (!$csvFiles) {
+            return back()->with('error', 'CSV tidak ditemukan');
+        }
+
+        $csvPath = $csvFiles[0];
+
+        $lines = file($csvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $delimiter = str_contains($lines[0], ';') ? ';' : ',';
+        $rows = array_map(fn($l) => str_getcsv($l, $delimiter), $lines);
+
+        if (count($rows) < 2) {
+            return back()->with('error', 'CSV kosong');
+        }
+
+        $data = array_slice($rows, 1);
+
+        $karyawanMap = Karyawan::pluck('id_fp')
+            ->map(fn($id) => $this->extractIdFp($id))
+            ->filter()
+            ->flip();
+
+        DB::beginTransaction();
+
+        try {
+            $inserted = 0;
+            $skipped  = 0;
+
+            foreach ($data as $row) {
+
+                $idFp = null;
+                foreach ($row as $cell) {
+                    $idFp = $this->extractIdFp($cell);
+                    if ($idFp !== null) break;
+                }
+
+                if (!$idFp || !isset($karyawanMap[$idFp])) {
+                    $skipped++;
+                    continue;
+                }
+
+                $rawTanggal = null;
+
+                for ($i = 0; $i < count($row); $i++) {
+                    if (preg_match('/^\d{2}\/\d{2}\/\d{2}$/', trim($row[$i] ?? ''))) {
+                        $rawTanggal = trim($row[$i]) . ' ' . trim($row[$i + 1] ?? '');
+                        break;
+                    }
+
+                    if (preg_match('/\d{2}-[A-Za-z]{3}-\d{2}/', trim($row[$i] ?? ''))) {
+                        $rawTanggal = trim($row[$i]);
+                        break;
+                    }
+                }
+
+                if (!$rawTanggal) {
+                    $skipped++;
+                    continue;
+                }
+
+                $tanggal = $this->parseTanggalFingerprint($rawTanggal);
+                if (!$tanggal) {
+                    $skipped++;
+                    continue;
+                }
+
+                LogAbsensi::create([
+                    'id'             => Str::uuid(),
+                    'divisi_id'      => AuthDivisi::id(),
+                    'id_fp'          => $idFp,
+                    'tanggal_waktu'  => $tanggal,
+                    'created_by'     => Auth::id(),
+                    'updated_by'     => Auth::id(),
+                ]);
+
+                $inserted++;
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
+
+        @unlink($csvPath);
+        @rmdir($tempOutDir);
+
+        return back()->with(
+            'success',
+            "Import selesai. Masuk: {$inserted}, Skip: {$skipped}"
+        );
+    }
+
+    private function extractIdFp($value)
+    {
+        if (preg_match('/\d+/', (string) $value, $m)) {
+            return ltrim($m[0], '0'); // 02 → 2
+        }
+        return null;
+    }
+
+    private function parseTanggalFingerprint($value)
+    {
+        $value = trim($value);
+
+        if (preg_match('/\d{1,2}\.\d{1}$/', $value)) {
+            $value = preg_replace_callback(
+                '/(\d{1,2})\.(\d{1})$/',
+                fn($m) =>
+                str_pad($m[1], 2, '0', STR_PAD_LEFT) . '.' .
+                    str_pad($m[2], 2, '0', STR_PAD_RIGHT),
+                $value
+            );
+        }
+
+        $formats = [
+            'd-M-y h:i:s A',
+            'd/m/y H.i',
+            'd/m/y H:i',
+        ];
+
+        foreach ($formats as $f) {
+            try {
+                return Carbon::createFromFormat($f, $value);
+            } catch (\Exception $e) {
+            }
+        }
+
+        return null;
+    }
+
+    public function edit($id)
+    {
+        try {
+            $data["edit"] = $this->log_absensi_service->edit($id);
+
+            return view("pages.modules.rekap.absensi.edit", $data);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $this->log_absensi_service->update($id, $request->all());
+
+            return back()->with('success', 'Data berhasil diperbarui');
+
+        } catch (\Throwable $e) {
+
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $this->log_absensi_service->delete($id);
+
+            return back()
+                ->with('success', 'Data berhasil dihapus');
+
+        } catch (\Throwable $e) {
+
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
 }
