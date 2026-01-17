@@ -10,4 +10,6 @@ Route::prefix("denda")->group(function() {
     Route::get("/{id}/edit", [DendaKaryawanController::class, "edit"]);
     Route::put("/{id}", [DendaKaryawanController::class, "update"]);
     Route::delete("/{id}", [DendaKaryawanController::class, "destroy"]);
+    Route::get("/{id}/ubah-status", [DendaKaryawanController::class, "ubah_status"]);
+    Route::put("/{id}/ubah-status", [DendaKaryawanController::class, "update_status"]);
 });

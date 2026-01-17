@@ -10,4 +10,6 @@ Route::prefix("peringatan")->group(function() {
     Route::get("/{id}/edit", [PeringatanKaryawanController::class, "edit"]);
     Route::put("/{id}", [PeringatanKaryawanController::class, "update"]);
     Route::delete("/{id}", [PeringatanKaryawanController::class, "destroy"]);
+    Route::get("/{id}/ubah-status", [PeringatanKaryawanController::class, "ubah_status"]);
+    Route::put("/{id}/ubah-status", [PeringatanKaryawanController::class, "update_status"]);
 });

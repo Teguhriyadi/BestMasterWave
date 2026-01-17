@@ -59,6 +59,34 @@ class PeringatanKaryawanController extends Controller
         }
     }
 
+    public function ubah_status($id)
+    {
+        try {
+            $data["edit"] = $this->peringatan_service->edit($id);
+
+            return view("pages.modules.peringatan.ubah-status", $data);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function update_status(Request $request, $id)
+    {
+        try {
+            $data = $request->all();
+
+            $this->peringatan_service->update_status($id, $data);
+
+            return back()->with('success', 'Data berhasil diperbarui');
+
+        } catch (\Throwable $e) {
+
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
     public function update(UpdateRequest $request, $id)
     {
         try {

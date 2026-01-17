@@ -35,7 +35,7 @@ class LogAbsensiRepository
 
             return [
                 'id'             => $item->id,
-                'divisi'         => $item->divisi->nama ?? '-',
+                'divisi'         => $item->karyawan->divisi->nama_divisi ?? '-',
                 'nama_karyawan'  => $item->karyawan->nama ?? '-',
                 'tanggal_waktu'  => $this->formatTanggalIndo($item->tanggal_waktu),
                 'status'         => $status,

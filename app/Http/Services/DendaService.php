@@ -40,15 +40,17 @@ class DendaService
         });
     }
 
+    public function update_status(string $id, array $data)
+    {
+        return DB::transaction(function () use ($id, $data) {
+            return $this->denda_repository->update_status_by_id($id, $data);
+        });
+    }
+
     public function delete(string $id)
     {
         return DB::transaction(function () use ($id) {
             $this->denda_repository->delete_by_id($id);
         });
-    }
-
-    public function getRolesByDivision(string $divisionId)
-    {
-        return $this->divisi_repository->getRolesByDivisi($divisionId);
     }
 }

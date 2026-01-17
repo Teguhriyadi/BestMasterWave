@@ -58,6 +58,10 @@
                             <td class="text-center">{!! $item['status'] !!}</td>
                             <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">
+                                <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
+                                    class="btn btn-info btn-sm" data-toggle="modal" data-target="#exampleModalUbahStatus">
+                                    <i class="fa fa-edit"></i> Ubah Status
+                                </button>
                                 <button onclick="editDenda('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                     <i class="fa fa-edit"></i> Edit
@@ -99,6 +103,27 @@
         </div>
     </div>
     <!-- End Modal Edit -->
+
+    <!-- Modal Ubah Status -->
+    <div class="modal fade" id="exampleModalUbahStatus" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-edit"></i> Ubah Status Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-ubah-status">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Ubah Status -->
 @endpush
 
 @push('js_style')
@@ -120,6 +145,19 @@
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function ubahStatus(id) {
+            $.ajax({
+                url: "{{ url('/admin-panel/denda') }}" + "/" + id + "/ubah-status",
+                type: "GET",
+                success: function(response) {
+                    $("#modal-content-ubah-status").html(response)
                 },
                 error: function(error) {
                     console.log(error);

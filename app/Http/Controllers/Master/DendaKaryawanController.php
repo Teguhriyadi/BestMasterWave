@@ -76,6 +76,19 @@ class DendaKaryawanController extends Controller
         }
     }
 
+    public function update_status(Request $request, $id)
+    {
+        try {
+            $this->denda_service->update_status($id, $request->all());
+
+            return back()->with('success', 'Data berhasil diperbarui');
+
+        } catch (\Throwable $e) {
+
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
     public function destroy($id)
     {
         try {
@@ -86,6 +99,19 @@ class DendaKaryawanController extends Controller
 
         } catch (\Throwable $e) {
 
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function ubah_status($id)
+    {
+        try {
+            $data["edit"] = $this->denda_service->edit($id);
+
+            return view("pages.modules.denda.ubah-status", $data);
+        } catch (\Throwable $e) {
             return redirect()
                 ->back()
                 ->with('error', $e->getMessage());

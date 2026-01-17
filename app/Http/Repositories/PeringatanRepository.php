@@ -49,6 +49,19 @@ class PeringatanRepository
         return $divisi;
     }
 
+    public function update_status_by_id(string $id, array $data)
+    {
+        $peringatan = PeringatanKaryawan::findOrFail($id);
+
+        $peringatan->update([
+            "status" => $data["status"],
+            "approved_by" => Auth::user()->id,
+            "approved_at" => now()
+        ]);
+
+        return $peringatan;
+    }
+
     public function delete_by_id(string $id): void
     {
         $peringatan_karyawan = PeringatanKaryawan::findOrFail($id);

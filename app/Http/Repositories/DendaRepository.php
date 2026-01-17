@@ -54,6 +54,20 @@ class DendaRepository
         return $denda;
     }
 
+    public function update_status_by_id(string $id, array $data)
+    {
+        $ubah_status = DendaKaryawan::findOrFail($id);
+
+        $ubah_status->update([
+            "status" => $data["status"],
+            "approved_by" => Auth::user()->id,
+            "updated_by" => Auth::user()->id,
+            "approved_at" => now()
+        ]);
+
+        return $ubah_status;
+    }
+
     public function delete_by_id(string $id): void
     {
         $denda = DendaKaryawan::findOrFail($id);
