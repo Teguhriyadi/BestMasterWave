@@ -55,7 +55,7 @@ class LokasiController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $data = $request->validated();
+            $data = $request->all();
 
             $this->lokasi_service->update($id, $data);
 
