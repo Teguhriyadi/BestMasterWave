@@ -72,14 +72,31 @@ class MenuRepository
     {
         $menu = Menu::findOrFail($id);
 
+        $oldType     = $menu->type;
+        $oldParentId = $menu->parent_id;
+
+        $newType     = $data['tipe_menu'];
+        $newParentId = $data['parent_id'] ?? null;
+
+        if ($oldType !== $newType || $oldParentId !== $newParentId) {
+
+            $query = Menu::where('type', $newType);
+
+            if ($newType !== 'header') {
+                $query->where('parent_id', $newParentId);
+            }
+
+            $lastOrder = $query->max('order');
+            $menu->order = $lastOrder ? $lastOrder + 1 : 1;
+        }
+
         $menu->update([
             "type" => $data["tipe_menu"],
             "nama_menu" => $data["nama_menu"],
             "slug" => Str::slug($data["nama_menu"]),
             "url_menu" => $data['url'] ?? null,
             "icon" => $data['icon'] ?? null,
-            "parent_id" => $data['parent_id'] ?? null,
-            "order" => $data['order'] ?? 0
+            "parent_id" => $data['parent_id'] ?? null
         ]);
 
         return $menu;
