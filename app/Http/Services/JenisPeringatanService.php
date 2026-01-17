@@ -21,6 +21,13 @@ class JenisPeringatanService
         return JenisPeringatanMapper::toTable($jenis_peringatan);
     }
 
+    public function list_peringatan()
+    {
+        $jenis_peringatan = $this->jenis_peringatan_repository->get_all_data();
+
+        return JenisPeringatanMapper::toListPeringatan($jenis_peringatan);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {

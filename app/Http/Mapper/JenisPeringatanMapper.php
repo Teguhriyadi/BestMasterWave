@@ -25,14 +25,15 @@ class JenisPeringatanMapper
         });
     }
 
-    public static function toListDenda(Collection $jenis_denda): Collection
+    public static function toListPeringatan(Collection $jenis_peringatan): Collection
     {
-        return $jenis_denda->map(function(JenisDenda $jenis) {
+        return $jenis_peringatan->map(function(JenisPeringatan $jenis) {
             return [
-                'id'            => $jenis->id,
-                'kode'          => $jenis->kode,
-                'nama_jenis'    => $jenis->nama_jenis,
-                'nominal'       => (int) $jenis->nominal
+                'id'                => $jenis->id,
+                'kode'              => $jenis->kode,
+                'nama_peringatan'   => $jenis->nama_peringatan,
+                'level'             => $jenis->level,
+                "masa_berlaku_hari" => $jenis->masa_berlaku_hari
             ];
         });
     }
