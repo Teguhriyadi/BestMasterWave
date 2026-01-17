@@ -36,7 +36,6 @@ class MenuController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
-
         } catch (\Throwable $e) {
 
             return redirect()
@@ -69,7 +68,6 @@ class MenuController extends Controller
             $this->menu_service->update($id, $data);
 
             return back()->with('success', 'Data berhasil diperbarui');
-
         } catch (\Throwable $e) {
 
             return back()->withInput()->with('error', $e->getMessage());
@@ -83,12 +81,21 @@ class MenuController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil dihapus');
-
         } catch (\Throwable $e) {
 
             return redirect()
                 ->back()
                 ->with('error', $e->getMessage());
+        }
+    }
+
+    public function move($id, $direction)
+    {
+        try {
+            $this->menu_service->move($id, $direction);
+            return back()->with('success', 'Urutan berhasil diubah');
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 }

@@ -96,6 +96,17 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
+                                    <form action="{{ url('/admin-panel/menu/' . $item['id'] . '/move/up') }}" method="POST"
+                                        style="display:inline">
+                                        @csrf
+                                        <button class="btn btn-secondary btn-sm" title="Naik">⬆️</button>
+                                    </form>
+
+                                    <form action="{{ url('/admin-panel/menu/' . $item['id'] . '/move/down') }}" method="POST"
+                                        style="display:inline">
+                                        @csrf
+                                        <button class="btn btn-secondary btn-sm" title="Turun">⬇️</button>
+                                    </form>
                                     <button onclick="editMenu(`{{ $item['id'] }}`)" type="button"
                                         class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                         <i class="fa fa-edit"></i> Edit
@@ -151,11 +162,13 @@
                                 Tipe Menu
                                 <small class="text-danger">*</small>
                             </label>
-                            <select name="tipe_menu" class="form-control tipe-menu @error("tipe_menu") is-invalid @enderror">
+                            <select name="tipe_menu"
+                                class="form-control tipe-menu @error('tipe_menu') is-invalid @enderror">
                                 <option value="">- Pilih -</option>
-                                <option {{ old('tipe_menu') == "header" ? 'selected' : '' }} value="header">Header</option>
-                                <option {{ old('tipe_menu') == "menu" ? 'selected' : '' }} value="menu">Menu</option>
-                                <option {{ old('tipe_menu') == "submenu" ? 'selected' : '' }} value="submenu">Sub Menu</option>
+                                <option {{ old('tipe_menu') == 'header' ? 'selected' : '' }} value="header">Header</option>
+                                <option {{ old('tipe_menu') == 'menu' ? 'selected' : '' }} value="menu">Menu</option>
+                                <option {{ old('tipe_menu') == 'submenu' ? 'selected' : '' }} value="submenu">Sub Menu
+                                </option>
                             </select>
                             @error('tipe_menu')
                                 <div class="invalid-feedback">{{ $message }}</div>

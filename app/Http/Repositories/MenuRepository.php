@@ -97,4 +97,28 @@ class MenuRepository
             ->orderBy('order')
             ->get();
     }
+
+    public function swapOrder(Menu $current, string $direction): void
+    {
+        $query = Menu::where('type', $current->type);
+
+        if ($current->type === 'menu') {
+            $query->where('parent_id', $current->parent_id);
+        }
+
+        if ($current->type === 'submenu') {
+            $query->where('parent_id', $current->parent_id);
+        }
+
+        $target = $direction === 'up'
+            ? $query->where('order', '<', $current->order)->orderBy('order', 'DESC')->first()
+            : $query->where('order', '>', $current->order)->orderBy('order', 'ASC')->first();
+
+        if (! $target) return;
+
+        [$current->order, $target->order] = [$target->order, $current->order];
+
+        $current->save();
+        $target->save();
+    }
 }

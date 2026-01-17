@@ -38,14 +38,14 @@ class MenuService
 
     public function list_parent()
     {
-        return DB::transaction(function() {
+        return DB::transaction(function () {
             return $this->menu_repository->get_parent();
         });
     }
 
     public function list_parent_header()
     {
-        return DB::transaction(function() {
+        return DB::transaction(function () {
             return $this->menu_repository->get_parent_header();
         });
     }
@@ -59,7 +59,7 @@ class MenuService
 
     public function edit(string $id)
     {
-        return DB::transaction(function() use ($id) {
+        return DB::transaction(function () use ($id) {
             return $this->menu_repository->get_data_by_id($id);
         });
     }
@@ -121,5 +121,18 @@ class MenuService
             ->merge($allowedSubmenus)
             ->sortBy('order')
             ->values();
+    }
+
+    public function move(string $id, string $direction): void
+    {
+        DB::transaction(function () use ($id, $direction) {
+            $menu = Menu::findOrFail($id);
+
+            if (!in_array($direction, ['up', 'down'])) {
+                throw new \Exception('Direction tidak valid');
+            }
+
+            $this->menu_repository->swapOrder($menu, $direction);
+        });
     }
 }

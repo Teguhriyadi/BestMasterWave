@@ -10,4 +10,5 @@ Route::prefix("menu")->group(function() {
     Route::get("/{id}/edit", [MenuController::class, "edit"]);
     Route::put("/{id}", [MenuController::class, "update"]);
     Route::delete("/{id}", [MenuController::class, "destroy"]);
+    Route::post("/{id}/move/{direction}", [MenuController::class, "move"]);
 });
