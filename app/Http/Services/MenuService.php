@@ -94,17 +94,18 @@ class MenuService
             if ($menu->type !== 'submenu') return false;
 
             $permission = menuReadPermission($menu);
-            if (!$permission) return false;
-
-            return canPermission($permission);
+            return $permission && canPermission($permission);
         });
 
         $allowedMenus = $menus->filter(function ($menu) use ($allowedSubmenus) {
             if ($menu->type !== 'menu') return false;
 
-            return $allowedSubmenus
-                ->where('parent_id', $menu->id)
-                ->isNotEmpty();
+            if ($allowedSubmenus->where('parent_id', $menu->id)->isNotEmpty()) {
+                return true;
+            }
+
+            $permission = menuReadPermission($menu);
+            return $permission && canPermission($permission);
         });
 
         $allowedHeaders = $menus->filter(function ($menu) use ($allowedMenus) {
@@ -122,6 +123,7 @@ class MenuService
             ->sortBy('order')
             ->values();
     }
+
 
     public function move(string $id, string $direction): void
     {

@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 if (!function_exists('isActive')) {
     function isActive(string $slug): bool
     {
@@ -13,13 +11,14 @@ if (!function_exists('isOpen')) {
     function isOpen($children, bool $collapse = false): string
     {
         foreach ($children as $child) {
-            if (isActive($child->slug)) {
+            if (isActive('admin-panel/' . $child->url_menu)) {
                 return $collapse ? 'show' : 'active';
             }
         }
         return '';
     }
 }
+
 
 if (!function_exists('menuReadPermission')) {
     function menuReadPermission($menu): ?string

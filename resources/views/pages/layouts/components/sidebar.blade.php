@@ -21,58 +21,52 @@
         <hr class="sidebar-divider">
     @endif
 
-    <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ url('/admin-panel/dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
+    @foreach ($sidebarMenus->where('type', 'header') as $header)
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">
+            {{ $header->nama_menu }}
+        </div>
 
-    @if (!empty(Auth::user()->one_divisi_roles))
-        @foreach ($sidebarMenus->where('type', 'header') as $header)
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                {{ $header->nama_menu }}
-            </div>
+        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
+            @php
+                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
+            @endphp
 
-            @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
-                @php
-                    $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
-                @endphp
+            @if ($submenus->count() > 0)
+                <li class="nav-item {{ isOpen($submenus) ? 'active' : '' }}">
+                    <a class="nav-link {{ isOpen($submenus) ? '' : 'collapsed' }}" href="#" data-toggle="collapse"
+                        data-target="#menu-{{ $menu->id }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
 
-                @if ($submenus->count() > 0)
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse"
-                            data-target="#menu-{{ $menu->id }}">
-                            <i class="{{ $menu->icon }}"></i>
-                            <span>{{ $menu->nama_menu }}</span>
-                        </a>
-
-                        <div id="menu-{{ $menu->id }}" class="collapse">
-                            <div class="bg-white py-2 collapse-inner rounded">
-                                @foreach ($submenus as $sub)
-                                    <a class="collapse-item
-                                {{ Request::is('admin-panel/' . $sub->url_menu . '*') ? 'active' : '' }}"
-                                        href="{{ url('/admin-panel/' . $sub->url_menu) }}">
-                                        {{ $sub->nama_menu }}
-                                    </a>
-                                @endforeach
-                            </div>
+                    <div id="menu-{{ $menu->id }}" class="collapse {{ isOpen($submenus, true) }}">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @foreach ($submenus as $sub)
+                                <a class="collapse-item {{ isActive('admin-panel/'.$sub->url_menu) ? 'active' : '' }}"
+                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
+                                    {{ $sub->nama_menu }}
+                                </a>
+                            @endforeach
                         </div>
-                    </li>
-                @else
-                    <li
-                        class="nav-item
+                    </div>
+                </li>
+            @else
+                <li
+                    class="nav-item
                 {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
-                            <i class="{{ $menu->icon }}"></i>
-                            <span>{{ $menu->nama_menu }}</span>
-                        </a>
-                    </li>
-                @endif
-            @endforeach
+                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
+                        <i class="{{ $menu->icon }}"></i>
+                        <span>{{ $menu->nama_menu }}</span>
+                    </a>
+                </li>
+            @endif
         @endforeach
-    @else
+    @endforeach
+
+    {{-- @if (!empty(Auth::user()->one_divisi_roles)) --}}
+
+    {{-- @else
         <hr class="sidebar-divider">
         <div class="sidebar-heading">
             Master Data
@@ -191,7 +185,7 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endif --}}
 
     <!-- Nav Item - Dashboard -->
     {{-- <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
@@ -329,8 +323,8 @@
 
             <li
                 class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') ? 'active' : '' }}">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse"
-                    data-target="#collapseKelolaMenu" aria-expanded="true" aria-controls="collapseKelolaMenu">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKelolaMenu"
+                    aria-expanded="true" aria-controls="collapseKelolaMenu">
                     <i class="fas fa-fw fa-book"></i>
                     <span>Kelola Menu</span>
                 </a>
