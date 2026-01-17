@@ -13,12 +13,25 @@ class KaryawanMapper
     public static function toTable(Collection $karyawan): Collection
     {
         return $karyawan->map(function(Karyawan $item) {
+            $statusNoKK = empty($item['no_kk'])
+                ? '<span class="badge bg-danger text-white text-uppercase">Belum Upload</span>'
+                : '<span class="badge bg-success text-white text-uppercase">Sudah Upload</span>';
+
+            $statusBPJS = empty($item['no_bpjs_kesehatan'])
+                ? '<span class="badge bg-danger text-white text-uppercase">Belum Upload</span>'
+                : '<span class="badge bg-success text-white text-uppercase">Sudah Upload</span>';
+
+            $statusAccNo = empty($item['acc_no'])
+                ? '<span class="badge bg-danger text-white text-uppercase">Belum Upload</span>'
+                : '<span class="badge bg-success text-white text-uppercase">Sudah Upload</span>';
+
             return [
                 'id' => $item["id"],
                 "sidik_jari" => $item["id_fp"],
                 "no_ktp" => $item["no_ktp"],
-                "no_kk" => $item["no_kk"],
-                "no_bpjs_kesehatan" => $item["no_bpjs_kesehatan"],
+                "no_kk" => $statusNoKK,
+                "no_bpjs_kesehatan" => $statusBPJS,
+                "acc_no"    => $statusAccNo,
                 "nama" => $item["nama"],
                 "tanggal_masuk" => $item->tanggal_masuk->locale('id')->translatedFormat('d F Y'),
                 "no_hp" => $item["no_hp"],

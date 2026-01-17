@@ -15,8 +15,8 @@ class KetidakHadiranMapper
                 "nama"    => $absen["karyawan"]["nama"],
                 "status"  => $absen["status"],
                 "alasan"  => $absen["alasan"],
-                "tanggal" => $absen["tanggal"],
-                "upload"  => $absen["created_at"]
+                "tanggal" => $absen["tanggal"]->locale('id')->translatedFormat('d F Y'),
+                "upload"  => $absen["created_at"]->locale('id')->translatedFormat('d F Y H:i:s'),
             ];
         });
     }

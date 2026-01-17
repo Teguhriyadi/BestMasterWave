@@ -17,6 +17,11 @@ class RekapAbsensi extends Model
 
     public $primaryKey = "id";
 
+    protected $casts = [
+        "tanggal" => 'date',
+        "created_at" => 'datetime'
+    ];
+
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class, "karyawan_id");

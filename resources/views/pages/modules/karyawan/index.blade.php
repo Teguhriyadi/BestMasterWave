@@ -42,6 +42,9 @@
                         <th>No. KTP</th>
                         <th>Nama Karyawan</th>
                         <th class="text-center">Tanggal Masuk</th>
+                        <th>No. KK</th>
+                        <th>No. Rekening</th>
+                        <th>No. BPJS Kesehatan</th>
                         <th>No. Handphone</th>
                         <th>No. Handphone Darurat</th>
                         <th>Jenis Kelamin</th>
@@ -62,6 +65,9 @@
                             <td>{{ $item['no_ktp'] }}</td>
                             <td>{{ $item['nama'] }}</td>
                             <td class="text-center">{{ $item['tanggal_masuk'] }}</td>
+                            <td>{!! $item['no_kk'] !!}</td>
+                            <td>{!! $item['acc_no'] !!}</td>
+                            <td>{!! $item['no_bpjs_kesehatan'] !!}</td>
                             <td>{{ $item['no_hp'] }}</td>
                             <td>{{ $item['no_hp_darurat'] }}</td>
                             <td class="text-center">{{ $item['jenis_kelamin'] }}</td>
