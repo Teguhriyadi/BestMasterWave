@@ -29,6 +29,17 @@ class KaryawanMapper
         });
     }
 
+    public static function toListKaryawan(Collection $karyawan): Collection
+    {
+        return $karyawan->map(function(Karyawan $item) {
+            return [
+                'id' => $item["id"],
+                "nama" => $item["nama"],
+                "jabatan" => $item["jabatan"]["nama_jabatan"]
+            ];
+        });
+    }
+
     public static function toListLogKaryawan(Collection $log): Collection
     {
         return $log->map(function(LogKaryawan $item) {

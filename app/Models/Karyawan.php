@@ -30,4 +30,9 @@ class Karyawan extends Model
                 "nama_divisi" => "-"
             ]);
     }
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, "jabatan_id");
+    }
 }

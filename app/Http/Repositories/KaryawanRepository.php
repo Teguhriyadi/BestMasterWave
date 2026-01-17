@@ -16,6 +16,12 @@ class KaryawanRepository
         return Karyawan::orderBy("created_at", "DESC")->get();
     }
 
+    public function get_list_karyawan()
+    {
+        return Karyawan::where("divisi_id", AuthDivisi::id())
+            ->get();
+    }
+
     public function insert_data(array $data)
     {
         $karyawan = Karyawan::create([

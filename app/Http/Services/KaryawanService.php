@@ -22,6 +22,13 @@ class KaryawanService
         return KaryawanMapper::toTable($divisi);
     }
 
+    public function list_karyawan()
+    {
+        $karyawan = $this->karyawan_repository->get_list_karyawan();
+
+        return KaryawanMapper::toListKaryawan($karyawan);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
