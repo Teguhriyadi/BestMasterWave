@@ -24,4 +24,16 @@ class JenisDendaMapper
             ];
         });
     }
+
+    public static function toListDenda(Collection $jenis_denda): Collection
+    {
+        return $jenis_denda->map(function(JenisDenda $jenis) {
+            return [
+                'id'            => $jenis->id,
+                'kode'          => $jenis->kode,
+                'nama_jenis'    => $jenis->nama_jenis,
+                'nominal'       => (int) $jenis->nominal
+            ];
+        });
+    }
 }

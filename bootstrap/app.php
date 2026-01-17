@@ -42,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/rekap/absensi.php';
                     require __DIR__ . '/../routes/rekap/ketidakhadiran.php';
                     require __DIR__ . '/../routes/master/jenis-denda.php';
+                    require __DIR__ . '/../routes/rekap/denda.php';
                 });
             });
         },

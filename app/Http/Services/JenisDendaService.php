@@ -14,9 +14,16 @@ class JenisDendaService
 
     public function list()
     {
-        $supplier = $this->jenis_denda_repository->get_all_data();
+        $jenis_denda = $this->jenis_denda_repository->get_all_data();
 
-        return JenisDendaMapper::toTable($supplier);
+        return JenisDendaMapper::toTable($jenis_denda);
+    }
+
+    public function list_denda()
+    {
+        $jenis_denda = $this->jenis_denda_repository->get_all_data();
+
+        return JenisDendaMapper::toListDenda($jenis_denda);
     }
 
     public function create(array $data)
