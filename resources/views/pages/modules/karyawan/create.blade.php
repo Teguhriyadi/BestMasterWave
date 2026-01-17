@@ -37,10 +37,11 @@
                         <div class="mb-3 row">
                             <label for="id_sidik_jari" class="col-sm-3 col-form-label">
                                 ID Sidik Jari
+                                <small class="text-danger">*</small>
                             </label>
                             <div class="col-sm-4">
-                                <input type="text" name="id_sidik_jari" class="form-control @error('id_sidik_jari') is-invalid @enderror" id="id_sidik_jari"
-                                    placeholder="Masukkan ID Sidik Jari" value="{{ old('id_sidik_jari') }}">
+                                <input type="number" name="id_sidik_jari" class="form-control @error('id_sidik_jari') is-invalid @enderror" id="id_sidik_jari"
+                                    placeholder="Masukkan ID Sidik Jari" value="{{ old('id_sidik_jari') }}" min="1">
 
                                 @error('id_sidik_jari')
                                     <div class="invalid-feedback">{{ $message }}</div>

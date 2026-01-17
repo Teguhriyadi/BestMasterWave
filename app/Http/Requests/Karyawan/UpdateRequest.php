@@ -9,6 +9,7 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id_sidik_jari'     => ['required'],
             'nama'              => ['required'],
             'nama_panggilan'    => ['required'],
             'tanggal_masuk'     => ['required'],
@@ -26,6 +27,7 @@ class UpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'id_sidik_jari.required'     => 'ID Sidik Jari Wajib Diisi',
             'nama.required'              => 'Nama Wajib Diisi',
             'nama_panggilan.required'    => 'Nama Panggilan Wajib Diisi',
             'no_hp.required'             => 'Nomor Handphone Wajib Diisi',
