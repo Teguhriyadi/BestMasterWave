@@ -106,6 +106,11 @@
                                 </div>
                             </div>
                             <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Tanggal Keluar</div>
+                                <div class="col-sm-8">: {{ empty($edit->tanggal_keluar) ? "-" : $edit->tanggal_keluar->locale('id')->translatedFormat('d F Y') }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
                                 <div class="col-sm-4 text-muted">Nomor Handphone Darurat</div>
                                 <div class="col-sm-8">: {{ $edit->no_hp_darurat }}</div>
                             </div>
