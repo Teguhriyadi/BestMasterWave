@@ -62,7 +62,7 @@
                                 <td>{{ $item['divisi'] }}</td>
                             @endif
                             <td>{{ $item['sidik_jari'] }}</td>
-                            <td>{{ $item['no_ktp'] }}</td>
+                            <td>{!! $item['no_ktp'] !!}</td>
                             <td>{{ $item['nama'] }}</td>
                             <td class="text-center">{{ $item['tanggal_masuk'] }}</td>
                             <td>{!! $item['no_kk'] !!}</td>

@@ -20,7 +20,8 @@ class Karyawan extends Model
     public $primaryKey = "id";
 
     protected $casts = [
-        "tanggal_masuk" => 'date'
+        "tanggal_masuk" => 'date',
+        "tanggal_lahir" => 'date'
     ];
 
     public function divisi()

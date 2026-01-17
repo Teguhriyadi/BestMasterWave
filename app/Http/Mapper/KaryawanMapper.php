@@ -13,6 +13,10 @@ class KaryawanMapper
     public static function toTable(Collection $karyawan): Collection
     {
         return $karyawan->map(function(Karyawan $item) {
+            $noKtp = empty($item['no_ktp'])
+                ? '<span class="badge bg-danger text-white text-uppercase">Belum Upload</span>'
+                : $item['no_ktp'];
+
             $statusNoKK = empty($item['no_kk'])
                 ? '<span class="badge bg-danger text-white text-uppercase">Belum Upload</span>'
                 : '<span class="badge bg-success text-white text-uppercase">Sudah Upload</span>';
@@ -28,7 +32,7 @@ class KaryawanMapper
             return [
                 'id' => $item["id"],
                 "sidik_jari" => $item["id_fp"],
-                "no_ktp" => $item["no_ktp"],
+                "no_ktp" => $noKtp,
                 "no_kk" => $statusNoKK,
                 "no_bpjs_kesehatan" => $statusBPJS,
                 "acc_no"    => $statusAccNo,

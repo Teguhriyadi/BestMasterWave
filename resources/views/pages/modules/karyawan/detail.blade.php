@@ -2,15 +2,10 @@
 
 @push('title_module', 'Karyawan')
 
-@push('css_style')
-    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-@endpush
-
 @push('content_app')
 
-
     <h1 class="h3 mb-4 text-gray-800">
-        Data Karyawan
+        Detail Data Karyawan
     </h1>
 
     @if (session('success'))
@@ -24,7 +19,7 @@
     @endif
 
     <div class="row">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <a href="{{ url('/admin-panel/karyawan') }}" class="btn btn-danger btn-sm">
@@ -32,277 +27,142 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3 row">
-                        <label for="id_sidik_jari" class="col-sm-3 col-form-label">
-                            ID Sidik Jari
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="id_sidik_jari" class="form-control" id="id_sidik_jari"
-                                placeholder="Masukkan ID Sidik Jari"
-                                value="{{ old('id_sidik_jari', $edit['id_sidik_jari']) }}">
-
-                            @error('id_sidik_jari')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="{{ asset('templating/img/undraw_profile.svg') }}" class="rounded-circle mb-3"
+                                width="120" height="120" style="object-fit: cover">
+                            <h5 class="font-weight-bold mb-1">
+                                {{ $edit->nama }}
+                            </h5>
+                            <span class="badge badge-primary mb-2">
+                                {{ $edit->jabatan->nama_jabatan }}
+                            </span>
+                            <hr>
+                            <p class="mb-1">
+                                <i class="fa fa-phone"></i>
+                                {{ $edit->no_hp ?? '-' }}
+                            </p>
                         </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="no_ktp" class="col-sm-3 col-form-label">
-                            Nomor KTP
-                        </label>
-                        <div class="col-sm-3">
-                            <input type="text" name="no_ktp" class="form-control" id="no_ktp"
-                                placeholder="Masukkan Nomor KTP" value="{{ old('no_ktp', $edit['no_ktp']) }}">
-
-                            @error('no_ktp')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="no_kk" class="col-sm-3 col-form-label">
-                            Nomor Kartu Keluarga
-                        </label>
-                        <div class="col-sm-3">
-                            <input type="text" name="no_kk" class="form-control" id="no_kk"
-                                placeholder="Masukkan Nomor Kartu Keluarga" value="{{ old('no_kk', $edit['no_kk']) }}">
-
-                            @error('no_kk')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="no_bpjs_kesehatan" class="col-sm-3 col-form-label">
-                            Nomor BPJS Kesehatan
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="no_bpjs_kesehatan" class="form-control" id="no_bpjs_kesehatan"
-                                placeholder="Masukkan Nomor BPJS Kesehatan"
-                                value="{{ old('no_bpjs_kesehatan', $edit['no_bpjs_kesehatan']) }}">
-
-                            @error('no_bpjs_kesehatan')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="nama" class="col-sm-3 col-form-label">
-                            Nama Lengkap
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-5">
-                            <input type="text" name="nama" class="form-control" id="nama"
-                                placeholder="Masukkan Nama Lengkap" value="{{ old('nama', $edit['nama']) }}">
-
-                            @error('nama')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="nama_panggilan" class="col-sm-3 col-form-label">
-                            Nama Panggilan
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="nama_panggilan" class="form-control" id="nama_panggilan"
-                                placeholder="Masukkan Nama Panggilan"
-                                value="{{ old('nama_panggilan', $edit['nama_panggilan']) }}">
-
-                            @error('nama_panggilan')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="tanggal_masuk" class="col-sm-3 col-form-label">
-                            Tanggal Masuk
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="date" name="tanggal_masuk" class="form-control" id="tanggal_masuk"
-                                value="{{ old('tanggal_masuk', $edit['tanggal_masuk']) }}">
-
-                            @error('tanggal_masuk')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="tanggal_keluar" class="col-sm-3 col-form-label">
-                            Tanggal Keluar
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="date" name="tanggal_keluar" class="form-control" id="tanggal_keluar"
-                                value="{{ old('tanggal_keluar', $edit['tanggal_keluar']) }}">
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="no_hp" class="col-sm-3 col-form-label">
-                            Nomor Handphone
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="no_hp" class="form-control" id="no_hp"
-                                placeholder="Masukkan Nomor Handphone" value="{{ old('no_hp', $edit['no_hp']) }}">
-
-                            @error('no_hp')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="no_hp_darurat" class="col-sm-3 col-form-label">
-                            Nomor Handphone Darurat
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="no_hp_darurat" class="form-control" id="no_hp_darurat"
-                                placeholder="Masukkan Nomor Handphone Darurat"
-                                value="{{ old('no_hp_darurat', $edit['no_hp_darurat']) }}">
-
-                            @error('no_hp_darurat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="tempat_lahir" class="col-sm-3 col-form-label">
-                            Tempat Lahir
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="tempat_lahir" class="form-control" id="tempat_lahir"
-                                placeholder="Masukkan Tempat Lahir"
-                                value="{{ old('tempat_lahir', $edit['tempat_lahir']) }}">
-
-                            @error('tempat_lahir')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="tanggal_lahir" class="col-sm-3 col-form-label">
-                            Tanggal Lahir
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <input type="date" name="tanggal_lahir" class="form-control" id="tanggal_lahir"
-                                value="{{ old('tanggal_lahir', $edit['tanggal_lahir']) }}">
-
-                            @error('tanggal_lahir')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="jenis_kelamin" class="col-sm-3 col-form-label">
-                            Jenis Kelamin
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <select name="jenis_kelamin" class="form-control" id="jenis_kelamin">
-                                <option value="">- Pilih -</option>
-                                <option {{ old('jenis_kelamin', $edit['jenis_kelamin'] ?? '') == 'L' ? 'selected' : '' }}
-                                    value="L">Laki - Laki
-                                </option>
-                                <option {{ old('jenis_kelamin', $edit['jenis_kelamin'] ?? '') == 'P' ? 'selected' : '' }}
-                                    value="P">Perempuan
-                                </option>
-                            </select>
-                            @error('jenis_kelamin')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="alamat" class="col-sm-3 col-form-label">
-                            Alamat
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-6">
-                            <textarea name="alamat" class="form-control" id="alamat" rows="5" placeholder="Masukkan Alamat">{{ old('alamat', $edit['alamat']) }}</textarea>
-
-                            @error('alamat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="status_pernikahan" class="col-sm-3 col-form-label">
-                            Status Pernikahan
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-                            <select name="status_pernikahan" class="form-control" id="status_pernikahan">
-                                <option value="">- Pilih -</option>
-                                <option value="Sudah Menikah"
-                                    {{ old('status_pernikahan', $edit['status_pernikahan'] ?? '') == 'Sudah Menikah' ? 'selected' : '' }}>
-                                    Sudah Menikah
-                                </option>
-
-                                <option value="Belum Menikah"
-                                    {{ old('status_pernikahan', $edit['status_pernikahan'] ?? '') == 'Belum Menikah' ? 'selected' : '' }}>
-                                    Belum Menikah
-                                </option>
-                            </select>
-
-                            @error('status_pernikahan')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="jabatan_id" class="col-sm-3 col-form-label">
-                            Jabatan
-                            <small class="text-danger">*</small>
-                        </label>
-                        <div class="col-sm-4">
-
-
-                            @error('jabatan_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="bank_id" class="col-sm-3 col-form-label">
-                            Nama Bank
-                        </label>
-                        <div class="col-sm-4">
-
-
-                            @error('bank_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="acc_no" class="col-sm-3 col-form-label">
-                            Nomor Rekening
-                        </label>
-                        <div class="col-sm-3">
-                            <input type="text" name="acc_no" class="form-control" id="acc_no"
-                                placeholder="Masukkan Nomor Rekening" value="{{ old('acc_no', $edit['acc_no'] ?? '') }}">
-
-                            @error('acc_no')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="acc_name" class="col-sm-3 col-form-label">
-                            Nama Rekening
-                        </label>
-                        <div class="col-sm-5">
-                            <input type="text" name="acc_name" class="form-control" id="acc_name"
-                                placeholder="Masukkan Nama Rekening"
-                                value="{{ old('acc_name', $edit['acc_name'] ?? '') }}">
-
-                            @error('acc_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="col-md-8">
+                            <h5 class="fw-bold">
+                                <strong><i class="fa fa-edit"></i> Profil Diri</strong>
+                            </h5>
+                            <hr>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">ID Sidik Jari</div>
+                                <div class="col-sm-8">:
+                                    <span class="badge bg-success text-white text-uppercase" style="font-size: 14px">
+                                        {{ $edit['id_fp'] }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nomor KTP</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['no_ktp']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->no_ktp }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nomor Kartu Keluarga</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['no_kk']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->no_kk }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nomor BPJS Kesehatan</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['no_bpjs_kesehatan']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->no_bpjs_kesehatan }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nama Panggilan</div>
+                                <div class="col-sm-8">: {{ $edit->nama_panggilan }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Tanggal Masuk</div>
+                                <div class="col-sm-8">: {{ $edit->tanggal_masuk->locale('id')->translatedFormat('d F Y') }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nomor Handphone Darurat</div>
+                                <div class="col-sm-8">: {{ $edit->no_hp_darurat }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Tempat Lahir</div>
+                                <div class="col-sm-8">: {{ $edit->tempat_lahir }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Tanggal Lahir</div>
+                                <div class="col-sm-8">: {{ $edit->tanggal_lahir->locale('id')->translatedFormat('d F Y') }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Jenis Kelamin</div>
+                                <div class="col-sm-8">: {{ $edit->jenis_kelamin == 'L' ? 'Laki - Laki' : 'Perempuan' }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Alamat</div>
+                                <div class="col-sm-8">: {{ $edit->alamat }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Status Pernikahan</div>
+                                <div class="col-sm-8">: {{ $edit->status_pernikahan }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nama Bank</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['bank']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->bank }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nomor Rekening</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['acc_no']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->acc_no }}
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Nama Rekening</div>
+                                <div class="col-sm-8">:
+                                    @if (empty($edit['acc_name']))
+                                        <span class="badge bg-danger text-white text-uppercase">
+                                            Belum Upload
+                                        </span>
+                                    @else
+                                        {{ $edit->acc_name }}
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
