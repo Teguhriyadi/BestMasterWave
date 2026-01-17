@@ -3,9 +3,11 @@
 namespace App\Http\Repositories;
 
 use App\Helpers\AuthDivisi;
+use App\Models\DendaKaryawan;
 use App\Models\Jabatan;
 use App\Models\Karyawan;
 use App\Models\LogKaryawan;
+use App\Models\PeringatanKaryawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -19,6 +21,20 @@ class KaryawanRepository
     public function get_list_karyawan()
     {
         return Karyawan::where("divisi_id", AuthDivisi::id())
+            ->get();
+    }
+
+    public function get_denda_karyawan_by_id(string $karyawan_id)
+    {
+        return DendaKaryawan::where("karyawan_id", $karyawan_id)
+            ->where("status", "Disetujui")
+            ->get();
+    }
+
+    public function get_pelanggaran_karyawan_by_id(string $karyawan_id)
+    {
+        return PeringatanKaryawan::where("karyawan_id", $karyawan_id)
+            ->where("status", "Aktif")
             ->get();
     }
 

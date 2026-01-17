@@ -2,6 +2,10 @@
 
 @push('title_module', 'Karyawan')
 
+@push('css_style')
+    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -165,8 +169,101 @@
                             </div>
                         </div>
                     </div>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-4">
+                        <i class="fa fa-edit"></i> Denda Karyawan
+                    </h5>
+
+                    <table class="table table-bordered nowrap" id="dataTable-denda" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No.</th>
+                                <th class="text-center">Tanggal Denda</th>
+                                <th class="text-center">Kode Denda</th>
+                                <th>Jenis Denda</th>
+                                <th>Keterangan</th>
+                                <th class="text-center">Nominal Potongan</th>
+                                <th>Periode Gaji</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $nomer = 0
+                            @endphp
+                            @foreach ($denda as $item)
+                                <tr>
+                                    <td class="text-center">{{ ++$nomer }}.</td>
+                                    <td class="text-center">{{ $item["tanggal_denda"] }}</td>
+                                    <td class="text-center">{{ $item["kode"] }}</td>
+                                    <td>{{ $item["jenis_denda"] }}</td>
+                                    <td>{{ $item["keterangan"] }}</td>
+                                    <td class="text-center">{{ $item["nominal"] }}</td>
+                                    <td>{{ $item["periode_gaji"] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-4">
+                        <i class="fa fa-book"></i> Peringatan Karyawan
+                    </h5>
+
+                    <table class="table table-bordered nowrap" id="dataTable-pelanggaran" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No.</th>
+                                <th class="text-center">Tanggal Pelanggaran</th>
+                                <th class="text-center">Kode Pelanggaran</th>
+                                <th>Jenis Pelanggaran</th>
+                                <th class="text-center">Tanggal Terbit SP</th>
+                                <th class="text-center">Berlaku Sampai</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $nomer = 0
+                            @endphp
+                            @foreach ($pelanggaran as $item)
+                                <tr>
+                                    <td class="text-center">{{ ++$nomer }}.</td>
+                                    <td class="text-center">{{ $item["tanggal_pelanggaran"] }}</td>
+                                    <td class="text-center">{{ $item["kode"] }}</td>
+                                    <td>{{ $item["jenis_pelanggaran"] }}</td>
+                                    <td class="text-center">{{ $item["tanggal_terbit_sp"] }}</td>
+                                    <td class="text-center">{{ $item["berlaku_sampai"] }}</td>
+                                    <td>{{ $item["keterangan"] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+@endpush
+
+@push("js_style")
+    <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#dataTable-denda').DataTable({
+                scrollX: true,
+                autoWidth: false,
+                responsive: false
+            });
+
+            $('#dataTable-pelanggaran').DataTable({
+                scrollX: true,
+                autoWidth: false,
+                responsive: false
+            });
+        });
+    </script>
 @endpush

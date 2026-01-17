@@ -3,8 +3,10 @@
 namespace App\Http\Mapper;
 
 use App\Models\Bank;
+use App\Models\DendaKaryawan;
 use App\Models\Karyawan;
 use App\Models\LogKaryawan;
+use App\Models\PeringatanKaryawan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -53,6 +55,36 @@ class KaryawanMapper
                 'id' => $item["id"],
                 "nama" => $item["nama"],
                 "jabatan" => $item["jabatan"]["nama_jabatan"]
+            ];
+        });
+    }
+
+    public static function toDendaKaryawanById(Collection $denda): Collection
+    {
+        return $denda->map(function(DendaKaryawan $item) {
+            return [
+                'id'            => $item["id"],
+                "tanggal_denda" => $item->tanggal_denda->locale('id')->translatedFormat('d F Y'),
+                "kode"          => $item["jenis_denda"]["kode"],
+                "jenis_denda"   => $item["jenis_denda"]["nama_jenis"],
+                "keterangan"    => $item["keterangan"],
+                "nominal"       => number_format($item->jenis_denda->nominal, 0, ',', '.'),
+                "periode_gaji"  => $item->periode_gaji->locale('id')->translatedFormat('d F Y'),
+            ];
+        });
+    }
+
+    public static function toPelanggaranKaryawanById(Collection $denda): Collection
+    {
+        return $denda->map(function(PeringatanKaryawan $item) {
+            return [
+                'id'            => $item["id"],
+                "tanggal_pelanggaran" => $item->tanggal_pelanggaran->locale('id')->translatedFormat('d F Y'),
+                "tanggal_terbit_sp" => $item->tanggal_terbit_sp->locale('id')->translatedFormat('d F Y'),
+                "berlaku_sampai" => $item->berlaku_sampai->locale('id')->translatedFormat('d F Y'),
+                "kode"          => $item["jenis_peringatan"]["kode"],
+                "jenis_pelanggaran"   => $item["jenis_peringatan"]["nama_peringatan"],
+                "keterangan"    => $item["keterangan"]
             ];
         });
     }

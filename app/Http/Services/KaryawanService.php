@@ -17,9 +17,23 @@ class KaryawanService
 
     public function list()
     {
-        $divisi = $this->karyawan_repository->get_all_data();
+        $karyawan = $this->karyawan_repository->get_all_data();
 
-        return KaryawanMapper::toTable($divisi);
+        return KaryawanMapper::toTable($karyawan);
+    }
+
+    public function list_denda_karyawan(string $karyawan_id)
+    {
+        $karyawan = $this->karyawan_repository->get_denda_karyawan_by_id($karyawan_id);
+
+        return KaryawanMapper::toDendaKaryawanById($karyawan);
+    }
+
+    public function list_pelanggaran_karyawan(string $karyawan_id)
+    {
+        $karyawan = $this->karyawan_repository->get_pelanggaran_karyawan_by_id($karyawan_id);
+
+        return KaryawanMapper::toPelanggaranKaryawanById($karyawan);
     }
 
     public function list_karyawan()

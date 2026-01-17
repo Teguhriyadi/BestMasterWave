@@ -55,6 +55,8 @@ class KaryawanController extends Controller
     {
         try {
             $data["edit"] = $this->karyawan_service->edit($id);
+            $data["denda"] = $this->karyawan_service->list_denda_karyawan($id);
+            $data["pelanggaran"] = $this->karyawan_service->list_pelanggaran_karyawan($id);
 
             return view("pages.modules.karyawan.detail", $data);
         } catch (\Throwable $e) {
