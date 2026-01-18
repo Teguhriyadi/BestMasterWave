@@ -35,47 +35,60 @@ class LogAbsensiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'file']
+            'file' => ['required', 'file'],
         ]);
 
-        $sofficeMac   = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
-        $sofficeLinux = '/usr/bin/libreoffice';
+        $file = $request->file('file');
+        $ext  = strtolower($file->getClientOriginalExtension());
 
-        $soffice = file_exists($sofficeMac)
-            ? $sofficeMac
-            : (file_exists($sofficeLinux) ? $sofficeLinux : null);
+        $canLibre = $this->canUseLibreOffice();
 
-        if (!$soffice) {
-            return back()->with('error', 'LibreOffice tidak ditemukan');
+        if (!$canLibre && $ext !== 'csv') {
+            return back()->with(
+                'error',
+                'Server ini hanya mendukung file CSV. Silakan convert XLS ke CSV terlebih dahulu.'
+            );
         }
 
-        $uploadedPath = $request->file('file')->getPathname();
+        $tempDir = null;
 
-        $tempOutDir = sys_get_temp_dir() . '/fp_' . uniqid();
-        mkdir($tempOutDir, 0777, true);
+        if ($ext === 'csv') {
+            $csvPath = $file->getPathname();
 
-        $cmd = "\"$soffice\" --headless --nologo --nolockcheck --convert-to csv \"$uploadedPath\" --outdir \"$tempOutDir\"";
-        exec($cmd, $out, $exitCode);
+        } else {
+            $soffice = $this->getLibreOfficePath();
 
-        if ($exitCode !== 0) {
-            return back()->with('error', 'Gagal convert fingerprint');
+            if (!$soffice) {
+                return back()->with('error', 'LibreOffice tidak tersedia di server');
+            }
+
+            $tempDir = sys_get_temp_dir() . '/fp_' . uniqid();
+            mkdir($tempDir, 0777, true);
+
+            $uploadedPath = $file->getPathname();
+
+            $cmd = "\"{$soffice}\" --headless --nologo --nolockcheck --convert-to csv \"{$uploadedPath}\" --outdir \"{$tempDir}\"";
+            exec($cmd, $out, $exitCode);
+
+            if ($exitCode !== 0) {
+                return back()->with('error', 'Gagal convert file XLS');
+            }
+
+            $csvFiles = glob($tempDir . '/*.csv');
+            if (!$csvFiles) {
+                return back()->with('error', 'CSV hasil convert tidak ditemukan');
+            }
+
+            $csvPath = $csvFiles[0];
         }
-
-        $csvFiles = glob($tempOutDir . '/*.csv');
-        if (!$csvFiles) {
-            return back()->with('error', 'CSV tidak ditemukan');
-        }
-
-        $csvPath = $csvFiles[0];
 
         $lines = file($csvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $delimiter = str_contains($lines[0], ';') ? ';' : ',';
-        $rows = array_map(fn($l) => str_getcsv($l, $delimiter), $lines);
-
-        if (count($rows) < 2) {
+        if (count($lines) < 2) {
             return back()->with('error', 'CSV kosong');
         }
 
+        $delimiter = str_contains($lines[0], ';') ? ';' : ',';
+        $rows = array_map(fn($l) => str_getcsv($l, $delimiter), $lines);
         $data = array_slice($rows, 1);
 
         $karyawanMap = Karyawan::pluck('id_fp')
@@ -103,7 +116,6 @@ class LogAbsensiController extends Controller
                 }
 
                 $rawTanggal = null;
-
                 for ($i = 0; $i < count($row); $i++) {
                     if (preg_match('/^\d{2}\/\d{2}\/\d{2}$/', trim($row[$i] ?? ''))) {
                         $rawTanggal = trim($row[$i]) . ' ' . trim($row[$i + 1] ?? '');
@@ -127,32 +139,68 @@ class LogAbsensiController extends Controller
                     continue;
                 }
 
+                $kodeLokasi = isset($row[4])
+                    ? (int) preg_replace('/[^0-9]/', '', $row[4])
+                    : null;
+
                 LogAbsensi::create([
-                    'id'             => Str::uuid(),
-                    'divisi_id'      => AuthDivisi::id(),
-                    'id_fp'          => $idFp,
-                    'tanggal_waktu'  => $tanggal,
-                    'kode_lokasi'    => (int) preg_replace('/[^0-9]/', '', $row[4]),
-                    'created_by'     => Auth::id(),
-                    'updated_by'     => Auth::id(),
+                    'id'            => Str::uuid(),
+                    'divisi_id'     => AuthDivisi::id(),
+                    'id_fp'         => $idFp,
+                    'tanggal_waktu' => $tanggal,
+                    'kode_lokasi'   => $kodeLokasi ?: null,
+                    'created_by'    => Auth::id(),
+                    'updated_by'    => Auth::id(),
                 ]);
 
                 $inserted++;
             }
 
             DB::commit();
+
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
 
-        @unlink($csvPath);
-        @rmdir($tempOutDir);
+        if ($tempDir) {
+            @unlink($csvPath);
+            @rmdir($tempDir);
+        }
 
         return back()->with(
             'success',
             "Import selesai. Masuk: {$inserted}, Skip: {$skipped}"
         );
+    }
+
+    private function canUseLibreOffice(): bool
+    {
+        if (!function_exists('exec')) {
+            return false;
+        }
+
+        return (bool) $this->getLibreOfficePath();
+    }
+
+    private function getLibreOfficePath(): ?string
+    {
+        $paths = [
+            '/usr/bin/libreoffice',
+            '/usr/bin/soffice',
+            '/Applications/LibreOffice.app/Contents/MacOS/soffice',
+        ];
+
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                exec("\"{$path}\" --version", $out, $code);
+                if ($code === 0) {
+                    return $path;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function extractIdFp($value)

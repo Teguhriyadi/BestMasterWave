@@ -23,11 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <a href="{{ url('/admin-panel/absensi/create') }}" class="btn btn-primary btn-sm">
-                <i class="fa fa-plus"></i> Tambah Data
-            </a>
-        </div>
+        @if (canPermission('absensi.create'))
+            <div class="card-header py-3">
+                <a href="{{ url('/admin-panel/absensi/create') }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </a>
+            </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -59,15 +61,15 @@
                             <td>{{ $item['lokasi'] }}</td>
                             <td class="text-center">{{ $item['tanggal_waktu'] }}</td>
                             <td class="text-center">
-                                @if ($item["status"] == "Tepat Waktu")
+                                @if ($item['status'] == 'Tepat Waktu')
                                     <span class="badge bg-success text-white text-uppercase">
                                         Tepat Waktu
                                     </span>
-                                @elseif ($item["status"] == "Terlambat")
+                                @elseif ($item['status'] == 'Terlambat')
                                     <span class="badge bg-danger text-white text-uppercase">
                                         Terlambat
                                     </span>
-                                @elseif ($item["status"] == "Pulang")
+                                @elseif ($item['status'] == 'Pulang')
                                     <span class="badge bg-success text-white text-uppercase">
                                         Pulang
                                     </span>
@@ -76,19 +78,27 @@
                             <td class="text-center">{{ $item['upload'] }}</td>
                             <td class="text-center">{{ $item['modif'] }}</td>
                             <td class="text-center">
-                                <button onclick="editLogAbsensi('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/absensi/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('absensi.edit'))
+                                    <button onclick="editLogAbsensi('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('absensi.delete'))
+                                    <form action="{{ url('/admin-panel/absensi/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('absensi.edit') && !canPermission('absensi.delete'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -98,8 +108,7 @@
     </div>
 
     <!-- Modal Edit -->
-    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
