@@ -6,6 +6,7 @@ use App\Helpers\AuthDivisi;
 use App\Models\DendaKaryawan;
 use App\Models\Jabatan;
 use App\Models\Karyawan;
+use App\Models\Kasbon;
 use App\Models\LogKaryawan;
 use App\Models\PeringatanKaryawan;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,13 @@ class KaryawanRepository
         return PeringatanKaryawan::where("karyawan_id", $karyawan_id)
             ->where("status", "Aktif")
             ->get();
+    }
+
+    public function get_kasbon_by_id(string $karyawan_id)
+    {
+        return Kasbon::where("karyawan_id", $karyawan_id)
+            ->where("status", "aktif")
+            ->first();
     }
 
     public function insert_data(array $data)

@@ -36,6 +36,13 @@ class KaryawanService
         return KaryawanMapper::toPelanggaranKaryawanById($karyawan);
     }
 
+    public function detail_karyawan(string $karyawan_id)
+    {
+        return DB::transaction(function () use ($karyawan_id) {
+            return $this->karyawan_repository->get_kasbon_by_id($karyawan_id);
+        });
+    }
+
     public function list_karyawan()
     {
         $karyawan = $this->karyawan_repository->get_list_karyawan();

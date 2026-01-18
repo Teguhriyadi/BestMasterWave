@@ -107,7 +107,8 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-4 text-muted">Tanggal Keluar</div>
-                                <div class="col-sm-8">: {{ empty($edit->tanggal_keluar) ? "-" : $edit->tanggal_keluar->locale('id')->translatedFormat('d F Y') }}
+                                <div class="col-sm-8">:
+                                    {{ empty($edit->tanggal_keluar) ? '-' : $edit->tanggal_keluar->locale('id')->translatedFormat('d F Y') }}
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -195,17 +196,17 @@
                         </thead>
                         <tbody>
                             @php
-                                $nomer = 0
+                                $nomer = 0;
                             @endphp
                             @foreach ($denda as $item)
                                 <tr>
                                     <td class="text-center">{{ ++$nomer }}.</td>
-                                    <td class="text-center">{{ $item["tanggal_denda"] }}</td>
-                                    <td class="text-center">{{ $item["kode"] }}</td>
-                                    <td>{{ $item["jenis_denda"] }}</td>
-                                    <td>{{ $item["keterangan"] }}</td>
-                                    <td class="text-center">{{ $item["nominal"] }}</td>
-                                    <td>{{ $item["periode_gaji"] }}</td>
+                                    <td class="text-center">{{ $item['tanggal_denda'] }}</td>
+                                    <td class="text-center">{{ $item['kode'] }}</td>
+                                    <td>{{ $item['jenis_denda'] }}</td>
+                                    <td>{{ $item['keterangan'] }}</td>
+                                    <td class="text-center">{{ $item['nominal'] }}</td>
+                                    <td>{{ $item['periode_gaji'] }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -231,28 +232,75 @@
                         </thead>
                         <tbody>
                             @php
-                                $nomer = 0
+                                $nomer = 0;
                             @endphp
                             @foreach ($pelanggaran as $item)
                                 <tr>
                                     <td class="text-center">{{ ++$nomer }}.</td>
-                                    <td class="text-center">{{ $item["tanggal_pelanggaran"] }}</td>
-                                    <td class="text-center">{{ $item["kode"] }}</td>
-                                    <td>{{ $item["jenis_pelanggaran"] }}</td>
-                                    <td class="text-center">{{ $item["tanggal_terbit_sp"] }}</td>
-                                    <td class="text-center">{{ $item["berlaku_sampai"] }}</td>
-                                    <td>{{ $item["keterangan"] }}</td>
+                                    <td class="text-center">{{ $item['tanggal_pelanggaran'] }}</td>
+                                    <td class="text-center">{{ $item['kode'] }}</td>
+                                    <td>{{ $item['jenis_pelanggaran'] }}</td>
+                                    <td class="text-center">{{ $item['tanggal_terbit_sp'] }}</td>
+                                    <td class="text-center">{{ $item['berlaku_sampai'] }}</td>
+                                    <td>{{ $item['keterangan'] }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-4">
+                        <i class="fa fa-wallet"></i> Kasbon Karyawan
+                    </h5>
+
+                    @if ($kasbon_aktif)
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="card border-left-warning shadow h-100">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-warning">
+                                            Sisa Kasbon
+                                        </div>
+                                        <div class="h5 font-weight-bold">
+                                            Rp {{ number_format($kasbon_aktif->sisa, 0, ',', '.') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card border-left-info shadow h-100">
+                                    <div class="card-body">
+                                        <div class="text-xs font-weight-bold text-info">
+                                            Tanggal Mulai
+                                        </div>
+                                        <div class="h5 font-weight-bold">
+                                            {{ $kasbon_aktif->tanggal_mulai->translatedFormat('d F Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 d-flex align-items-center">
+                                <a href="{{ url('/admin-panel/kasbon/' . $kasbon_aktif->id . '/show') }}"
+                                    class="btn btn-info btn-sm">
+                                    <i class="fa fa-eye"></i> Detail Kasbon
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <div class="alert alert-secondary">
+                            Karyawan ini tidak memiliki kasbon aktif.
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 @endpush
 
-@push("js_style")
+@push('js_style')
     <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
