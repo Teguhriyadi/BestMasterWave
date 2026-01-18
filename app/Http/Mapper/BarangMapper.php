@@ -14,6 +14,7 @@ class BarangMapper
     public static function toTable(Collection $barang): Collection
     {
         return $barang->map(function(Barang $barang) {
+            $statusSku = $barang->status_sku === "A" ? "<span class='badge bg-success text-white text-uppercase'>Aktif</span>" : "<span class='badge bg-danger text-white text-uppercase'>Tidak Aktif</span>";
             return [
                 'id'                         => $barang->id,
                 'sku_barang'                 => $barang->sku_barang,
@@ -21,7 +22,7 @@ class BarangMapper
                 'harga_pembelian_terakhir'   => number_format($barang->harga_pembelian_terakhir, 0, ',', '.'),
                 'tanggal_pembelian_terakhir' => $barang["tanggal_pembelian_terakhir"] == null ? null : Carbon::parse($barang["tanggal_pembelian_terakhir"])->translatedFormat('d F Y'),
                 'seller_id'                  => empty($barang->seller) ? "-" : $barang->seller->nama,
-                'status_sku'                 => $barang->status_sku === "A" ? "Aktif" : "Tidak Aktif",
+                'status_sku'                 => $statusSku,
                 'divisi'                     => !empty(Auth::user()->one_divisi_roles) ? "A" : $barang["divisi"]["nama_divisi"]
             ];
         });

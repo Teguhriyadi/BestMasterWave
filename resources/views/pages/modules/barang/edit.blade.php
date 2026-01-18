@@ -34,7 +34,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <label for="seller_id" class="form-label">Nama Seller</label>
-                    <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror" id="seller_id">
+                    <select name="seller_id" class="form-control select2 @error('seller_id') is-invalid @enderror" id="seller_id">
                         <option value="">- Pilih -</option>
                         @foreach ($seller as $item)
                             <option value="{{ $item['id'] }}"

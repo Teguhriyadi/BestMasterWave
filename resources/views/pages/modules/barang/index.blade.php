@@ -65,7 +65,7 @@
                             <td class="text-center">{{ $item['harga_modal'] }}</td>
                             <td class="text-center">{{ $item['harga_pembelian_terakhir'] }}</td>
                             <td class="text-center">{{ $item['tanggal_pembelian_terakhir'] }}</td>
-                            <td class="text-center">{{ $item['status_sku'] }}</td>
+                            <td class="text-center">{!! $item['status_sku'] !!}</td>
                             <td class="text-center">
                                 @if (canPermission('barang.edit'))
                                     <button onclick="editSupplier('{{ $item['id'] }}')" type="button"
@@ -209,7 +209,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#seller_id').select2({
-                theme: 'bootstrap4'
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal')
             });
 
             $('#dataTable').DataTable({
@@ -225,6 +226,11 @@
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+
+                    $('#modal-content-edit .select2').select2({
+                        theme: 'bootstrap4',
+                        dropdownParent: $('#exampleModalEdit')
+                    });
                 },
                 error: function(error) {
                     console.log(error);

@@ -21,6 +21,13 @@
         <hr class="sidebar-divider">
     @endif
 
+    <li class="nav-item {{ Request::is('admin-panel/dashboard') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ url('/admin-panel/dashboard') }}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
     @foreach ($sidebarMenus->where('type', 'header') as $header)
         <hr class="sidebar-divider">
         <div class="sidebar-heading">
