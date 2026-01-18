@@ -23,11 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('jenis-peringatan.create'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -56,19 +58,27 @@
                             <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">{!! $item['status'] !!}</td>
                             <td class="text-center">
-                                <button onclick="editJenisPeringatan('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/jenis-peringatan/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('jenis-peringatan.edit'))
+                                    <button onclick="editJenisPeringatan('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('jenis-peringatan.delete'))
+                                    <form action="{{ url('/admin-panel/jenis-peringatan/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('jenis-peringatan.edit') && !canPermission('jenis-peringatan.delete'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -130,7 +140,8 @@
                                         Level Jenis Peringatan
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <select name="level" class="form-control @error('level') is-invalid @enderror" id="level">
+                                    <select name="level" class="form-control @error('level') is-invalid @enderror"
+                                        id="level">
                                         <option value="">- Pilih -</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
@@ -147,9 +158,11 @@
                                         Masa Berlaku Hari
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="number" class="form-control @error('masa_berlaku_hari') is-invalid @enderror"
-                                        name="masa_berlaku_hari" id="masa_berlaku_hari" placeholder="Masukkan Masa Berlaku Hari"
-                                        value="{{ old('masa_berlaku_hari') }}" min="0">
+                                    <input type="number"
+                                        class="form-control @error('masa_berlaku_hari') is-invalid @enderror"
+                                        name="masa_berlaku_hari" id="masa_berlaku_hari"
+                                        placeholder="Masukkan Masa Berlaku Hari" value="{{ old('masa_berlaku_hari') }}"
+                                        min="0">
                                     @error('masa_berlaku_hari')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -183,7 +196,8 @@
     <!-- End Modal Tambah -->
 
     <!-- Modal Edit -->
-    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

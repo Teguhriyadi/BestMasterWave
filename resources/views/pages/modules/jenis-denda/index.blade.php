@@ -23,11 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('jenis-denda.create'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -54,19 +56,27 @@
                             <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">{!! $item['status'] !!}</td>
                             <td class="text-center">
-                                <button onclick="editJenisDenda('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/jenis-denda/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('jenis-denda.edit'))
+                                    <button onclick="editJenisDenda('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('jenis-denda.delete'))
+                                    <form action="{{ url('/admin-panel/jenis-denda/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('jenis-denda.edit') && !canPermission('jenis-denda.delete'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -158,7 +168,8 @@
     <!-- End Modal Tambah -->
 
     <!-- Modal Edit -->
-    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

@@ -23,11 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
-                <i class="fa fa-plus"></i> Tambah Data
-            </button>
-        </div>
+        @if (canPermission('peringatan.create'))
+            <div class="card-header py-3">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </button>
+            </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -58,23 +60,34 @@
                             <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">{!! $item['status'] !!}</td>
                             <td class="text-center">
-                                <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-info btn-sm" data-toggle="modal" data-target="#exampleModalUbahStatus">
-                                    <i class="fa fa-edit"></i> Ubah Status
-                                </button>
-                                <button onclick="editPeringatan('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/peringatan/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('peringatan.create'))
+                                    <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-info btn-sm" data-toggle="modal"
+                                        data-target="#exampleModalUbahStatus">
+                                        <i class="fa fa-edit"></i> Ubah Status
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('peringatan.create'))
+                                    <button onclick="editPeringatan('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                @endif
+                                @if (canPermission('peringatan.create'))
+                                    <form action="{{ url('/admin-panel/peringatan/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('peringatan.edit') && !canPermission('peringatan.delete'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -133,7 +146,8 @@
                                         @foreach ($jenis_peringatan as $item)
                                             <option value="{{ $item['id'] }}"
                                                 {{ old('jenis_peringatan_id') == $item['id'] ? 'selected' : '' }}>
-                                                {{ $item['kode'] }} - {{ $item['nama_peringatan'] }} - {{ $item['level'] }}
+                                                {{ $item['kode'] }} - {{ $item['nama_peringatan'] }} -
+                                                {{ $item['level'] }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -150,7 +164,8 @@
                                         Tanggal Pelanggaran
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="date" class="form-control @error('tanggal_pelanggaran') is-invalid @enderror"
+                                    <input type="date"
+                                        class="form-control @error('tanggal_pelanggaran') is-invalid @enderror"
                                         name="tanggal_pelanggaran" id="tanggal_pelanggaran"
                                         value="{{ old('tanggal_pelanggaran') }}">
                                     @error('tanggal_pelanggaran')
@@ -166,7 +181,8 @@
                                     </label>
                                     <input type="date"
                                         class="form-control @error('tanggal_terbit_sp') is-invalid @enderror"
-                                        name="tanggal_terbit_sp" id="tanggal_terbit_sp" value="{{ old('tanggal_terbit_sp') }}">
+                                        name="tanggal_terbit_sp" id="tanggal_terbit_sp"
+                                        value="{{ old('tanggal_terbit_sp') }}">
                                     @error('tanggal_terbit_sp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -178,7 +194,9 @@
                                         Berlaku Sampai
                                         <small class="text-danger">*</small>
                                     </label>
-                                    <input type="date" class="form-control @error('berlaku_sampai') is-invalid @enderror" name="berlaku_sampai" id="berlaku_sampai" value="{{ old('berlaku_sampai') }}">
+                                    <input type="date"
+                                        class="form-control @error('berlaku_sampai') is-invalid @enderror"
+                                        name="berlaku_sampai" id="berlaku_sampai" value="{{ old('berlaku_sampai') }}">
                                     @error('berlaku_sampai')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

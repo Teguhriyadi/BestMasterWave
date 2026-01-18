@@ -24,9 +24,11 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <a href="{{ url('/admin-panel/denda/create') }}" class="btn btn-primary btn-sm">
-                <i class="fa fa-plus"></i> Tambah Data
-            </a>
+            @if (canPermission('denda.create'))
+                <a href="{{ url('/admin-panel/denda/create') }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </a>
+            @endif
         </div>
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
@@ -58,23 +60,34 @@
                             <td class="text-center">{!! $item['status'] !!}</td>
                             <td>{{ $item['keterangan'] }}</td>
                             <td class="text-center">
-                                <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-info btn-sm" data-toggle="modal" data-target="#exampleModalUbahStatus">
-                                    <i class="fa fa-edit"></i> Ubah Status
-                                </button>
-                                <button onclick="editDenda('{{ $item['id'] }}')" type="button"
-                                    class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
-                                    <i class="fa fa-edit"></i> Edit
-                                </button>
-                                <form action="{{ url('/admin-panel/denda/' . $item['id']) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
+                                @if (canPermission('denda.change_status'))
+                                    <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-info btn-sm" data-toggle="modal"
+                                        data-target="#exampleModalUbahStatus">
+                                        <i class="fa fa-edit"></i> Ubah Status
                                     </button>
-                                </form>
+                                @endif
+                                @if (canPermission('denda.edit'))
+                                    <button onclick="editDenda('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                @endif
+                                @if (canPermission('denda.delete'))
+                                    <form action="{{ url('/admin-panel/denda/' . $item['id']) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('denda.edit') && !canPermission('denda.delete') && !canPermission('denda.change_status'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -84,8 +97,7 @@
     </div>
 
     <!-- Modal Edit -->
-    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
