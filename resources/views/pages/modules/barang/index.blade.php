@@ -46,9 +46,7 @@
                         <th class="text-center">Harga Pembelian Terakhir</th>
                         <th class="text-center">Tanggal Pembelian Terakhir</th>
                         <th class="text-center">Status SKU</th>
-                        @if (!empty(Auth::user()->one_divisi_roles))
-                            <th class="text-center">Aksi</th>
-                        @endif
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -208,16 +206,35 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#seller_id').select2({
-                theme: 'bootstrap4',
-                dropdownParent: $('#exampleModal')
-            });
-
             $('#dataTable').DataTable({
                 scrollX: true,
                 autoWidth: false,
                 responsive: false
             });
+        });
+
+        $('#exampleModal').on('shown.bs.modal', function() {
+            let $seller = $('#seller_id');
+
+            if ($seller.hasClass('select2-hidden-accessible')) {
+                $seller.select2('destroy');
+            }
+
+            $seller.select2({
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal'),
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            });
+        });
+
+        $('#exampleModal').on('hidden.bs.modal', function() {
+            let $seller = $('#seller_id');
+
+            if ($seller.hasClass('select2-hidden-accessible')) {
+                $seller.select2('destroy');
+            }
         });
 
         function editSupplier(id) {
@@ -227,9 +244,19 @@
                 success: function(response) {
                     $("#modal-content-edit").html(response)
 
-                    $('#modal-content-edit .select2').select2({
-                        theme: 'bootstrap4',
-                        dropdownParent: $('#exampleModalEdit')
+                    $('#modal-content-edit .select2').each(function() {
+
+                        if ($(this).hasClass('select2-hidden-accessible')) {
+                            $(this).select2('destroy');
+                        }
+
+                        $(this).select2({
+                            theme: 'bootstrap4',
+                            dropdownParent: $('#exampleModalEdit'),
+                            width: '100%',
+                            placeholder: '- Pilih -',
+                            allowClear: true
+                        });
                     });
                 },
                 error: function(error) {
