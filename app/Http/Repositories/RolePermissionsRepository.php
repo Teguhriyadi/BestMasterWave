@@ -2,17 +2,28 @@
 
 namespace App\Http\Repositories;
 
+use App\Models\Role;
 use App\Models\RolePermission;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RolePermissionsRepository
 {
     public function list_permissions()
     {
-        return RolePermission::with([
-            'role',
-            'permission.menu'
-        ])->get();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return RolePermission::with([
+                'role',
+                'permission.menu'
+            ])->get();
+        } else {
+            $role_id = Role::where("nama_role", "Super Admin")->first();
+
+            return RolePermission::whereNot("role_id", $role_id->id)->with([
+                'role',
+                'permission.menu'
+            ])->get();
+        }
     }
 
     public function getSelectedPermissions(

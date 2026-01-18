@@ -33,6 +33,9 @@
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        @if (empty(Auth::user()->one_divisi_roles))
+                            <th>Divisi</th>
+                        @endif
                         <th>Role</th>
                         <th>Menu</th>
                         <th>Permissions</th>
@@ -46,6 +49,9 @@
                     @foreach ($grouping as $item)
                         <tr>
                             <td class="text-center">{{ ++$nomer }}.</td>
+                            @if (empty(Auth::user()->one_divisi_roles))
+                                <td>{{ $item["divisi"] }}</td>
+                            @endif
                             <td>{{ $item['role'] }}</td>
                             <td>{{ $item['menu'] }}</td>
                             <td>

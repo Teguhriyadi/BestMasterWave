@@ -4,10 +4,17 @@ namespace App\Http\Repositories;
 
 use App\Models\Bank;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ProfilRepository
 {
+    public function get_data_by_auth_no_params()
+    {
+        return User::where("id", Auth::user()->id)
+            ->first();
+    }
+
     public function get_data_by_auth(string $id)
     {
         return User::where("id", $id)->first();

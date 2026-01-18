@@ -2,6 +2,30 @@
 
 @push('title_module', 'Permissions')
 
+@push('css_style')
+    <style>
+        .permission-item {
+            cursor: pointer;
+            border: 1px solid #e3e6f0;
+            transition: all .15s ease-in-out;
+            background: #fff;
+        }
+
+        .permission-item:hover {
+            background: #f8f9fc;
+        }
+
+        .permission-item input[type="checkbox"] {
+            transform: scale(1.1);
+        }
+
+        .permission-item.active {
+            background: #e8f4ff;
+            border-color: #36b9cc;
+        }
+    </style>
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -47,42 +71,48 @@
                     </div>
                     <div class="col-md-9">
                         <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-info">Permission</h6>
+                            <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-info">
+                                    <i class="fa fa-key mr-2"></i> Permission
+                                </h6>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        @foreach ($grouping as $menu)
-                                            @if ($menu->permissions->count())
-                                                <div class="mb-3">
-                                                    <h6 class="font-weight-bold text-dark mb-1">
-                                                        {{ $menu->nama_menu }}
-                                                    </h6>
-                                                    <hr class="mt-2 mb-3">
-                                                    <div class="row">
-                                                        @foreach ($menu->permissions as $permission)
-                                                            <div class="col-md-3">
-                                                                <div class="custom-control custom-checkbox mb-2">
-                                                                    <input type="checkbox" class="custom-control-input"
-                                                                        id="perm_{{ $permission->id }}"
-                                                                        name="permission_ids[]"
-                                                                        value="{{ $permission->id }}"
-                                                                        {{ in_array($permission->id, $selectedPermissions ?? []) ? 'checked' : '' }}>
-                                                                    <label class="custom-control-label"
-                                                                        for="perm_{{ $permission->id }}">
-                                                                        {{ $permission->nama }}
-                                                                    </label>
-                                                                </div>
 
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
+                            <div class="card-body">
+                                @foreach ($grouping as $menu)
+                                    @if ($menu->permissions->count())
+                                        <div class="card border-left-info mb-4">
+                                            <div class="card-body pb-2">
+
+                                                <h6 class="font-weight-bold text-dark mb-3 d-flex align-items-center">
+                                                    <i class="fa fa-folder-open text-info mr-2"></i>
+                                                    {{ $menu->nama_menu }}
+                                                </h6>
+
+                                                <div class="row">
+                                                    @foreach ($menu->permissions as $permission)
+                                                        <div class="col-md-4 col-sm-6 mb-3">
+                                                            <label
+                                                                class="permission-item d-flex align-items-center p-2 rounded
+                                            {{ in_array($permission->id, $selectedPermissions ?? []) ? 'active' : '' }}"
+                                                                for="perm_{{ $permission->id }}">
+
+                                                                <input type="checkbox" class="mr-3"
+                                                                    id="perm_{{ $permission->id }}" name="permission_ids[]"
+                                                                    value="{{ $permission->id }}"
+                                                                    {{ in_array($permission->id, $selectedPermissions ?? []) ? 'checked' : '' }}>
+
+                                                                <span class="text-dark">
+                                                                    {{ $permission->nama }}
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
+
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
                         </div>
                     </div>

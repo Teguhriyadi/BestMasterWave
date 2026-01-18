@@ -127,6 +127,7 @@
                                         <option {{ old('tipe_akses') == "edit" ? 'selected' : '' }} value="edit">Update (Ubah)</option>
                                         <option {{ old('tipe_akses') == "delete" ? 'selected' : '' }} value="delete">Delete (Hapus)</option>
                                         <option {{ old('tipe_akses') == "show" ? 'selected' : '' }} value="show">Show (Detail)</option>
+                                        <option {{ old('tipe_akses') == "change_status" ? 'selected' : '' }} value="change_status">Change Status (Ubah Status)</option>
                                     </select>
                                     @error('tipe_akses')
                                         <div class="invalid-feedback">{{ $message }}</div>

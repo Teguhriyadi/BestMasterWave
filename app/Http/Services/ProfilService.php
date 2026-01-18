@@ -11,6 +11,13 @@ class ProfilService
         protected ProfilRepository $profil_repository
     ) {}
 
+    public function get_data()
+    {
+        return DB::transaction(function()  {
+            return $this->profil_repository->get_data_by_auth_no_params();
+        });
+    }
+
     public function edit(string $id)
     {
         return DB::transaction(function() use ($id) {

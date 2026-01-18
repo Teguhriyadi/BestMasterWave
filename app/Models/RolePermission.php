@@ -22,6 +22,11 @@ class RolePermission extends Model
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class, "divisi_id");
+    }
+
     public function permission()
     {
         return $this->belongsTo(Permission::class, 'permission_id');

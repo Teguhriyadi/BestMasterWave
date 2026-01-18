@@ -3,6 +3,7 @@
 namespace App\Http\Mapper;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class RolePermissionsMapper
 {
@@ -18,6 +19,7 @@ class RolePermissionsMapper
                 $first = $items->first();
 
                 return [
+                    'divisi'  => empty(Auth::user()->one_divisi_roles) ? empty($first->divisi) ? "-" : $first->divisi->nama_divisi : "-",
                     'role_id' => $first->role_id,
                     'menu_id' => $first->permission->menu_id,
                     'role'    => $first->role->nama_role,

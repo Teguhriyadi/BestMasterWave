@@ -23,13 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        {{-- @if (canPermission('role.create')) --}}
+        @if (canPermission('role.create'))
             <div class="card-header py-3">
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                     <i class="fa fa-plus"></i> Tambah Data
                 </button>
             </div>
-        {{-- @endif --}}
+        @endif
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -113,7 +113,7 @@
                                 <small class="text-danger">*</small>
                             </label>
                             <input type="text" class="form-control @error('nama_role') is-invalid @enderror"
-                                name="nama_role" id="nama_role" placeholder="Masukkan Nama Seller"
+                                name="nama_role" id="nama_role" placeholder="Masukkan Nama Role"
                                 value="{{ old('nama_role') }}">
                             @error('nama_role')
                                 <div class="invalid-feedback">{{ $message }}</div>

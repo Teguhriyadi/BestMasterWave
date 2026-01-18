@@ -15,10 +15,10 @@ class ProfilSayaController extends Controller
         protected ProfilService $profil_service
     ) {}
 
-    public function index($id)
+    public function index()
     {
         try {
-            $data["profil"] = $this->profil_service->edit($id);
+            $data["profil"] = $this->profil_service->get_data();
 
             return view("pages.modules.pengaturan.profil-saya.index", $data);
         } catch (\Throwable $e) {
