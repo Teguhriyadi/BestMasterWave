@@ -38,6 +38,7 @@
                         <th class="text-center">No.</th>
                         <th>Nama Permissions</th>
                         <th>Akses</th>
+                        <th>Tipe Menu</th>
                         <th>Nama Menu</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -51,6 +52,7 @@
                             <td class="text-center">{{ ++$nomer }}.</td>
                             <td>{{ $item['nama'] }}</td>
                             <td>{{ $item['akses'] }}</td>
+                            <td>{{ $item['tipe'] }}</td>
                             <td>{{ $item['menu'] }}</td>
                             <td class="text-center">
                                 <button onclick="editPermissions('{{ $item['id'] }}')" type="button"
