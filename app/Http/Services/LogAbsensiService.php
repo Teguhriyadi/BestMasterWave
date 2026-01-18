@@ -21,20 +21,6 @@ class LogAbsensiService
         return $barang;
     }
 
-    public function list_barang_sku()
-    {
-        $barang = $this->barang_repository->get_all_data();
-
-        return BarangMapper::toSkuTable($barang);
-    }
-
-    public function create(array $data)
-    {
-        return DB::transaction(function () use ($data) {
-            return $this->barang_repository->insert_data($data);
-        });
-    }
-
     public function edit(string $id)
     {
         return DB::transaction(function () use ($id) {

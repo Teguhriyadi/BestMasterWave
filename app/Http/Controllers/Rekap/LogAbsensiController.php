@@ -54,7 +54,6 @@ class LogAbsensiController extends Controller
 
         if ($ext === 'csv') {
             $csvPath = $file->getPathname();
-
         } else {
             $soffice = $this->getLibreOfficePath();
 
@@ -89,12 +88,63 @@ class LogAbsensiController extends Controller
 
         $delimiter = str_contains($lines[0], ';') ? ';' : ',';
         $rows = array_map(fn($l) => str_getcsv($l, $delimiter), $lines);
+
+        $header = $rows[0];
+
+        $departemenIndex = null;
+        foreach ($header as $i => $col) {
+            if (str_contains(strtolower($col), 'departemen')) {
+                $departemenIndex = $i;
+                break;
+            }
+        }
+
+        if ($departemenIndex === null) {
+            return back()->with('error', 'Kolom Departemen tidak ditemukan di file');
+        }
+
+        $divisiUser = strtoupper(
+            trim(Auth::user()->one_divisi_roles->divisi->nama_divisi ?? '')
+        );
+
+        if (!$divisiUser) {
+            return back()->with('error', 'Divisi akun tidak valid');
+        }
+
+        $departemenFile = collect($rows)
+            ->slice(1)
+            ->map(fn($r) => strtoupper(trim($r[$departemenIndex] ?? '')))
+            ->filter()
+            ->unique();
+
+        if ($departemenFile->count() !== 1) {
+            return back()->with(
+                'error',
+                'File mengandung lebih dari satu Departemen'
+            );
+        }
+
+        if ($departemenFile->first() !== $divisiUser) {
+            return back()->with(
+                'error',
+                "Departemen file ({$departemenFile->first()}) tidak sesuai dengan divisi akun ({$divisiUser})"
+            );
+        }
+
         $data = array_slice($rows, 1);
 
         $karyawanMap = Karyawan::pluck('id_fp')
             ->map(fn($id) => $this->extractIdFp($id))
             ->filter()
             ->flip();
+
+        $existingAbsensi = LogAbsensi::where('divisi_id', AuthDivisi::id())
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [
+                    $item->id_fp . '|' . $item->tanggal_waktu => true
+                ];
+            });
 
         DB::beginTransaction();
 
@@ -139,6 +189,13 @@ class LogAbsensiController extends Controller
                     continue;
                 }
 
+                $key = $idFp . '|' . $tanggal;
+
+                if (isset($existingAbsensi[$key])) {
+                    $skipped++;
+                    continue;
+                }
+
                 $kodeLokasi = isset($row[4])
                     ? (int) preg_replace('/[^0-9]/', '', $row[4])
                     : null;
@@ -153,11 +210,11 @@ class LogAbsensiController extends Controller
                     'updated_by'    => Auth::id(),
                 ]);
 
+                $existingAbsensi[$key] = true;
                 $inserted++;
             }
 
             DB::commit();
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
@@ -261,7 +318,6 @@ class LogAbsensiController extends Controller
             $this->log_absensi_service->update($id, $request->all());
 
             return back()->with('success', 'Data berhasil diperbarui');
-
         } catch (\Throwable $e) {
 
             return back()->withInput()->with('error', $e->getMessage());
@@ -275,7 +331,6 @@ class LogAbsensiController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil dihapus');
-
         } catch (\Throwable $e) {
 
             return redirect()

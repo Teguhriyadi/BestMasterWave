@@ -41,7 +41,8 @@ class LoginController extends Controller
                 return back()->with("error", "Silahkan Pilih Divisi Terlebih Dahulu")->withInput();
             }
 
-            $user_divisi_role = UserDivisiRole::where("divisi_id", $request->divisi_id)->first();
+            $user_divisi_role = UserDivisiRole::where("user_id", $cek->id)
+                ->where("divisi_id", $request->divisi_id)->first();
 
             if (empty($user_divisi_role)) {
                 return back()->with("error", "Akun Tidak Ditemukan")->withInput();
