@@ -50,7 +50,14 @@ class PermissionsController extends Controller
     {
         try {
             $data["menu"] = $this->menu_service->list_menu();
+            $data["permissions"] = $this->permissions_service->list();
             $data["edit"] = $this->permissions_service->edit($id);
+
+            $akses_nama_full = $data["edit"]["akses"];
+            $explode = explode('.', $akses_nama_full);
+
+            $data['akses_nama'] = $explode[0];
+            $data["tipe_akses"] = $explode[1];
 
             return view("pages.modules.kelola-menu.permissions.edit", $data);
         } catch (\Throwable $e) {

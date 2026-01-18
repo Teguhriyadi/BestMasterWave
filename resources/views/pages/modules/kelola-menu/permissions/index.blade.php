@@ -202,7 +202,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#menu_id').select2({
-                theme: 'bootstrap4'
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal')
             });
 
             $('#dataTable').DataTable({
