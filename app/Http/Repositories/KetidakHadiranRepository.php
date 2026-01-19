@@ -48,6 +48,21 @@ class KetidakHadiranRepository
         return $rekap_absensi;
     }
 
+    public function update_status_by_id(string $id, array $data)
+    {
+        $rekap_absensi = RekapAbsensi::findOrFail($id);
+
+        $rekap_absensi->update([
+            "updated_by" => Auth::user()->id,
+            "status_approval"    => $data["status"],
+            "approved_by" => $data["status"] == "Disetujui" ? Auth::user()->id : null,
+            "approved_at" => $data["status"] == "Disetujui" ? now() : null,
+            "reject_notes"    => $data["status"] == "Ditolak" ? $data["reject_notes"] : null
+        ]);
+
+        return $rekap_absensi;
+    }
+
     public function delete_by_id(string $id): void
     {
         $ketidakhadiran = RekapAbsensi::findOrFail($id);

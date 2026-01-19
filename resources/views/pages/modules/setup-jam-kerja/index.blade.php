@@ -38,6 +38,7 @@
                         <th>Divisi</th>
                         <th>Jam Masuk</th>
                         <th>Jam Pulang</th>
+                        <th class="text-center">Toleransi Keterlambatan</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -51,6 +52,7 @@
                             <td>{{ $item['divisi'] }}</td>
                             <td>{{ $item['jam_masuk'] }}</td>
                             <td>{{ $item['jam_pulang'] }}</td>
+                            <td class="text-center">{{ $item['toleransi'] }} Menit</td>
                             <td class="text-center">
                                 @if (canPermission('setup-jam-kerja.edit'))
                                     <button onclick="editSetupJamKerja('{{ $item['id'] }}')" type="button"

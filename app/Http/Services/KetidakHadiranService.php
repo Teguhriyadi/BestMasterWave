@@ -40,6 +40,13 @@ class KetidakHadiranService
         });
     }
 
+    public function update_status(string $id, array $data)
+    {
+        return DB::transaction(function () use ($id, $data) {
+            return $this->ketidak_hadiran_repository->update_status_by_id($id, $data);
+        });
+    }
+
     public function delete(string $id)
     {
         return DB::transaction(function () use ($id) {

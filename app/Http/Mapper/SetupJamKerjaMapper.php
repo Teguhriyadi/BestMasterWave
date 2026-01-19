@@ -15,7 +15,8 @@ class SetupJamKerjaMapper
                 'id'             => $item->id,
                 'jam_masuk'      => $item->jam_masuk,
                 'jam_pulang'     => $item->jam_pulang,
-                'divisi'         => $item->divisi->nama_divisi
+                'divisi'         => $item->divisi->nama_divisi,
+                'toleransi'      => $item->toleransi_menit
             ];
         });
     }

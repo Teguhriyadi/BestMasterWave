@@ -7,6 +7,7 @@ use App\Http\Requests\KetidakHadiran\CreateRequest;
 use App\Http\Requests\KetidakHadiran\UpdateRequest;
 use App\Http\Services\KaryawanService;
 use App\Http\Services\KetidakHadiranService;
+use Illuminate\Http\Request;
 
 class KetidakHadiranController extends Controller
 {
@@ -80,6 +81,32 @@ class KetidakHadiranController extends Controller
             return redirect()
                 ->back()
                 ->with('error', $e->getMessage());
+        }
+    }
+
+    public function ubah_status($id)
+    {
+        try {
+            $data["edit"] = $this->ketidak_hadiran_service->edit($id);
+
+            return view("pages.modules.rekap.ketidakhadiran.ubah-status", $data);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    public function update_status_terbaru(Request $request, $id)
+    {
+        try {
+            $this->ketidak_hadiran_service->update_status($id, $request->all());
+
+            return back()->with('success', 'Data berhasil diperbarui');
+
+        } catch (\Throwable $e) {
+
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 }

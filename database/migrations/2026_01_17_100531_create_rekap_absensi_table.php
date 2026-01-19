@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('rekap_absensi', function (Blueprint $table) {
             $table->uuid("id", 50)->primary();
             $table->uuid('karyawan_id');
-            $table->enum("status", ["Alfa", "Sakit", "Izin", "Cuti"]);
+            $table->enum("status", ["Alfa", "Sakit", "Izin", "Cuti", "Lembur"]);
             $table->text("alasan")->nullable();
             $table->string("foto")->nullable();
             $table->date("tanggal");

@@ -4,6 +4,9 @@
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -23,11 +26,13 @@
     @endif
 
     <div class="card shadow mb-4">
+        @if (canPermission('ketidakhadiran.create'))
         <div class="card-header py-3">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
                 <i class="fa fa-plus"></i> Tambah Data
             </button>
         </div>
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -41,6 +46,7 @@
                         <th class="text-center">Tanggal Absen</th>
                         <th>Alasan</th>
                         <th class="text-center">Tanggal Diinputkan</th>
+                        <th class="text-center">Status Approval</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -59,11 +65,25 @@
                             <td class="text-center">{{ $item['tanggal'] }}</td>
                             <td>{{ $item['alasan'] }}</td>
                             <td class="text-center">{{ $item['upload'] }}</td>
+                            <td class="text-center">{!! $item['approval'] !!}</td>
                             <td class="text-center">
+                                @if (canPermission('ketidakhadiran.change_status'))
+                                    @if ($item['status_approval'] != "Diajukan")
+
+                                    @else
+                                    <button onclick="ubahStatus('{{ $item['id'] }}')" type="button"
+                                        class="btn btn-info btn-sm" data-toggle="modal" data-target="#exampleModalUbahStatus">
+                                        <i class="fa fa-edit"></i> Ubah Status
+                                    </button>
+                                    @endif
+                                @endif
+                                @if (canPermission('ketidakhadiran.edit'))
                                 <button onclick="editAbsensi('{{ $item['id'] }}')" type="button"
                                     class="btn btn-warning btn-sm" data-toggle="modal" data-target="#exampleModalEdit">
                                     <i class="fa fa-edit"></i> Edit
                                 </button>
+                                @endif
+                                @if (canPermission('ketidakhadiran.delete'))
                                 <form action="{{ url('/admin-panel/ketidakhadiran/' . $item['id']) }}" method="POST"
                                     style="display: inline">
                                     @csrf
@@ -73,6 +93,11 @@
                                         <i class="fa fa-trash"></i> Hapus
                                     </button>
                                 </form>
+                                @endif
+
+                                @if (!canPermission('ketidakhadiran.edit') && !canPermission('ketidakhadiran.delete') && !canPermission('ketidakhadiran.change_status'))
+                                    -
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -203,11 +228,33 @@
         </div>
     </div>
     <!-- End Modal Edit -->
+
+    <!-- Modal Ubah Status -->
+    <div class="modal fade" id="exampleModalUbahStatus" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="exampleModalLabel">
+                        <i class="fa fa-edit"></i> Ubah Status Data
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content-ubah-status">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Ubah Status -->
 @endpush
 
 @push('js_style')
     <script src="{{ asset('templating/vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -218,12 +265,64 @@
             });
         });
 
+        $('#exampleModal').on('shown.bs.modal', function() {
+            let $karyawan = $('#karyawan_id');
+
+            if ($karyawan.hasClass('select2-hidden-accessible')) {
+                $karyawan.select2('destroy');
+            }
+
+            $karyawan.select2({
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal'),
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            });
+        });
+
+        $('#exampleModal').on('hidden.bs.modal', function() {
+            let $karyawan = $('#karyawan_id');
+
+            if ($karyawan.hasClass('select2-hidden-accessible')) {
+                $karyawan.select2('destroy');
+            }
+        });
+
         function editAbsensi(id) {
             $.ajax({
                 url: "{{ url('/admin-panel/ketidakhadiran') }}" + "/" + id + "/edit",
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+
+                    $('#modal-content-edit .select2').each(function() {
+
+                        if ($(this).hasClass('select2-hidden-accessible')) {
+                            $(this).select2('destroy');
+                        }
+
+                        $(this).select2({
+                            theme: 'bootstrap4',
+                            dropdownParent: $('#exampleModalEdit'),
+                            width: '100%',
+                            placeholder: '- Pilih -',
+                            allowClear: true
+                        });
+                    });
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function ubahStatus(id) {
+            $.ajax({
+                url: "{{ url('/admin-panel/ketidakhadiran') }}" + "/" + id + "/ubah-status",
+                type: "GET",
+                success: function(response) {
+                    $("#modal-content-ubah-status").html(response)
                 },
                 error: function(error) {
                     console.log(error);
