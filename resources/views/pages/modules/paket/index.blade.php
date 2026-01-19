@@ -23,13 +23,13 @@
     @endif
 
     <div class="card shadow mb-4">
-        {{-- @if (canPermission('bank.create')) --}}
+        @if (canPermission('paket.create'))
         <div class="card-header py-3">
             <a href="{{ url('/admin-panel/paket/create') }}" class="btn btn-primary btn-sm">
                 <i class="fa fa-plus"></i> Tambah Data
             </a>
         </div>
-        {{-- @endif --}}
+        @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
                 <thead>
@@ -62,13 +62,13 @@
                             </td>
                             <td>{{ $item->harga_display }}</td>
                             <td class="text-center">
-                                {{-- @if (canPermission('paket.edit')) --}}
+                                @if (canPermission('paket.edit'))
                                 <a href="{{ url('/admin-panel/paket/' . $item->id . '/edit') }}"
                                     class="btn btn-warning btn-sm">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                {{-- @endif --}}
-                                {{-- @if (canPermission('paket.delete')) --}}
+                                @endif
+                                @if (canPermission('paket.delete'))
                                 <form action="{{ url('/admin-panel/paket/' . $item->id) }}" method="POST"
                                     style="display: inline">
                                     @csrf
@@ -78,7 +78,7 @@
                                         <i class="fa fa-trash"></i> Hapus
                                     </button>
                                 </form>
-                                {{-- @endif --}}
+                                @endif
                             </td>
                         </tr>
                     @endforeach
