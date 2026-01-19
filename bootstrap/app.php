@@ -47,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/rekap/peringatan.php';
                     require __DIR__ . '/../routes/keuangan/kasbon.php';
                     require __DIR__ . '/../routes/master/setup-jam-kerja.php';
+                    require __DIR__ . '/../routes/master/paket.php';
                 });
             });
         },
