@@ -40,7 +40,10 @@
                         <hr>
                         <div class="form-group">
                             <label>SKU Paket <span class="text-danger">*</span></label>
-                            <input type="text" name="sku_paket" class="form-control @error("sku_paket") is-invalid @enderror" placeholder="Contoh: PKT-HEM-01" value="{{ old('sku_paket') }}">
+                            <input type="text" name="sku_paket"
+                                class="form-control @error(' sku_paket') is-invalid
+                            @enderror"
+                                placeholder="Contoh: PKT-HEM-01" value="{{ old('sku_paket') }}">
 
                             @error('sku_paket')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -48,7 +51,9 @@
                         </div>
                         <div class="form-group">
                             <label>Nama Paket <span class="text-danger">*</span></label>
-                            <input type="text" name="nama_paket" class="form-control @error("nama_paket") is-invalid @enderror"
+                            <input type="text" name="nama_paket"
+                                class="form-control @error(' nama_paket') is-invalid
+                            @enderror"
                                 placeholder="Contoh: Paket Hemat Sembako" value="{{ old('nama_paket') }}">
 
                             @error('nama_paket')
@@ -56,20 +61,13 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label>Harga Jual Paket (Rp) <span class="text-danger">*</span></label>
-                            <input type="number" name="harga_paket" id="harga_paket" class="form-control @error("harga_paket") is-invalid @enderror" placeholder="0" value="{{ old('harga_paket') }}">
-                            <small class="text-muted">Tentukan harga jual akhir untuk pembeli.</small>
-
-                            @error('harga_paket')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label>Nama Seller <span class="text-danger">*</span></label>
-                            <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror" id="seller_id">
+                            <label>Nama Seller</label>
+                            <select name="seller_id" class="form-control @error('seller_id') is-invalid @enderror"
+                                id="seller_id">
                                 <option value="">- Pilih -</option>
                                 @foreach ($seller as $item)
-                                    <option {{ old('seller_id') == $item['id'] ? 'selected' : '' }} value="{{ $item['id'] }}">
+                                    <option {{ old('seller_id') == $item['id'] ? 'selected' : '' }}
+                                        value="{{ $item['id'] }}">
                                         {{ $item['nama'] }}
                                     </option>
                                 @endforeach
@@ -120,6 +118,13 @@
                                     </td>
                                 </tr>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-right">Total : </td>
+                                    <td>Ada</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
                         </table>
                         <button type="button" id="add-item" class="btn btn-primary btn-sm">
                             <i class="fa fa-plus"></i> Tambah Barang
@@ -148,6 +153,32 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <script>
+        function initSelect2Barang() {
+            $('.select2-barang').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Pilih Barang',
+                width: '100%'
+            });
+        }
+
+        function bindBarangChange() {
+            $(document).off('change', '.select2-barang').on('change', '.select2-barang', function() {
+                var selectedOption = $(this).find('option:selected');
+                var harga = selectedOption.data('harga');
+
+                var row = $(this).closest('tr');
+                var hargaInput = row.find('input[name="harga[]"]');
+
+                if (harga) {
+                    hargaInput.val(harga);
+                    hargaInput.prop('disabled', true);
+                } else {
+                    hargaInput.val(1);
+                    hargaInput.prop('disabled', false);
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('#seller_id').select2({
                 theme: 'bootstrap4',
@@ -156,14 +187,16 @@
                 width: '100%'
             });
 
+            initSelect2Barang();
+
             $('#add-item').click(function() {
                 var newRow = `
                 <tr class="bundle-item">
                     <td style="width:50%">
-                        <select name="barang_id[]" class="form-control" required>
+                        <select name="barang_id[]" class="form-control select2-barang" required>
                             <option value="">-- Pilih Barang --</option>
                             @foreach ($barangs as $b)
-                                <option value="{{ $b['id'] }}">{{ $b['sku_barang'] }}</option>
+                                <option value="{{ $b['id'] }}" data-harga="{{ $b['harga_modal'] }}">{{ $b['sku_barang'] }}</option>
                             @endforeach
                         </select>
                     </td>
@@ -180,6 +213,9 @@
                     </td>
                 </tr>`;
                 $('#bundle-container').append(newRow);
+
+                initSelect2Barang();
+                bindBarangChange();
             });
 
             $(document).on('click', '.remove-item', function() {
