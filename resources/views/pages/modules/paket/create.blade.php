@@ -33,6 +33,7 @@
         </div>
         <form action="{{ url('/admin-panel/paket') }}" method="POST">
             @csrf
+            <input type="hidden" name="total_paket" id="total_paket_input" value="0">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-5">
@@ -97,19 +98,19 @@
                                         <select name="barang_id[]" class="form-control select2-barang" required>
                                             <option value="">-- Pilih Barang --</option>
                                             @foreach ($barangs as $b)
-                                                <option value="{{ $b['id'] }}">
+                                                <option value="{{ $b['id'] }}" data-harga="{{ $b['harga_modal'] }}">
                                                     {{ $b['sku_barang'] }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="number" name="qty[]" class="form-control" value="1"
+                                        <input type="number" name="qty[]" class="form-control" placeholder="0"
                                             min="1" required>
                                     </td>
                                     <td>
-                                        <input type="number" name="harga[]" class="form-control" value="1"
-                                            min="1" required>
+                                        <input type="number" name="harga[]" class="form-control" placeholder="0"
+                                            min="1" required disabled>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-item">
@@ -121,7 +122,7 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="2" class="text-right">Total : </td>
-                                    <td>Ada</td>
+                                    <td id="total-harga"></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -161,22 +162,49 @@
             });
         }
 
-        function bindBarangChange() {
-            $(document).off('change', '.select2-barang').on('change', '.select2-barang', function() {
-                var selectedOption = $(this).find('option:selected');
-                var harga = selectedOption.data('harga');
+        function hitungTotal() {
+            var total = 0;
 
-                var row = $(this).closest('tr');
-                var hargaInput = row.find('input[name="harga[]"]');
+            $('.bundle-item').each(function() {
+                var qty = parseFloat($(this).find('input[name="qty[]"]').val()) || 0;
+                var harga = parseFloat($(this).find('input[name="harga[]"]').val()) || 0;
 
-                if (harga) {
-                    hargaInput.val(harga);
-                    hargaInput.prop('disabled', true);
-                } else {
-                    hargaInput.val(1);
-                    hargaInput.prop('disabled', false);
-                }
+                total += qty * harga;
             });
+
+            $('#total-harga').text(total.toLocaleString('id-ID'));
+            $('#total_paket_input').val(total);
+        }
+
+        function bindBarangChange() {
+            $(document)
+                .off('change', '.select2-barang')
+                .on('change', '.select2-barang', function() {
+                    var selectedOption = $(this).find('option:selected');
+                    var harga = selectedOption.data('harga');
+
+                    var row = $(this).closest('tr');
+                    var hargaInput = row.find('input[name="harga[]"]');
+                    var qtyInput = row.find('input[name="qty[]"]');
+
+                    if (harga !== undefined) {
+                        hargaInput.val(harga).prop('readonly', true);
+                        qtyInput.prop('disabled', false).val(1);
+                    } else {
+                        hargaInput.val(0).prop('readonly', true);
+                        qtyInput.val(0).prop('disabled', true);
+                    }
+
+                    hitungTotal();
+                });
+        }
+
+        function bindQtyChange() {
+            $(document)
+                .off('input', 'input[name="qty[]"]')
+                .on('input', 'input[name="qty[]"]', function() {
+                    hitungTotal();
+                });
         }
 
         $(document).ready(function() {
@@ -188,43 +216,57 @@
             });
 
             initSelect2Barang();
+            bindBarangChange();
+            bindQtyChange();
 
             $('#add-item').click(function() {
                 var newRow = `
-                <tr class="bundle-item">
-                    <td style="width:50%">
-                        <select name="barang_id[]" class="form-control select2-barang" required>
-                            <option value="">-- Pilih Barang --</option>
-                            @foreach ($barangs as $b)
-                                <option value="{{ $b['id'] }}" data-harga="{{ $b['harga_modal'] }}">{{ $b['sku_barang'] }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" name="qty[]" class="form-control" value="1" min="1" required>
-                    </td>
-                    <td>
-                        <input type="number" name="harga[]" class="form-control" value="1" min="1" required>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm remove-item">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>`;
+        <tr class="bundle-item">
+            <td style="width:50%">
+                <select name="barang_id[]" class="form-control select2-barang" required>
+                    <option value="">-- Pilih Barang --</option>
+                    @foreach ($barangs as $b)
+                        <option value="{{ $b['id'] }}" data-harga="{{ $b['harga_modal'] }}">
+                            {{ $b['sku_barang'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <input type="number" name="qty[]" class="form-control"
+                       placeholder="0" min="1" required disabled>
+            </td>
+            <td>
+                <input type="number" name="harga[]" class="form-control"
+                       placeholder="0" min="1" required readonly>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+
                 $('#bundle-container').append(newRow);
 
                 initSelect2Barang();
                 bindBarangChange();
+                bindQtyChange();
             });
 
             $(document).on('click', '.remove-item', function() {
                 if ($('.bundle-item').length > 1) {
                     $(this).closest('tr').remove();
+                    hitungTotal();
                 } else {
                     alert("Minimal harus ada 1 barang dalam paket!");
                 }
             });
+
+            $('form').on('submit', function() {
+                $('input[name="harga[]"], input[name="qty[]"]').prop('disabled', false);
+            });
         });
     </script>
+
 @endpush

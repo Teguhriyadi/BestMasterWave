@@ -51,10 +51,23 @@ class PaketService
     public function update(string $id, array $data)
     {
         return DB::transaction(function () use ($id, $data) {
+            $totalServer = 0;
+
+            foreach ($data['barang_id'] as $i => $barangId) {
+                $qty   = (int) ($data['qty'][$i] ?? 0);
+                $harga = (int) ($data['harga'][$i] ?? 0);
+
+                $totalServer += $qty * $harga;
+            }
+
+            if ($totalServer != (int) $data['total_paket']) {
+                throw new \Exception('Total paket tidak valid!');
+            }
+
             $this->paket_repository->update_header($id, [
                 'sku_paket'  => $data['sku_paket'],
                 'nama_paket' => $data['nama_paket'],
-                'harga_jual' => $data['harga_paket'],
+                'harga_jual' => $totalServer,
                 'seller_id'  => $data['seller_id'],
                 'updated_by' => Auth::user()->id
             ]);

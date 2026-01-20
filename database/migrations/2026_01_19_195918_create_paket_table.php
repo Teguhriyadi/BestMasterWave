@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("nama_paket", 150)->index();
             $table->unsignedBigInteger("harga_jual");
             $table->enum("status", ["A", "N"])->default("A");
-            $table->uuid('seller_id');
+            $table->uuid('seller_id')->nullable();
             $table->foreign('seller_id')->references('id')->on('seller')->cascadeOnDelete();
             $table->uuid('created_by');
             $table->foreign('created_by')->references('id')->on('users')->cascadeOnDelete();

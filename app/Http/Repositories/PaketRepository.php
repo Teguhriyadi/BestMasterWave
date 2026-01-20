@@ -22,7 +22,7 @@ class PaketRepository
         $add_paket = Paket::create([
             "sku_paket" => $data["sku_paket"],
             "nama_paket" => $data["nama_paket"],
-            "harga_jual" => $data["harga_paket"],
+            "harga_jual" => $data["total_paket"],
             "seller_id" => $data["seller_id"],
             "created_by" => Auth::user()->id
         ]);
