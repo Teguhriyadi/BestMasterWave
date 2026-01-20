@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Services\LogAbsensiService;
 use App\Models\Karyawan;
 use App\Models\LogAbsensi;
+use App\Models\RekapAbsensi;
+use App\Models\SetupJamKerja;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,12 +133,24 @@ class LogAbsensiController extends Controller
             );
         }
 
+        $divisiId = Auth::user()->one_divisi_roles->divisi->id ?? null;
+
+        $setupJamKerja = SetupJamKerja::where('divisi_id', $divisiId)->first();
+
+        if (!$setupJamKerja) {
+            return back()->with('error', 'Setup jam kerja untuk divisi ini belum dibuat');
+        }
+
+        $jamPulang = Carbon::createFromFormat('H:i:s', $setupJamKerja->jam_pulang);
+        $mulaiLemburMenit = (int) $setupJamKerja->mulai_lembur;
+
         $data = array_slice($rows, 1);
 
-        $karyawanMap = Karyawan::pluck('id_fp')
-            ->map(fn($id) => $this->extractIdFp($id))
-            ->filter()
-            ->flip();
+        $karyawanMap = Karyawan::select('id', 'id_fp')->get()
+            ->mapWithKeys(function ($k) {
+                $idFp = $this->extractIdFp($k->id_fp);
+                return $idFp ? [$idFp => $k->id] : [];
+            });
 
         $existingAbsensi = LogAbsensi::where('divisi_id', AuthDivisi::id())
             ->get()
@@ -166,14 +180,33 @@ class LogAbsensiController extends Controller
                 }
 
                 $rawTanggal = null;
+
                 for ($i = 0; $i < count($row); $i++) {
-                    if (preg_match('/^\d{2}\/\d{2}\/\d{2}$/', trim($row[$i] ?? ''))) {
-                        $rawTanggal = trim($row[$i]) . ' ' . trim($row[$i + 1] ?? '');
+
+                    $cell = trim($row[$i] ?? '');
+
+                    if (is_numeric($cell) && $cell > 40000) {
+                        $rawTanggal = $cell;
                         break;
                     }
 
-                    if (preg_match('/\d{2}-[A-Za-z]{3}-\d{2}/', trim($row[$i] ?? ''))) {
-                        $rawTanggal = trim($row[$i]);
+                    if (preg_match('/^\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2}$/', $cell)) {
+                        $rawTanggal = $cell;
+                        break;
+                    }
+
+                    if (preg_match('/^\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}$/', $cell)) {
+                        $rawTanggal = $cell;
+                        break;
+                    }
+
+                    if (preg_match('/\d{2}-[A-Za-z]{3}-\d{2}/', $cell)) {
+                        $rawTanggal = $cell;
+                        break;
+                    }
+
+                    if (preg_match('/^\d{2}\/\d{2}\/\d{2}$/', $cell)) {
+                        $rawTanggal = $cell . ' ' . trim($row[$i + 1] ?? '');
                         break;
                     }
                 }
@@ -196,6 +229,23 @@ class LogAbsensiController extends Controller
                     continue;
                 }
 
+                $waktuAbsen = Carbon::parse($tanggal);
+
+                $jamMulaiLembur = $jamPulang
+                    ->copy()
+                    ->setDate(
+                        $waktuAbsen->year,
+                        $waktuAbsen->month,
+                        $waktuAbsen->day
+                    )
+                    ->addMinutes($mulaiLemburMenit);
+
+                $statusAbsensi = '';
+
+                if ($waktuAbsen->gt($jamMulaiLembur)) {
+                    $statusAbsensi = 'Lembur';
+                }
+
                 $kodeLokasi = isset($row[4])
                     ? (int) preg_replace('/[^0-9]/', '', $row[4])
                     : null;
@@ -209,6 +259,29 @@ class LogAbsensiController extends Controller
                     'created_by'    => Auth::id(),
                     'updated_by'    => Auth::id(),
                 ]);
+
+                if ($statusAbsensi === 'Lembur') {
+
+                    $karyawanId = $karyawanMap[$idFp] ?? null;
+
+                    $alreadyLembur = RekapAbsensi::where('karyawan_id', $karyawanId)
+                        ->whereDate('tanggal', $waktuAbsen->toDateString())
+                        ->where('status', 'Lembur')
+                        ->exists();
+
+                    if (!$alreadyLembur) {
+
+                        RekapAbsensi::create([
+                            'id'          => Str::uuid(),
+                            'status'      => 'Lembur',
+                            'karyawan_id' => $karyawanId,
+                            'divisi_id'   => AuthDivisi::id(),
+                            'id_fp'       => $idFp,
+                            'tanggal'     => $waktuAbsen->toDateString(),
+                            'created_by'  => Auth::user()->id
+                        ]);
+                    }
+                }
 
                 $existingAbsensi[$key] = true;
                 $inserted++;
@@ -268,29 +341,26 @@ class LogAbsensiController extends Controller
         return null;
     }
 
-    private function parseTanggalFingerprint($value)
+    private function parseTanggalFingerprint(string $raw)
     {
-        $value = trim($value);
+        $raw = trim($raw);
 
-        if (preg_match('/\d{1,2}\.\d{1}$/', $value)) {
-            $value = preg_replace_callback(
-                '/(\d{1,2})\.(\d{1})$/',
-                fn($m) =>
-                str_pad($m[1], 2, '0', STR_PAD_LEFT) . '.' .
-                    str_pad($m[2], 2, '0', STR_PAD_RIGHT),
-                $value
-            );
+        if (is_numeric($raw)) {
+            $unix = ((float)$raw - 25569) * 86400;
+            return Carbon::createFromTimestamp($unix)
+                ->format('Y-m-d H:i:s');
         }
 
         $formats = [
             'd-M-y h:i:s A',
-            'd/m/y H.i',
+            'd/m/y H:i:s',
             'd/m/y H:i',
         ];
 
-        foreach ($formats as $f) {
+        foreach ($formats as $fmt) {
             try {
-                return Carbon::createFromFormat($f, $value);
+                return Carbon::createFromFormat($fmt, $raw)
+                    ->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
             }
         }
