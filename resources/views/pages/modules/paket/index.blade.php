@@ -24,11 +24,11 @@
 
     <div class="card shadow mb-4">
         @if (canPermission('paket.create'))
-        <div class="card-header py-3">
-            <a href="{{ url('/admin-panel/paket/create') }}" class="btn btn-primary btn-sm">
-                <i class="fa fa-plus"></i> Tambah Data
-            </a>
-        </div>
+            <div class="card-header py-3">
+                <a href="{{ url('/admin-panel/paket/create') }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Tambah Data
+                </a>
+            </div>
         @endif
         <div class="card-body">
             <table class="table table-bordered nowrap" id="dataTable" width="100%" cellspacing="0">
@@ -62,22 +62,32 @@
                             </td>
                             <td>{{ $item->harga_display }}</td>
                             <td class="text-center">
+                                @if (canPermission('paket.show'))
+                                    <a href="{{ url('/admin-panel/paket/' . $item->id . '/show') }}"
+                                        class="btn btn-info btn-sm">
+                                        <i class="fa fa-search"></i> Detail
+                                    </a>
+                                @endif
                                 @if (canPermission('paket.edit'))
-                                <a href="{{ url('/admin-panel/paket/' . $item->id . '/edit') }}"
-                                    class="btn btn-warning btn-sm">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
+                                    <a href="{{ url('/admin-panel/paket/' . $item->id . '/edit') }}"
+                                        class="btn btn-warning btn-sm">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
                                 @endif
                                 @if (canPermission('paket.delete'))
-                                <form action="{{ url('/admin-panel/paket/' . $item->id) }}" method="POST"
-                                    style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
-                                        class="btn btn-danger btn-sm">
-                                        <i class="fa fa-trash"></i> Hapus
-                                    </button>
-                                </form>
+                                    <form action="{{ url('/admin-panel/paket/' . $item->id) }}" method="POST"
+                                        style="display: inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('Yakin ? Ingin Menghapus Data Ini?')" type="submit"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if (!canPermission('paket.edit') && !canPermission('paket.delete') && !canPermission('paket.show'))
+                                    -
                                 @endif
                             </td>
                         </tr>

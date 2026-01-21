@@ -10,4 +10,5 @@ Route::prefix("paket")->group(function() {
     Route::get("/{id}/edit", [PaketController::class, "edit"])->middleware("permission:paket.edit");
     Route::put("/{id}", [PaketController::class, "update"])->middleware("permission:paket.edit");
     Route::delete("/{id}", [PaketController::class, "destroy"])->middleware("permission:paket.delete");
+    Route::get("/{id}/show", [PaketController::class, "show"])->middleware("permission:paket.show");
 });

@@ -40,6 +40,11 @@ class PaketRepository
         return Paket::where("id", $id)->first();
     }
 
+    public function get_show_data_by_id(string $id)
+    {
+        return Paket::where("id", $id)->first();
+    }
+
     public function update_by_id(string $id, array $data)
     {
         $supplier = Bank::findOrFail($id);

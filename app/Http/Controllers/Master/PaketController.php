@@ -82,6 +82,19 @@ class PaketController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $data["detail"] = $this->paket_service->show($id);
+
+            return view("pages.modules.paket.show", $data);
+        } catch (\Throwable $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
+    }
+
     public function destroy($id)
     {
         try {

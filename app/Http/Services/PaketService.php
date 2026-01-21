@@ -48,6 +48,13 @@ class PaketService
         });
     }
 
+    public function show(string $id)
+    {
+        return DB::transaction(function() use ($id) {
+            return $this->paket_repository->get_show_data_by_id($id);
+        });
+    }
+
     public function update(string $id, array $data)
     {
         return DB::transaction(function () use ($id, $data) {
