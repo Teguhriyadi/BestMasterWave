@@ -116,20 +116,19 @@
                                 <div class="form-group">
                                     <label>Nama Menu <small class="text-danger">*</small></label>
                                     <select name="menu_id" id="menu_id" class="form-control select2">
-    <option value="">- Pilih -</option>
-
-    @foreach ($menu as $group)
-        <optgroup label="{{ strtoupper($group['label']) }}">
-            @foreach ($group['items'] as $item)
-                <option value="{{ $item['id'] }}"
-                        data-header="{{ $group['label'] }}"
-                        data-type="{{ $item['type'] }}">
-                    {{ $item['text'] }}
-                </option>
-            @endforeach
-        </optgroup>
-    @endforeach
-</select>
+                                        <option value="">- Pilih -</option>
+                                        @foreach ($menu as $group)
+                                            <optgroup label="{{ strtoupper($group['label']) }}">
+                                                @foreach ($group['items'] as $item)
+                                                    <option value="{{ $item['id'] }}"
+                                                        data-header="{{ $group['label'] }}"
+                                                        data-type="{{ $item['type'] }}">
+                                                        {{ $item['text'] }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
 
                                     @error('menu_id')
                                         <div class="invalid-feedback">{{ $message }}</div>

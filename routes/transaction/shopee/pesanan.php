@@ -3,7 +3,7 @@
 use App\Http\Controllers\Transaction\Shopee\PesananController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix("shopee/pesanan")->group(function() {
+Route::prefix("shopee-pesanan")->group(function() {
     Route::get("/", [PesananController::class, "index"])->middleware("permission:shopee-pesanan.read");
     Route::post("/", [PesananController::class, "store"])->middleware("permission:shopee-pesanan.create");
     Route::post("/process", [PesananController::class, "process"])->middleware("permission:shopee-pesanan.create");

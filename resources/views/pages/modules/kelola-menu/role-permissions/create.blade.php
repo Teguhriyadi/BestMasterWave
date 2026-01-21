@@ -99,7 +99,6 @@
             <div class="card-body">
                 <div class="row">
 
-                    {{-- ================= ROLE ================= --}}
                     <div class="col-md-3">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
@@ -113,7 +112,7 @@
                                     <div class="card-body pb-2">
 
                                         <h6 class="font-weight-bold text-dark mb-3 d-flex align-items-center">
-                                            <i class="fa fa-user-shield text-primary mr-2"></i>
+                                            <i class="fa fa-edit text-primary mr-2"></i>
                                             Pilih Role Akses
                                         </h6>
 
@@ -143,7 +142,6 @@
                         </div>
                     </div>
 
-                    {{-- ================= PERMISSION ================= --}}
                     <div class="col-md-9">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3 d-flex align-items-center justify-content-between">
@@ -160,7 +158,7 @@
 
                                                 <h6 class="font-weight-bold text-dark mb-3 d-flex align-items-center">
                                                     <i class="fa fa-folder-open text-info mr-2"></i>
-                                                    {{ $menu->nama_menu }}
+                                                    {{ $menu->nama_menu }} - {{ $menu->parent->nama_menu }}
                                                 </h6>
 
                                                 <div class="row">
@@ -183,7 +181,6 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-
                                             </div>
                                         </div>
                                     @endif

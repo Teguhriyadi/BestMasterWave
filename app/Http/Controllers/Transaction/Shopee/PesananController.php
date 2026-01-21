@@ -51,7 +51,7 @@ class PesananController extends Controller
         try {
 
             if (empty(Auth::user()->one_divisi_roles)) {
-                return redirect()->to("/admin-panel/shopee/pesanan/data");
+                return redirect()->to("/admin-panel/shopee-pesanan/data");
             }
 
             $platform = Platform::where("slug", "shopee")->firstOrFail();
@@ -350,7 +350,7 @@ class PesananController extends Controller
             return response()->json([
                 'status'   => true,
                 'message'  => "Berhasil memuat $total baris data pesanan.",
-                'redirect' => url("/admin-panel/shopee/pesanan/{$file->id}/show")
+                'redirect' => url("/admin-panel/shopee-pesanan/{$file->id}/show")
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -468,7 +468,7 @@ class PesananController extends Controller
             DB::commit();
 
             return redirect()
-                ->to("/admin-panel/shopee/pesanan")
+                ->to("/admin-panel/shopee-pesanan")
                 ->with('success', 'Data pesanan berhasil di-import/update.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -512,7 +512,7 @@ class PesananController extends Controller
                     return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/shopee/pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                    return '<a href="' . url('/admin-panel/shopee-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
                             <i class="fa fa-search"></i> Detail
                         </a>';
                 })
@@ -531,7 +531,7 @@ class PesananController extends Controller
 
             $data["detail"] = ShopeePesanan::where("uuid", $uuid)->first();
 
-            if (empty($data["detail"])) return redirect()->to("/admin-panel/shopee/pesanan/data")->with("error", "Data Tidak Ditemukan");
+            if (empty($data["detail"])) return redirect()->to("/admin-panel/shopee-pesanan/data")->with("error", "Data Tidak Ditemukan");
 
             DB::commit();
 
@@ -540,7 +540,7 @@ class PesananController extends Controller
 
             DB::rollBack();
 
-            return redirect()->to("/admin-panel/shopee/pesanan/data")->with("error", $e->getMessage());
+            return redirect()->to("/admin-panel/shopee-pesanan/data")->with("error", $e->getMessage());
         }
     }
 }

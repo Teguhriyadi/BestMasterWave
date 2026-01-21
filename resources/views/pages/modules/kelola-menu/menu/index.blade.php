@@ -269,10 +269,47 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('#nama_menu').select2({
-                theme: 'bootstrap4'
+
+        $('#exampleModal').on('shown.bs.modal', function() {
+            let $parent_menu_header = $('#select_header');
+            let $parent_sub_header = $('#select_menu')
+
+            if ($parent_menu_header.hasClass('select2-hidden-accessible')) {
+                $parent_menu_header.select2('destroy');
+            }
+
+            $parent_menu_header.select2({
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal'),
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
             });
+
+            if ($parent_sub_header.hasClass('select2-hidden-accessible')) {
+                $parent_sub_header.select2('destroy');
+            }
+
+            $parent_sub_header.select2({
+                theme: 'bootstrap4',
+                dropdownParent: $('#exampleModal'),
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            });
+        });
+
+        $('#exampleModal').on('hidden.bs.modal', function() {
+            let $parent_menu_header = $('#select_header');
+            let $parent_sub_menu_header = $('#select_menu');
+
+            if ($parent_menu_header.hasClass('select2-hidden-accessible')) {
+                $parent_menu_header.select2('destroy');
+            }
+
+            if ($parent_sub_menu_header.hasClass('select2-hidden-accessible')) {
+                $parent_sub_menu_header.select2('destroy');
+            }
         });
 
         function editMenu(id) {
@@ -281,6 +318,21 @@
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+
+                    $('#modal-content-edit .select2').each(function() {
+
+                        if ($(this).hasClass('select2-hidden-accessible')) {
+                            $(this).select2('destroy');
+                        }
+
+                        $(this).select2({
+                            theme: 'bootstrap4',
+                            dropdownParent: $('#exampleModalEdit'),
+                            width: '100%',
+                            placeholder: '- Pilih -',
+                            allowClear: true
+                        });
+                    });
                     toggleMenuField(document.getElementById('modal-content-edit'));
                 },
                 error: function(error) {
@@ -330,9 +382,5 @@
         }
 
         toggleMenuField(document);
-
-        // $(document).on('shown.bs.modal', '#exampleModalEdit', function() {
-        //     toggleMenuField(this);
-        // });
     </script>
 @endpush

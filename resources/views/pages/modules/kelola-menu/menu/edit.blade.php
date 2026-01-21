@@ -29,7 +29,7 @@
         <div class="parent-headers-wrap" style="display:none">
             <div class="form-group">
                 <label class="form-label">Nama Header Menu <small class="text-danger">*</small></label>
-                <select class="form-control" id="select_header">
+                <select class="form-control select2" id="select_header">
                     <option value="">- Pilih Header -</option>
                     @foreach ($headers as $header)
                         <option value="{{ $header['id'] }}"
@@ -44,7 +44,7 @@
         <div class="parent-wrap" style="display:none">
             <div class="form-group">
                 <label class="form-label">Nama Parent Menu <small class="text-danger">*</small></label>
-                <select class="form-control" id="select_menu">
+                <select class="form-control select2" id="select_menu">
                     <option value="">- Pilih Parent -</option>
                     @foreach ($parents as $parent)
                         <option value="{{ $parent['id'] }}"
