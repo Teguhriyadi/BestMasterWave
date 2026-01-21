@@ -51,6 +51,75 @@
     @include("pages.layouts.javascript.style-js")
 
     @stack("js_style")
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('sidebarSearch');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+
+        // LOOP MENU
+        document.querySelectorAll('.sidebar-menu-item').forEach(menu => {
+            const menuText = menu.innerText.toLowerCase();
+            const submenus = menu.querySelectorAll('.sidebar-submenu-item');
+
+            let submenuMatch = false;
+
+            submenus.forEach(sub => {
+                const match = sub.innerText.toLowerCase().includes(keyword);
+                sub.style.display = match || keyword === '' ? '' : 'none';
+                if (match) submenuMatch = true;
+            });
+
+            const menuMatch = menuText.includes(keyword);
+
+            // tampil / sembunyi menu
+            if (menuMatch || submenuMatch || keyword === '') {
+                menu.style.display = '';
+            } else {
+                menu.style.display = 'none';
+            }
+
+            // auto buka collapse
+            const collapse = menu.querySelector('.collapse');
+            if (collapse) {
+                if (submenuMatch && keyword !== '') {
+                    collapse.classList.add('show');
+                } else if (keyword === '') {
+                    collapse.classList.remove('show');
+                }
+            }
+        });
+
+        document.querySelectorAll('.sidebar-header').forEach(header => {
+    let next = header.nextElementSibling;
+    let visible = false;
+
+    while (next && !next.classList.contains('sidebar-header')) {
+        if (
+            next.classList.contains('sidebar-menu-item') &&
+            next.style.display !== 'none'
+        ) {
+            visible = true;
+            break;
+        }
+        next = next.nextElementSibling;
+    }
+
+    header.style.display = visible || keyword === '' ? '' : 'none';
+
+    // 🔥 HR sebelum header ikut disembunyikan
+    const prev = header.previousElementSibling;
+    if (prev && prev.classList.contains('sidebar-divider-item')) {
+        prev.style.display = visible || keyword === '' ? '' : 'none';
+    }
+});
+    });
+});
+</script>
+
 </body>
 
 </html>
