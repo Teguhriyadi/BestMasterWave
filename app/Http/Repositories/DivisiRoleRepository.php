@@ -44,9 +44,10 @@ class DivisiRoleRepository
             return Role::where('nama_role', '=', 'Super Admin')
                 ->get();
         } else {
-            return Role::where("divisi_id", AuthDivisi::id())
-                ->where('nama_role', '!=', 'Super Admin')
-                ->get();
+            return DivisiRole::where("divisi_id", AuthDivisi::id())
+                ->whereHas("role", function($q) {
+                    $q->where("nama_role", "!=", "Super Admin");
+                })->get();
         }
     }
 

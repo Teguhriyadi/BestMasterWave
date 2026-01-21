@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Mapper\DivisiRoleMapper;
 use App\Http\Repositories\DivisiRoleRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DivisiRoleService
@@ -37,7 +38,11 @@ class DivisiRoleService
     {
         $divisi_role = $this->divisi_role_repository->get_akses_role_all();
 
-        return DivisiRoleMapper::toPermissionsRole($divisi_role);
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return DivisiRoleMapper::toPermissionsRole($divisi_role);
+        } else {
+            return DivisiRoleMapper::toPermissionsRoleNoSuperAdmin($divisi_role);
+        }
     }
 
     public function create(array $data): void

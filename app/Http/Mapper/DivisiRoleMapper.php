@@ -42,6 +42,16 @@ class DivisiRoleMapper
         });
     }
 
+    public static function toPermissionsRoleNoSuperAdmin(Collection $role_permissions): Collection
+    {
+        return $role_permissions->map(function (DivisiRole $role) {
+            return [
+                'id'          => $role->role->id,
+                'nama_role'   => $role->role->nama_role
+            ];
+        });
+    }
+
     public static function toListData(Collection $user_divisi_role): Collection
     {
         return $user_divisi_role->map(function (UserDivisiRole $users_role) {
