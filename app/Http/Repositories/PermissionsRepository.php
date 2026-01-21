@@ -11,15 +11,17 @@ class PermissionsRepository
         return Permission::orderBy("created_at", "DESC")->get();
     }
 
-    public function insert_data(array $data)
+    public function get_group_data(string $nama, string $aksesBase, string $menuId)
     {
-        $permissions = Permission::create([
-            "nama" => $data["nama"],
-            "akses" => $data["akses"] . "." . $data["tipe_akses"],
-            "menu_id" => $data["menu_id"]
-        ]);
+        return Permission::where('nama', $nama)
+            ->where('menu_id', $menuId)
+            ->where('akses', 'like', $aksesBase . '.%')
+            ->get();
+    }
 
-        return $permissions;
+    public function insert_data(array $rows)
+    {
+        return Permission::insert($rows);
     }
 
     public function get_data_by_id(string $id)
@@ -44,5 +46,13 @@ class PermissionsRepository
     {
         $permissions = Permission::findOrFail($id);
         $permissions->delete();
+    }
+
+    public function delete_group_data(string $nama, string $aksesBase, string $menuId)
+    {
+        return Permission::where('nama', $nama)
+            ->where('menu_id', $menuId)
+            ->where('akses', 'like', $aksesBase . '.%')
+            ->delete();
     }
 }

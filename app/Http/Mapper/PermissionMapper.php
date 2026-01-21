@@ -9,19 +9,26 @@ class PermissionMapper
 {
     public static function toTable(Collection $permissions): Collection
     {
-        return $permissions->map(function(Permission $permission) {
-            $explode = explode('.', $permission->akses);
+        return $permissions
+            ->groupBy(fn($p) => $p->nama . '|' . $p->menu_id . '|' . explode('.', $p->akses)[0])
+            ->map(function ($group) {
 
-            $akses = $explode[0] ?? null;
-            $tipe  = $explode[1] ?? null;
+                $first = $group->first();
 
-            return [
-                'id'    => $permission->id,
-                'nama'  => $permission->nama,
-                'akses' => $akses,
-                "tipe"  => ucfirst(str_replace('_', ' ', $tipe)),
-                'menu'  => $permission->menu->nama_menu
-            ];
-        });
+                $aksesBase = explode('.', $first->akses)[0];
+
+                $tipeList = $group->map(function ($p) {
+                    return ucfirst(str_replace('_', ' ', explode('.', $p->akses)[1] ?? ''));
+                })->implode(', ');
+
+                return [
+                    'id'    => $first->id,
+                    'nama'  => $first->nama,
+                    'akses' => $aksesBase,
+                    'tipe'  => $tipeList,
+                    'menu'  => $first->menu->nama_menu
+                ];
+            })
+            ->values();
     }
 }

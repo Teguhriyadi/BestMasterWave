@@ -32,11 +32,13 @@ class PermissionsController extends Controller
     public function store(CreateRequest $request)
     {
         try {
-            $this->permissions_service->create($request->all());
+            $data = $request->validated();
+            $data['tipe_akses'] = array_values($data['tipe_akses']);
+
+            $this->permissions_service->create($data);
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
-
         } catch (\Throwable $e) {
 
             return redirect()
@@ -50,20 +52,28 @@ class PermissionsController extends Controller
     {
         try {
             $data["menu"] = $this->menu_service->list_menu();
-            $data["permissions"] = $this->permissions_service->list();
-            $data["edit"] = $this->permissions_service->edit($id);
 
-            $akses_nama_full = $data["edit"]["akses"];
-            $explode = explode('.', $akses_nama_full);
+            $row = $this->permissions_service->getSingle($id);
 
-            $data['akses_nama'] = $explode[0];
-            $data["tipe_akses"] = $explode[1];
+            $explode = explode('.', $row->akses);
+            $aksesBase = $explode[0];
+
+            $group = $this->permissions_service->getGroup(
+                $row->nama,
+                $aksesBase,
+                $row->menu_id
+            );
+
+            $data["edit"] = $row;
+            $data["akses_nama"] = $aksesBase;
+
+            $data["tipe_akses"] = $group->map(function ($p) {
+                return explode('.', $p->akses)[1] ?? null;
+            })->filter()->values()->toArray();
 
             return view("pages.modules.kelola-menu.permissions.edit", $data);
         } catch (\Throwable $e) {
-            return redirect()
-                ->back()
-                ->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -71,13 +81,12 @@ class PermissionsController extends Controller
     {
         try {
             $data = $request->validated();
+            $data['tipe_akses'] = array_values($data['tipe_akses']);
 
-            $this->permissions_service->update($id, $data);
+            $this->permissions_service->updateGroup($id, $data);
 
             return back()->with('success', 'Data berhasil diperbarui');
-
         } catch (\Throwable $e) {
-
             return back()->withInput()->with('error', $e->getMessage());
         }
     }
@@ -89,7 +98,6 @@ class PermissionsController extends Controller
 
             return back()
                 ->with('success', 'Data berhasil dihapus');
-
         } catch (\Throwable $e) {
 
             return redirect()
