@@ -32,11 +32,15 @@
                         id="menu_id_edit">
 
                         <option value="">- Pilih -</option>
-                        @foreach ($menu as $item)
-                            <option value="{{ $item['id'] }}"
-                                {{ old('menu_id', $edit['menu_id']) == $item['id'] ? 'selected' : '' }}>
-                                {{ $item['nama_menu'] }}
-                            </option>
+                        @foreach ($menu as $group)
+                            <optgroup label="{{ strtoupper($group['label']) }}">
+                                @foreach ($group['items'] as $item)
+                                    <option {{ old('menu_id', $edit['menu_id']) == $item['id'] ? 'selected' : '' }} value="{{ $item['id'] }}" data-header="{{ $group['label'] }}"
+                                        data-type="{{ $item['type'] }}">
+                                        {{ $item['text'] }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
 

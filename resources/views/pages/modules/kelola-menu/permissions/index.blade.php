@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
         rel="stylesheet">
 
-
 @endpush
 
 @push('content_app')
