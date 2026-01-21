@@ -33,7 +33,7 @@ class MenuService
     {
         $menu = $this->menu_repository->get_menus();
 
-        return MenuMapper::toTable($menu);
+        return MenuMapper::toListMenus($menu);
     }
 
     public function list_parent()

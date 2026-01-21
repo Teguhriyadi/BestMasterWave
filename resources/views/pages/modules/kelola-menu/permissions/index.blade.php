@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
         rel="stylesheet">
+
+
 @endpush
 
 @push('content_app')
@@ -113,16 +115,21 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Nama Menu <small class="text-danger">*</small></label>
-                                    <select name="menu_id" id="menu_id"
-                                        class="form-control @error('menu_id') is-invalid @enderror">
-                                        <option value="">- Pilih -</option>
-                                        @foreach ($menu as $item)
-                                            <option value="{{ $item['id'] }}"
-                                                {{ old('menu_id') == $item['id'] ? 'selected' : '' }}>
-                                                {{ $item['nama_menu'] }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <select name="menu_id" id="menu_id" class="form-control select2">
+    <option value="">- Pilih -</option>
+
+    @foreach ($menu as $group)
+        <optgroup label="{{ strtoupper($group['label']) }}">
+            @foreach ($group['items'] as $item)
+                <option value="{{ $item['id'] }}"
+                        data-header="{{ $group['label'] }}"
+                        data-type="{{ $item['type'] }}">
+                    {{ $item['text'] }}
+                </option>
+            @endforeach
+        </optgroup>
+    @endforeach
+</select>
 
                                     @error('menu_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
