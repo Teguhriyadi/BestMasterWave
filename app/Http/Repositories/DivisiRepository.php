@@ -56,7 +56,7 @@ class DivisiRepository
         return Divisi::with([
             'roles' => function ($q) use ($divisionId) {
                 $q->select('id', 'nama_role', 'divisi_id')
-                  ->where('divisi_id', $divisionId);
+                  ->where('divisi_id', AuthDivisi::id());
             }
         ])
         ->findOrFail($divisionId)
