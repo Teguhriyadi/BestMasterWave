@@ -2,6 +2,12 @@
 
 @push('title_module', 'Denda')
 
+@push('css_style')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -28,8 +34,8 @@
             @csrf
             <div class="card-body">
                 <div class="mb-3 row">
-                    <label for="supplier_id" class="col-sm-3 col-form-label">
-                        Nama Supplier
+                    <label for="karyawan_id" class="col-sm-3 col-form-label">
+                        Nama Karyawan
                         <small class="text-danger">*</small>
                     </label>
                     <div class="col-sm-6">
@@ -121,36 +127,43 @@
 @endpush
 
 @push('js_style')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
     <script type="text/javascript">
         const dendaaList = @json($denda);
         let itemIndex = 0;
 
         $(document).ready(function() {
+            $("#karyawan_id").select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            })
+
             $('#dataTable').DataTable({
                 scrollX: true,
                 autoWidth: false,
                 responsive: false
             });
-        });
 
-        function editSupplier(id) {
-            $.ajax({
-                url: "{{ url('/admin-panel/bank') }}" + "/" + id + "/edit",
-                type: "GET",
-                success: function(response) {
-                    $("#modal-content-edit").html(response)
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        }
+            initJenisDendaSelect();
+        });
 
         function removeRow(id) {
             $("#row-" + id).remove();
             if ($("#itemBody tr").length === 0) {
                 $("#tableItem").hide();
             }
+        }
+
+        function initJenisDendaSelect(context = document) {
+            $(context).find('.jenis-denda-select').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '- Pilih Jenis Denda -',
+                allowClear: true
+            });
         }
 
         $("#btnAddItem").on("click", function(e) {
@@ -196,6 +209,7 @@
                     </td>
                 </tr>`;
             $("#itemBody").append(row);
+            initJenisDendaSelect(`#row-${itemIndex}`);
         });
 
         $(document).on('change', '.jenis-denda-select', function() {

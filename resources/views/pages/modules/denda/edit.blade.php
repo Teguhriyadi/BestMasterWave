@@ -7,7 +7,7 @@
                 Nama Karyawan
                 <small class="text-danger">*</small>
             </label>
-            <select name="karyawan_id" class="form-control" id="karyawan_id">
+            <select name="karyawan_id" class="form-control select2" id="karyawan_id">
                 <option value="">- Pilih -</option>
                 @foreach ($karyawan as $item)
                     <option value="{{ $item['id'] }}"
@@ -25,7 +25,7 @@
                 Jenis Denda
                 <small class="text-danger">*</small>
             </label>
-            <select name="jenis_denda_id" class="form-control" id="jenis_denda_id">
+            <select name="jenis_denda_id" class="form-control select2" id="jenis_denda_id">
                 <option value="">- Pilih -</option>
                 @foreach ($denda as $item)
                     <option value="{{ $item['id'] }}"
