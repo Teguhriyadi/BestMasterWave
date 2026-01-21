@@ -54,7 +54,7 @@ class MenuRepository
             "type" => $data["tipe_menu"],
             "nama_menu" => $data["nama_menu"],
             "slug" => Str::slug($data["nama_menu"]),
-            "url_menu" => Str::slug($data['url']) ?? null,
+            "url_menu" => $data['url'] ?? null,
             "icon" => $data['icon'] ?? null,
             "parent_id" => $data['parent_id'] ?? null,
             "order" => $nextOrder
@@ -94,7 +94,7 @@ class MenuRepository
             "type" => $data["tipe_menu"],
             "nama_menu" => $data["nama_menu"],
             "slug" => Str::slug($data["nama_menu"]),
-            "url_menu" => Str::slug($data['url']) ?? null,
+            "url_menu" => $data['url'] ?? null,
             "icon" => $data['icon'] ?? null,
             "parent_id" => $data['parent_id'] ?? null
         ]);
