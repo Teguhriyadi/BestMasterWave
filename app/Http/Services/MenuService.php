@@ -31,7 +31,7 @@ class MenuService
 
     public function list_menu()
     {
-        $menu = $this->menu_repository->get_menu();
+        $menu = $this->menu_repository->get_menus();
 
         return MenuMapper::toTable($menu);
     }

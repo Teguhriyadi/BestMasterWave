@@ -37,6 +37,11 @@ class MenuRepository
         return Menu::whereIn("type", ["submenu"])->get();
     }
 
+    public function get_menus()
+    {
+        return Menu::whereIn("type", ["submenu", "menu"])->get();
+    }
+
     public function insert_data(array $data)
     {
         $query = Menu::query();
