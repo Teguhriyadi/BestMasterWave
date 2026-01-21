@@ -53,8 +53,13 @@ class DivisiRepository
 
     public function getRolesByDivisi(string $divisionId)
     {
-        return Divisi::with('roles:id,nama_role')
-            ->findOrFail($divisionId)
-            ->roles;
+        return Divisi::with([
+            'roles' => function ($q) use ($divisionId) {
+                $q->select('id', 'nama_role', 'divisi_id')
+                  ->where('divisi_id', $divisionId);
+            }
+        ])
+        ->findOrFail($divisionId)
+        ->roles;
     }
 }
