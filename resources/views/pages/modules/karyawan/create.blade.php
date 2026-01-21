@@ -3,7 +3,9 @@
 @push('title_module', 'Karyawan')
 
 @push('css_style')
-    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -318,4 +320,19 @@
             </div>
         </div>
     </div>
+@endpush
+
+@push("js_style")
+    <script src="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#jabatan_id').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            });
+        });
+    </script>
 @endpush

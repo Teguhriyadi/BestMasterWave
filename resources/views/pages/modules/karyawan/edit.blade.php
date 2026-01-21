@@ -4,6 +4,9 @@
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
 @endpush
 
 @push('content_app')
@@ -43,7 +46,7 @@
                             <div class="col-sm-4">
                                 <input type="number" name="id_sidik_jari" class="form-control @error('id_sidik_jari') is-invalid @enderror" id="id_sidik_jari"
                                     placeholder="Masukkan ID Sidik Jari" min="1"
-                                    value="{{ old('id_sidik_jari', $edit['id_sidik_jari']) }}">
+                                    value="{{ old('id_sidik_jari', $edit['id_fp']) }}">
 
                                 @error('id_sidik_jari')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -343,4 +346,18 @@
             </div>
         </div>
     </div>
+@endpush
+
+@push("js_style")
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#jabatan_id').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '- Pilih -',
+                allowClear: true
+            });
+        });
+    </script>
 @endpush
