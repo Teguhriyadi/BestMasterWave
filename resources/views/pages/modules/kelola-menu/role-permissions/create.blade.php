@@ -177,7 +177,7 @@
                                                                     {{ in_array($permission->id, $selectedPermissions ?? []) ? 'checked' : '' }}>
 
                                                                 <span class="text-dark">
-                                                                    {{ $permission->nama }}
+                                                                    {{ ucwords(str_replace('_', ' ', last(explode('.', $permission->akses)))) }}
                                                                 </span>
                                                             </label>
                                                         </div>
