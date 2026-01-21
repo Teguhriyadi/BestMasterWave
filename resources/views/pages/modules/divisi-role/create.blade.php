@@ -128,11 +128,15 @@
             $('#divisi_id').select2({
                 theme: 'bootstrap4'
             });
+
+            $('#divisi_id').on('change', function() {
+                loadDivisiRoles($(this).val());
+            });
         });
 
-        const divisiSelect = document.getElementById('divisi_id');
-
         function loadDivisiRoles(divisiId) {
+            console.log('loadDivisiRoles dipanggil dengan ID:', divisiId); // ✅
+
             document.querySelectorAll('input[name="roles[]"]').forEach(cb => {
                 cb.checked = false;
                 cb.closest('.role-checkbox').classList.remove('active');
@@ -156,12 +160,6 @@
                 .catch(() => {
                     alert('Gagal memuat role divisi');
                 });
-        }
-
-        if (divisiSelect) {
-            divisiSelect.addEventListener('change', function() {
-                loadDivisiRoles(this.value);
-            });
         }
 
         @if (!empty(Auth::user()->one_divisi_roles))

@@ -44,7 +44,7 @@ class DivisiRoleController extends Controller
         try {
             $this->divisi_role_service->create($request->all());
 
-            return back()
+            return redirect()->to("/admin-panel/divisi-role")
                 ->with('success', 'Data berhasil disimpan');
 
         } catch (\Throwable $e) {

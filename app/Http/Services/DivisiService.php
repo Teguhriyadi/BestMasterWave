@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Mapper\DivisiMapper;
 use App\Http\Repositories\DivisiRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DivisiService
@@ -49,6 +50,14 @@ class DivisiService
 
     public function getRolesByDivision(string $divisionId)
     {
-        return $this->divisi_repository->getRolesByDivisi($divisionId);
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return collect([$this->divisi_repository->getSuperAdmin()])
+                ->filter();
+        }
+
+        return $this->divisi_repository
+            ->getByDivision($divisionId)
+            ->where('nama_role', '!=', 'Super Admin')
+            ->values();
     }
 }

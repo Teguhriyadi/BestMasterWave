@@ -31,4 +31,29 @@ class Role extends Model
                 "nama_divisi" => "-"
             ]);
     }
+
+    public function divisions()
+    {
+        return $this->belongsToMany(
+            Divisi::class,
+            'divisi_role',
+            'role_id',
+            'divisi_id'
+        )->withTimestamps();
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', '1');
+    }
+
+    public function scopeSuperAdmin($query)
+    {
+        return $query->where('nama_role', 'Super Admin');
+    }
+
+    public function scopeExceptSuperAdmin($query)
+    {
+        return $query->where('nama_role', '!=', 'Super Admin');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Repositories;
 
 use App\Helpers\AuthDivisi;
 use App\Models\Divisi;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -56,5 +57,25 @@ class DivisiRepository
         return Divisi::with('roles:id,nama_role')
             ->findOrFail($divisionId)
             ->roles;
+    }
+
+    public function getByDivision($divisionId)
+    {
+        return Role::query()
+            ->active()
+            ->when($divisionId, function ($q) use ($divisionId) {
+                $q->whereHas('divisions', fn ($q) =>
+                    $q->where('divisi_id', $divisionId)
+                );
+            })
+            ->orderBy('nama_role')
+            ->get();
+    }
+
+    public function getSuperAdmin()
+    {
+        return Role::active()
+            ->superAdmin()
+            ->first();
     }
 }
