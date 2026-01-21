@@ -21,7 +21,7 @@
         Detail Data Pendapatan Shopee
     </h1>
 
-    <a href="{{ url('/admin-panel/shopee/pendapatan/data') }}" class="btn btn-danger btn-sm mb-4">
+    <a href="{{ url('/admin-panel/shopee-pendapatan/data') }}" class="btn btn-danger btn-sm mb-4">
         <i class="fa fa-sign-out-alt"></i> Kembali
     </a>
 

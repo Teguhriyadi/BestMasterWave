@@ -76,7 +76,7 @@
         </div>
     @endif
 
-    <a href="{{ url('/admin-panel/shopee/pendapatan/data') }}" class="btn btn-primary btn-sm mb-4">
+    <a href="{{ url('/admin-panel/shopee-pendapatan/data') }}" class="btn btn-primary btn-sm mb-4">
         <i class="fa fa-book"></i> Kelola Data Pendapatan
     </a>
     <div class="card shadow">
@@ -161,7 +161,7 @@
             let fd = new FormData();
             fd.append('file', uploadedFile);
 
-            fetch("{{ url('admin-panel/shopee/pendapatan') }}", {
+            fetch("{{ url('admin-panel/shopee-pendapatan') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -298,7 +298,7 @@
                 fd.append(`columns[${col}]`, allHeaders[col]);
             }
 
-            fetch("{{ url('admin-panel/shopee/pendapatan/process') }}", {
+            fetch("{{ url('admin-panel/shopee-pendapatan/process') }}", {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'

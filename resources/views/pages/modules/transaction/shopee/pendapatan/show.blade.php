@@ -106,7 +106,7 @@
                         <div class="alert alert-success">
                             <i class="fa fa-check-circle"></i> Struktur file dikenali. Tidak perlu mapping ulang.
                         </div>
-                        <form action="{{ url('/admin-panel/shopee/pendapatan/' . $file->id . '/process-database') }}"
+                        <form action="{{ url('/admin-panel/shopee-pendapatan/' . $file->id . '/process-database') }}"
                             method="POST">
                             @csrf
                             <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
@@ -152,7 +152,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <form method="POST"
-                    action="{{ url('/admin-panel/shopee/pendapatan/' . $file->id . '/process-database') }}">
+                    action="{{ url('/admin-panel/shopee-pendapatan/' . $file->id . '/process-database') }}">
                     @csrf
                     <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                     <div class="modal-header bg-primary text-white">

@@ -37,7 +37,7 @@ class PendapatanController extends Controller
             DB::beginTransaction();
 
             if (empty(Auth::user()->one_divisi_roles)) {
-                return redirect()->to("/admin-panel/shopee/pendapatan/data");
+                return redirect()->to("/admin-panel/shopee-pendapatan/data");
             }
 
             $platform = Platform::where('slug', 'shopee')->first();
@@ -356,7 +356,7 @@ class PendapatanController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => "Berhasil import {$totalNew} data",
-                'redirect' => url("/admin-panel/shopee/pendapatan/{$file->id}/show"),
+                'redirect' => url("/admin-panel/shopee-pendapatan/{$file->id}/show"),
             ]);
         } catch (\Throwable $e) {
 
@@ -563,7 +563,7 @@ class PendapatanController extends Controller
                     return 'Rp ' . number_format($row->harga_asli, 0, ',', '.');
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/shopee/pendapatan/data/' . $row->uuid . '/detail') . '"
+                    return '<a href="' . url('/admin-panel/shopee-pendapatan/data/' . $row->uuid . '/detail') . '"
                                class="btn btn-info btn-sm">
                                <i class="fa fa-search"></i> Detail
                             </a>';
@@ -584,7 +584,7 @@ class PendapatanController extends Controller
             $data['detail'] = ShopeePendapatan::where('uuid', $uuid)->first();
 
             if (empty($data['detail'])) {
-                return redirect()->to('/admin-panel/shopee/pendapatan/data')->with('error', 'Data Tidak Ditemukan');
+                return redirect()->to('/admin-panel/shopee-pendapatan/data')->with('error', 'Data Tidak Ditemukan');
             }
 
             DB::commit();
@@ -594,7 +594,7 @@ class PendapatanController extends Controller
 
             DB::rollBack();
 
-            return redirect()->to('/admin-panel/shopee/pendapatan/data')->with('error', $e->getMessage());
+            return redirect()->to('/admin-panel/shopee-pendapatan/data')->with('error', $e->getMessage());
         }
     }
 }
