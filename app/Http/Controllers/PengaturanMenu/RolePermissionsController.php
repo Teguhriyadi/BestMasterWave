@@ -29,6 +29,7 @@ class RolePermissionsController extends Controller
     {
         $roleId = $request->get('role_id');
 
+        dd("ada");
         $data["akses"] = $this->divisi_role_service->list_akses_role_all();
         $data["grouping"] = $this->menu_service->list_grouping();
 

@@ -27,7 +27,7 @@ class MenuRepository
     public function get_grouping_menu()
     {
         return Menu::with(["permissions"])
-            ->where("type", "submenu")
+            ->whereIn('type', ['menu', 'submenu'])
             ->orderBy("order")
             ->get();
     }
