@@ -170,8 +170,8 @@
                                 <option value="">- Pilih -</option>
                                 <option {{ old('tipe_menu') == 'header' ? 'selected' : '' }} value="header">Header</option>
                                 <option {{ old('tipe_menu') == 'menu' ? 'selected' : '' }} value="menu">Menu</option>
-                                <option {{ old('tipe_menu') == 'submenu' ? 'selected' : '' }} value="submenu">Sub Menu
-                                </option>
+                                {{-- <option {{ old('tipe_menu') == 'submenu' ? 'selected' : '' }} value="submenu">Sub Menu
+                                </option> --}}
                             </select>
                             @error('tipe_menu')
                                 <div class="invalid-feedback">{{ $message }}</div>

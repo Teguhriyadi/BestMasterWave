@@ -69,9 +69,9 @@
         @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles->roles->nama_role == 'Super Admin')
             <hr class="sidebar-divider sidebar-divider-item">
 
-            <div class="sidebar-heading sidebar-header">
+            {{-- <div class="sidebar-heading sidebar-header">
                 Master Menu
-            </div>
+            </div> --}}
 
             <li
                 class="nav-item {{ Request::is('admin-panel/permissions') || Request::is('admin-panel/role-permissions*') ? 'active' : '' }}">

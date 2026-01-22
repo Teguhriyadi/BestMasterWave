@@ -19,7 +19,7 @@
                 <option value="">- Pilih -</option>
                 <option value="header" {{ $edit['type'] == 'header' ? 'selected' : '' }}>Header</option>
                 <option value="menu" {{ $edit['type'] == 'menu' ? 'selected' : '' }}>Menu</option>
-                <option value="submenu" {{ $edit['type'] == 'submenu' ? 'selected' : '' }}>Sub Menu</option>
+                {{-- <option value="submenu" {{ $edit['type'] == 'submenu' ? 'selected' : '' }}>Sub Menu</option> --}}
             </select>
             @error('tipe_menu')
                 <div class="invalid-feedback">{{ $message }}</div>

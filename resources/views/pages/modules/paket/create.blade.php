@@ -28,7 +28,7 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <a href="{{ url('/admin-panel/paket') }}" class="btn btn-danger btn-sm">
-                <i class="fa fa-sign-out-alt"></i> Kembali
+                <i class="fa fa-sign-out-alt"></i> KEMBALI
             </a>
         </div>
         <form action="{{ url('/admin-panel/paket') }}" method="POST">
@@ -139,11 +139,11 @@
                 </div>
             </div>
             <div class="card-footer">
-                <button type="reset" class="btn btn-secondary btn-sm">
-                    <i class="fa fa-times"></i> Batal
+                <button type="reset" class="btn btn-danger btn-sm">
+                    <i class="fa fa-sign-in-alt"></i> BATAL
                 </button>
                 <button type="submit" class="btn btn-success btn-sm">
-                    <i class="fa fa-save"></i> Simpan
+                    <i class="fa fa-save"></i> SIMPAN
                 </button>
             </div>
         </form>
