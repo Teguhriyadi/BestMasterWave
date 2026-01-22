@@ -4,7 +4,7 @@ use App\Http\Controllers\Transaction\Shopee\PesananController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("shopee-pesanan")->group(function() {
-    Route::get("/", [PesananController::class, "index"])->middleware("permission:shopee-pesanan.read");
+    Route::get("/", [PesananController::class, "index"])->middleware("permission:shopee-pesanan.create");
     Route::post("/", [PesananController::class, "store"])->middleware("permission:shopee-pesanan.create");
     Route::post("/process", [PesananController::class, "process"])->middleware("permission:shopee-pesanan.create");
     Route::get("/{id}/show", [PesananController::class, "show"])->middleware("permission:shopee-pesanan.show");
