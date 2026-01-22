@@ -31,47 +31,38 @@
         </a>
     </li>
 
-    @foreach ($sidebarMenus->where('type', 'header') as $header)
-        <hr class="sidebar-divider sidebar-divider-item">
-        <div class="sidebar-heading sidebar-header">
-            {{ $header->nama_menu }}
-        </div>
+    @foreach ($sidebarMenus->where('type', 'header') as $menu)
+        @php
+            $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'menu');
+        @endphp
 
-        @foreach ($sidebarMenus->where('parent_id', $header->id)->where('type', 'menu') as $menu)
-            @php
-                $submenus = $sidebarMenus->where('parent_id', $menu->id)->where('type', 'submenu');
-            @endphp
+        @if ($submenus->count() > 0)
+            <li class="nav-item sidebar-menu-item {{ isOpen($submenus) ? 'active' : '' }}">
+                <a class="nav-link {{ isOpen($submenus) ? '' : 'collapsed' }}" href="#" data-toggle="collapse"
+                    data-target="#menu-{{ $menu->id }}">
+                    <i class="{{ $menu->icon }}"></i>
+                    <span>{{ $menu->nama_menu }}</span>
+                </a>
 
-            @if ($submenus->count() > 0)
-                <li class="nav-item sidebar-menu-item {{ isOpen($submenus) ? 'active' : '' }}">
-                    <a class="nav-link {{ isOpen($submenus) ? '' : 'collapsed' }}" href="#" data-toggle="collapse"
-                        data-target="#menu-{{ $menu->id }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
-
-                    <div id="menu-{{ $menu->id }}" class="collapse {{ isOpen($submenus, true) }}">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            @foreach ($submenus as $sub)
-                                <a class="collapse-item sidebar-submenu-item {{ isActive('admin-panel/' . $sub->url_menu) ? 'active' : '' }}"
-                                    href="{{ url('/admin-panel/' . $sub->url_menu) }}">
-                                    {{ $sub->nama_menu }}
-                                </a>
-                            @endforeach
-                        </div>
+                <div id="menu-{{ $menu->id }}" class="collapse {{ isOpen($submenus, true) }}">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        @foreach ($submenus as $sub)
+                            <a class="collapse-item {{ isActive('admin-panel/' . $sub->url_menu) ? 'active' : '' }}"
+                                href="{{ url('/admin-panel/' . $sub->url_menu) }}">
+                                {{ $sub->nama_menu }}
+                            </a>
+                        @endforeach
                     </div>
-                </li>
-            @else
-                <li
-                    class="nav-item sidebar-menu-item
-                {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
-                        <i class="{{ $menu->icon }}"></i>
-                        <span>{{ $menu->nama_menu }}</span>
-                    </a>
-                </li>
-            @endif
-        @endforeach
+                </div>
+            </li>
+        @else
+            <li class="nav-item {{ Request::is('admin-panel/' . $menu->url_menu . '*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('/admin-panel/' . $menu->url_menu) }}">
+                    <i class="{{ $menu->icon }}"></i>
+                    <span>{{ $menu->nama_menu }}</span>
+                </a>
+            </li>
+        @endif
     @endforeach
 
     @if (empty(Auth::user()->one_divisi_roles) || Auth::user()->one_divisi_roles)

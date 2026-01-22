@@ -80,7 +80,7 @@
 
     <div class="modal-footer">
         <button type="reset" class="btn btn-secondary btn-sm" data-dismiss="modal">
-            <i class="fa fa-times"></i> Batalkan
+            <i class="fa fa-times"></i> Batal
         </button>
         <button type="submit" class="btn btn-success btn-sm">
             <i class="fa fa-save"></i> Simpan
