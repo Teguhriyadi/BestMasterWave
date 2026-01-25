@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transaction\Tiktok;
 
 use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
+use App\Http\Mapper\TiktokMapper;
 use App\Http\Services\SellerService;
 use App\Imports\ReadFilters\HeadersFilter;
 use App\Models\InvoiceDataTiktokPendapatan;
@@ -37,10 +38,10 @@ class PendapatanController extends Controller
             DB::beginTransaction();
 
             if (empty(Auth::user()->one_divisi_roles)) {
-                return redirect()->to("/admin-panel/shopee-pendapatan/data");
+                return redirect()->to("/admin-panel/tiktok-pendapatan/data");
             }
 
-            $platform = Platform::where('slug', 'shopee')->first();
+            $platform = Platform::where('slug', 'tiktok')->first();
             $data['seller'] = Seller::where('status', '1')
                 ->where('platform_id', $platform->id)->get();
 
@@ -512,7 +513,7 @@ class PendapatanController extends Controller
                     return 'Rp ' . number_format($row->harga_asli, 0, ',', '.');
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/shopee-pendapatan/data/' . $row->uuid . '/detail') . '"
+                    return '<a href="' . url('/admin-panel/tiktok-pendapatan/data/' . $row->uuid . '/detail') . '"
                                class="btn btn-info btn-sm">
                                <i class="fa fa-search"></i> Detail
                             </a>';
@@ -533,12 +534,14 @@ class PendapatanController extends Controller
             $data['detail'] = TiktokPendapatan::where('uuid', $uuid)->first();
 
             if (empty($data['detail'])) {
-                return redirect()->to('/admin-panel/shopee-pendapatan/data')->with('error', 'Data Tidak Ditemukan');
+                return redirect()->to('/admin-panel/tiktok-pendapatan/data')->with('error', 'Data Tidak Ditemukan');
             }
+
+            $data["details"] = TiktokMapper::map($data["detail"]);
 
             DB::commit();
 
-            return view('pages.modules.transaction.shopee.pendapatan.detail', $data);
+            return view('pages.modules.transaction.tiktok.pendapatan.detail', $data);
         } catch (\Exception $e) {
 
             DB::rollBack();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transaction\Tiktok;
 
 use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
+use App\Http\Mapper\TiktokMapper;
 use App\Http\Services\SellerService;
 use App\Models\InvoiceDataTiktokPesanan;
 use App\Models\InvoiceFileTiktokPesanan;
@@ -23,14 +24,6 @@ class PesananController extends Controller
     public function __construct(
         protected SellerService $seller_service
     ) {}
-
-    protected array $dateColumns = [
-        'Pesanan Harus Dikirimkan Sebelum (Menghindari keterlambatan)',
-        'Waktu Pengiriman Diatur',
-        'Waktu Pesanan Dibuat',
-        'Waktu Pembayaran Dilakukan',
-        'Waktu Pesanan Selesai'
-    ];
 
     protected array $dateDatabaseColumns = [
         'pesanan_harus_dikirimkan',
@@ -54,7 +47,7 @@ class PesananController extends Controller
                 return redirect()->to("/admin-panel/shopee-pesanan/data");
             }
 
-            $platform = Platform::where("slug", "shopee")->firstOrFail();
+            $platform = Platform::where("slug", "tiktok")->firstOrFail();
             $data["seller"] = Seller::where("status", "1")
                 ->where("divisi_id", AuthDivisi::id())
                 ->where("platform_id", $platform->id)
@@ -577,7 +570,7 @@ class PesananController extends Controller
                     return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/shopee-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                    return '<a href="' . url('/admin-panel/tiktok-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
                             <i class="fa fa-search"></i> Detail
                         </a>';
                 })
@@ -596,11 +589,13 @@ class PesananController extends Controller
 
             $data["detail"] = TiktokPesanan::where("uuid", $uuid)->first();
 
-            if (empty($data["detail"])) return redirect()->to("/admin-panel/shopee-pesanan/data")->with("error", "Data Tidak Ditemukan");
+            if (empty($data["detail"])) return redirect()->to("/admin-panel/tiktok-pesanan/data")->with("error", "Data Tidak Ditemukan");
+
+            $data["details"] = TiktokMapper::mapPesanan($data["detail"]);
 
             DB::commit();
 
-            return view("pages.modules.transaction.shopee.pesanan.detail", $data);
+            return view("pages.modules.transaction.tiktok.pesanan.detail", $data);
         } catch (\Exception $e) {
 
             DB::rollBack();
