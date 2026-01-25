@@ -16,7 +16,15 @@ class KaryawanRepository
 {
     public function get_all_data()
     {
-        return Karyawan::orderBy("created_at", "DESC")->get();
+        if (empty(Auth::user()->one_divisi_roles)) {
+            return Karyawan::orderBy("created_at", "DESC")->get();
+        } else {
+            return Karyawan::with(["divisi"])
+                ->whereHas("divisi", function($q) {
+                    $q->where("divisi_id", AuthDivisi::id());
+                })
+                ->orderBy("created_at", "DESC")->get();
+        }
     }
 
     public function get_list_karyawan()
