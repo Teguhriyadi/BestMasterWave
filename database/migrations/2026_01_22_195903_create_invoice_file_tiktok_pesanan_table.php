@@ -15,11 +15,13 @@ return new class extends Migration
             $table->uuid("id")->primary();
             $table->uuid("seller_id");
             $table->foreign('seller_id')->references('id')->on('seller')->cascadeOnDelete();
+            $table->string("schema_id")->nullable();
             $table->string("header_hash")->nullable();
             $table->timestamp("uploaded_at")->useCurrent();
+            $table->uuid("divisi_id");
             $table->unsignedInteger("total_rows")->default(0);
             $table->timestamp('processed_at')->nullable();
-            $table->uuid("divisi_id");
+
             $table->foreign('divisi_id')->references('id')->on('divisi')->cascadeOnDelete();
         });
     }

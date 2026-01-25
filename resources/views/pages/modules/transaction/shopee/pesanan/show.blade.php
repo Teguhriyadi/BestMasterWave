@@ -1,6 +1,6 @@
 @extends('pages.layouts.app')
 
-@push('title_module', 'Detail Shopee Pesanan')
+@push('title_module', 'Tiktok Pesanan')
 
 @push('css_style')
     <style>
@@ -61,7 +61,7 @@
 
 @push('content_app')
 
-    <h1 class="h3 mb-4 text-gray-800">Detail Shopee Pesanan</h1>
+    <h1 class="h3 mb-4 text-gray-800">Detail Tiktok Pesanan</h1>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -114,39 +114,11 @@
         </div>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Preview 20 Baris Pertama</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm" style="font-size: 10px;">
-                    <thead>
-                        <tr>
-                            @foreach (array_keys($rows->first() ?? []) as $h)
-                                <th class="bg-light">{{ $h }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($rows as $row)
-                            <tr>
-                                @foreach ($row as $v)
-                                    <td>{{ Str::limit($v, 20) }}</td>
-                                @endforeach
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     {{-- MODAL MAPPING DRAGGABLE --}}
     <div class="modal fade" id="mappingModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <form method="POST" action="{{ url('/admin-panel/shopee-pesanan/' . $file->id . '/process-database') }}">
+                <form method="POST" action="{{ url('/admin-panel/tiktok-pesanan/' . $file->id . '/process-database') }}">
                     @csrf
                     <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                     <div class="modal-header bg-primary text-white">

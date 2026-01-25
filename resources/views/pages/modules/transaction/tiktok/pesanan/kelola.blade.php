@@ -1,6 +1,6 @@
 @extends('pages.layouts.app')
 
-@push('title_module', 'List Data Shopee Pesanan')
+@push('title_module', 'Tiktok Pesanan')
 
 @push('css_style')
     <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
@@ -9,9 +9,9 @@
 @endpush
 
 @push('content_app')
-    <h1 class="h3 mb-4 text-gray-800">Data Pesanan Shopee</h1>
+    <h1 class="h3 mb-4 text-gray-800">Data Pesanan Tiktok</h1>
 
-    <a href="{{ url('/admin-panel/shopee-pesanan') }}" class="btn btn-danger btn-sm mb-4">
+    <a href="{{ url('/admin-panel/tiktok-pesanan') }}" class="btn btn-danger btn-sm mb-4">
         <i class="fa fa-sign-out-alt"></i> Kembali
     </a>
 
@@ -72,13 +72,13 @@
                     <thead>
                         <tr>
                             <th class="text-center">No.</th>
-                            <th>No. Pesanan</th>
-                            <th>Nama Seller</th>
-                            <th>No. Referensi SKU</th>
+                            <th>Order ID</th>
+                            <th>Order Status</th>
+                            <th>Order Sub Status</th>
+                            <th>SKU ID</th>
                             <th>Nama Produk</th>
-                            <th class="text-center">Waktu Dibuat</th>
-                            <th class="text-center">Waktu Bayar</th>
-                            <th class="text-center">Status</th>
+                            <th>Variant</th>
+                            <th class="text-center">QTY</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -117,34 +117,32 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'no_pesanan',
-                        name: 'no_pesanan'
+                        data: 'order_id',
+                        name: 'order_id'
                     },
                     {
-                        data: 'nama_seller',
-                        name: 'nama_seller'
+                        data: 'order_status',
+                        name: 'order_status'
                     },
                     {
-                        data: 'nomor_referensi_sku',
-                        name: 'nomor_referensi_sku'
+                        data: 'order_sub_status',
+                        name: 'order_sub_status'
                     },
                     {
-                        data: 'nama_produk',
-                        name: 'nama_produk'
+                        data: 'sku_id',
+                        name: 'sku_id'
                     },
                     {
-                        data: 'waktu_pesanan_dibuat',
-                        name: 'waktu_pesanan_dibuat',
-                        className: 'text-center'
+                        data: 'product_name',
+                        name: 'product_name'
                     },
                     {
-                        data: 'waktu_pembayaran_dilakukan',
-                        name: 'waktu_pembayaran_dilakukan',
-                        className: 'text-center'
+                        data: 'variant',
+                        name: 'variant'
                     },
                     {
-                        data: 'status_pesanan',
-                        name: 'status_pesanan',
+                        data: 'quantity',
+                        name: 'quantity',
                         className: 'text-center'
                     },
                     {

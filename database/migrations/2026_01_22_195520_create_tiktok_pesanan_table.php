@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string("normal_or_preorder", 100)->nullable();
             $table->string("sku_id", 100)->nullable();
             $table->string("seller_sku", 150)->nullable();
-            $table->string("product_name", 150);
-            $table->string("variant", 100);
+            $table->string("product_name", 150)->nullable();
+            $table->string("variant", 100)->nullable();
             $table->unsignedBigInteger("quantity")->default(0);
             $table->unsignedBigInteger("sku_quantity_of_return")->default(0);
             $table->unsignedBigInteger("sku_unit_original")->default(0);

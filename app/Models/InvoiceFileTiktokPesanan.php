@@ -38,7 +38,7 @@ class InvoiceFileTiktokPesanan extends Model
     {
         return $this->hasMany(
             InvoiceDataTiktokPesanan::class,
-            'invoice_file_pesanan_id'
+            'invoice_file_tiktok_pesanan_id'
         );
     }
 }
