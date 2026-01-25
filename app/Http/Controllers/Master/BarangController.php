@@ -129,8 +129,18 @@ class BarangController extends Controller
             true
         );
 
+        $hargaModalIndex = array_search(
+            true,
+            array_map(fn($h) => str_contains($h, 'harga') && str_contains($h, 'modal'), $headers),
+            true
+        );
+
         if ($skuIndex === false) {
             return back()->withErrors('Kolom SKU tidak ditemukan');
+        }
+
+        if ($hargaModalIndex === false) {
+            return back()->withErrors('Kolom Harga Modal tidak ditemukan');
         }
 
         $data = [];
@@ -145,10 +155,18 @@ class BarangController extends Controller
 
             $seenSku[$sku] = true;
 
+            $hargaModalRaw = $row[$hargaModalIndex] ?? 0;
+
+            $hargaModal = (int) str_replace(
+                [',', '.', ' '],
+                '',
+                (string) $hargaModalRaw
+            );
+
             $data[] = [
                 'id' => \Illuminate\Support\Str::uuid(),
                 'sku_barang' => $sku,
-                'harga_modal' => 0,
+                'harga_modal' => $hargaModal,
                 'created_by' => Auth::id(),
                 'divisi_id' => AuthDivisi::id(),
                 'created_at' => now(),
