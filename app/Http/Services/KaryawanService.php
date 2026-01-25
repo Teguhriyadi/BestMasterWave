@@ -2,10 +2,14 @@
 
 namespace App\Http\Services;
 
+use App\Helpers\AuthDivisi;
 use App\Http\Mapper\DivisiMapper;
 use App\Http\Mapper\KaryawanMapper;
 use App\Http\Repositories\DivisiRepository;
 use App\Http\Repositories\KaryawanRepository;
+use App\Http\Requests\Karyawan\CreateRequest;
+use App\Http\Requests\Karyawan\UpdateRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class KaryawanService
@@ -50,32 +54,73 @@ class KaryawanService
         return KaryawanMapper::toListKaryawan($karyawan);
     }
 
-    public function create(array $data)
+    public function create(CreateRequest $request)
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($request) {
+
+            $data = $request->validated();
+
+            if ($request->hasFile('foto')) {
+
+                $file = $request->file('foto');
+
+                if (!str_starts_with($file->getMimeType(), 'image/')) {
+                    throw new \Exception('File foto harus berupa gambar');
+                }
+
+                $data['foto'] = file_get_contents(
+                    $file->getRealPath()
+                );
+            } elseif ($request->filled('foto')) {
+                $data['foto'] = $request->foto;
+            }
+
+            $data['created_by'] = Auth::id();
+            $data['divisi_id']  = AuthDivisi::id();
+
             return $this->karyawan_repository->insert_data($data);
         });
     }
 
     public function edit(string $id)
     {
-        return DB::transaction(function() use ($id) {
+        return DB::transaction(function () use ($id) {
             return $this->karyawan_repository->get_data_by_id($id);
         });
     }
 
     public function show_log(string $id)
     {
-        return DB::transaction(function() use ($id) {
+        return DB::transaction(function () use ($id) {
             $log = $this->karyawan_repository->get_log_karyawan($id);
 
             return KaryawanMapper::toListLogKaryawan($log);
         });
     }
 
-    public function update(string $id, array $data)
+    public function update(string $id, UpdateRequest $request)
     {
-        return DB::transaction(function () use ($id, $data) {
+        return DB::transaction(function () use ($id, $request) {
+            $data = $request->validated();
+
+            if ($request->hasFile('foto')) {
+
+                $file = $request->file('foto');
+
+                if (!str_starts_with($file->getMimeType(), 'image/')) {
+                    throw new \Exception('File foto harus berupa gambar');
+                }
+
+                $data['foto'] = file_get_contents(
+                    $file->getRealPath()
+                );
+            } elseif ($request->filled('foto')) {
+                $data['foto'] = $request->foto;
+            }
+
+            $data['created_by'] = Auth::id();
+            $data['divisi_id']  = AuthDivisi::id();
+
             return $this->karyawan_repository->update_by_id($id, $data);
         });
     }

@@ -33,7 +33,7 @@
                         <i class="fa fa-sign-out-alt"></i> Kembali
                     </a>
                 </div>
-                <form action="{{ url('/admin-panel/karyawan') }}" method="POST">
+                <form action="{{ url('/admin-panel/karyawan') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
                         <div class="mb-3 row">
@@ -303,6 +303,18 @@
                                     placeholder="Masukkan Nama Rekening" value="{{ old('acc_name') }}">
 
                                 @error('acc_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="foto" class="col-sm-3 col-form-label">
+                                Foto
+                            </label>
+                            <div class="col-sm-5">
+                                <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror" id="foto">
+
+                                @error('foto')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

@@ -37,7 +37,7 @@ class KaryawanController extends Controller
     public function store(CreateRequest $request)
     {
         try {
-            $this->karyawan_service->create($request->all());
+            $this->karyawan_service->create($request);
 
             return back()
                 ->with('success', 'Data berhasil disimpan');
@@ -98,7 +98,7 @@ class KaryawanController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         try {
-            $this->karyawan_service->update($id, $request->all());
+            $this->karyawan_service->update($id, $request);
 
             return back()->with('success', 'Data berhasil diperbarui');
 

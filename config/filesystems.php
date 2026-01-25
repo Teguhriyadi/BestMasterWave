@@ -1,5 +1,13 @@
 <?php
 
+$bucket = "dev-ilham";
+$url = "https://nos.wjv-1.neo.id/dev-ilham/";
+
+if (env("APP_ENV") == 'production') {
+    $bucket = 'dev-ilham';
+    $url = 'https://nos.wjv-1.neo.id/dev-ilham/';
+}
+
 return [
 
     /*
@@ -47,14 +55,16 @@ return [
             'report' => false,
         ],
 
+
+
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
+            'key' => '26f46967828a30442626',
+            'secret' => "89kuQ4PonzHhJARBLgd22Acyq7iwV7194kzbpYKd",
+            'region' => "idn",
+            'bucket' => $bucket,
+            'url' => $url,
+            'endpoint' => 'https://nos.wjv-1.neo.id',
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,

@@ -46,13 +46,67 @@ class KaryawanRepository
             ->first();
     }
 
+    private function compressImage($imageData, $maxFileSize = 1048576)
+    {
+        if (empty($imageData)) {
+            throw new \Exception('Image data kosong');
+        }
+
+        $image = @imagecreatefromstring($imageData);
+
+        if ($image === false) {
+            throw new \Exception('Format gambar tidak dikenali');
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'img_') . '.jpg';
+
+        $quality = 90;
+        do {
+            imagejpeg($image, $tempFile, $quality);
+            $quality -= 5;
+        } while (filesize($tempFile) > $maxFileSize && $quality > 10);
+
+        $compressed = file_get_contents($tempFile);
+
+        imagedestroy($image);
+        unlink($tempFile);
+
+        return $compressed;
+    }
+
     public function insert_data(array $data)
     {
+        $fileRepo = new FileRepo();
+        $s3Url = null;
+
+        if (!empty($data['foto'])) {
+
+            $compressed = $this->compressImage($data['foto']);
+            $s3Url = $fileRepo->saveFile($compressed, 'images/foto/');
+        } elseif (!empty($data['foto'])) {
+
+            $image = preg_replace(
+                '#^data:image/\w+;base64,#i',
+                '',
+                $data['foto']
+            );
+
+            $image = str_replace(' ', '+', $image);
+            $imageData = base64_decode($image, true);
+
+            if ($imageData === false) {
+                throw new \Exception('Base64 foto tidak valid');
+            }
+
+            $compressed = $this->compressImage($imageData);
+            $s3Url = $fileRepo->saveFile($compressed, 'images/foto/');
+        }
+
         $karyawan = Karyawan::create([
             "id_fp" => $data["id_sidik_jari"],
-            "no_ktp" => $data["no_ktp"],
-            "no_kk" => $data["no_kk"],
-            "no_bpjs_kesehatan" => $data["no_bpjs_kesehatan"],
+            "no_ktp" => empty($data["no_ktp"]) ? null : $data["no_ktp"],
+            "no_kk" => empty($data["no_kk"]) ? null : $data["no_kk"],
+            "no_bpjs_kesehatan" => empty($data["no_bpjs_kesehatan"]) ? null : $data["no_bpjs_kesehatan"],
             "nama"  => $data["nama"],
             "nama_panggilan" => $data["nama_panggilan"],
             "tanggal_masuk" => $data["tanggal_masuk"],
@@ -63,12 +117,13 @@ class KaryawanRepository
             "jenis_kelamin" => $data["jenis_kelamin"],
             "alamat" => $data["alamat"],
             "status_pernikahan" => $data["status_pernikahan"],
-            "bank_id" => $data["bank_id"],
-            "acc_no" => $data["acc_no"],
-            "acc_name" => $data["acc_name"],
+            "bank_id" => empty($data["bank_id"]) ? null : $data["bank_id"],
+            "acc_no" => empty($data["acc_no"]) ? null : $data["acc_no"],
+            "acc_name" => empty($data["acc_name"]) ? null : $data["acc_name"],
             "created_by" => Auth::user()->id,
             "jabatan_id" => $data["jabatan_id"],
-            "divisi_id" => AuthDivisi::id()
+            "divisi_id" => AuthDivisi::id(),
+            "foto" => empty($data["foto"]) ? null : $s3Url
         ]);
 
         $fields = [
@@ -115,6 +170,32 @@ class KaryawanRepository
 
     public function update_by_id(string $id, array $data)
     {
+        $fileRepo = new FileRepo();
+        $s3Url = null;
+
+        if (!empty($data['foto'])) {
+
+            $compressed = $this->compressImage($data['foto']);
+            $s3Url = $fileRepo->saveFile($compressed, 'images/foto/');
+        } elseif (!empty($data['foto'])) {
+
+            $image = preg_replace(
+                '#^data:image/\w+;base64,#i',
+                '',
+                $data['foto']
+            );
+
+            $image = str_replace(' ', '+', $image);
+            $imageData = base64_decode($image, true);
+
+            if ($imageData === false) {
+                throw new \Exception('Base64 foto tidak valid');
+            }
+
+            $compressed = $this->compressImage($imageData);
+            $s3Url = $fileRepo->saveFile($compressed, 'images/foto/');
+        }
+
         $karyawan = Karyawan::findOrFail($id);
 
         $karyawan->update([
@@ -136,7 +217,8 @@ class KaryawanRepository
             "acc_no" => $data["acc_no"],
             "acc_name" => $data["acc_name"],
             "updated_by" => Auth::user()->id,
-            "jabatan_id" => $data["jabatan_id"]
+            "jabatan_id" => $data["jabatan_id"],
+            "foto" => empty($data["foto"]) ? null : $s3Url
         ]);
 
         $fields = [

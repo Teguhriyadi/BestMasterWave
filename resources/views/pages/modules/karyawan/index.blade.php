@@ -152,6 +152,19 @@
                 type: "GET",
                 success: function(response) {
                     $("#modal-content-edit").html(response)
+
+                    if ($.fn.DataTable.isDataTable('#logTable')) {
+                        $('#logTable').DataTable().destroy();
+                    }
+
+                    $('#logTable').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        info: true,
+                        autoWidth: false,
+                        responsive: true
+                    });
                 },
                 error: function(error) {
                     console.log(error);

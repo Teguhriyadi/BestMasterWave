@@ -33,8 +33,13 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 text-center">
+                            @if (empty($edit["foto"]))
                             <img src="{{ asset('templating/img/undraw_profile.svg') }}" class="rounded-circle mb-3"
                                 width="120" height="120" style="object-fit: cover">
+                            @else
+                            <img src="{{ url($edit['foto']) }}" class="rounded-circle mb-3"
+                                width="120" height="120" style="object-fit: cover">
+                            @endif
                             <h5 class="font-weight-bold mb-1">
                                 {{ $edit->nama }}
                             </h5>

@@ -1,5 +1,5 @@
 <div class="modal-body">
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped" id="logTable">
         <thead>
             <tr>
                 <th class="text-center">No.</th>
