@@ -26,7 +26,6 @@ return new class extends Migration
             $table->unsignedBigInteger("quantity")->default(0);
             $table->unsignedBigInteger("sku_quantity_of_return")->default(0);
             $table->unsignedBigInteger("sku_unit_original")->default(0);
-            $table->unsignedBigInteger("sku_subtotal")->default(0);
             $table->unsignedBigInteger("sku_subtotal_before_discount")->default(0);
             $table->unsignedBigInteger("sku_platform_discount")->default(0);
             $table->unsignedBigInteger("sku_seller_discount")->default(0);
