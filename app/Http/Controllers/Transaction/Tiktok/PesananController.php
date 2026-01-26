@@ -25,20 +25,6 @@ class PesananController extends Controller
         protected SellerService $seller_service
     ) {}
 
-    protected array $dateDatabaseColumns = [
-        'pesanan_harus_dikirimkan',
-        'waktu_pengiriman_diatur',
-        'waktu_pesanan_dibuat',
-        'waktu_pembayaran_dilakukan',
-        'waktu_pesanan_selesai',
-    ];
-
-    protected array $forceStringDatabaseColumns = [
-        'no_pesanan',
-        'nomor_referensi_sku',
-        'no_resi',
-    ];
-
     public function index()
     {
         try {
@@ -496,13 +482,7 @@ class PesananController extends Controller
 
                                 $value = $row[$excelHeader] ?? null;
 
-                                if (in_array($dbColumn, $this->dateDatabaseColumns)) {
-                                    $saveData[$dbColumn] = $this->smartDateTimeValue($value);
-                                } elseif (in_array($dbColumn, $this->forceStringDatabaseColumns)) {
-                                    $saveData[$dbColumn] = trim((string) $value);
-                                } else {
-                                    $saveData[$dbColumn] = $this->smartValue($value);
-                                }
+                                $saveData[$dbColumn] = $this->smartValue($value);
                             }
 
                             // ===== UPDATE / INSERT BY ORDER ID =====
