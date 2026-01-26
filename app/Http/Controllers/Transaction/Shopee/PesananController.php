@@ -375,7 +375,8 @@ class PesananController extends Controller
                 'nama_seller',
                 'harga_modal',
                 'seller_id',
-                'invoice_file_id'
+                'invoice_file_id',
+                'divisi_id'
             ]))
             ->values();
 
@@ -391,6 +392,9 @@ class PesananController extends Controller
 
     public function processDatabase(Request $request, $fileId)
     {
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
+
         $file = InvoiceFilePesanan::findOrFail($fileId);
 
         $mapping = $request->input('mapping');
@@ -406,6 +410,7 @@ class PesananController extends Controller
         $nama_seller = $request->nama_seller;
 
         DB::beginTransaction();
+
         try {
             $schema = InvoiceSchemaPesanan::updateOrCreate(
                 ['header_hash' => $file->header_hash],
@@ -417,52 +422,53 @@ class PesananController extends Controller
 
             $file->update(['schema_id' => $schema->id]);
 
-            $chunks = InvoiceDataPesanan::where('invoice_file_pesanan_id', $fileId)
+            InvoiceDataPesanan::where('invoice_file_pesanan_id', $fileId)
                 ->orderBy('chunk_index', 'asc')
-                ->get();
+                ->select(['id', 'payload'])
+                ->chunk(10, function($chunks) use ($mapping, $file, $nama_seller) {
+                    foreach ($chunks as $chunk) {
+                        $rows = $chunk->payload['rows'] ?? [];
+                        foreach ($rows as $row) {
 
-            foreach ($chunks as $chunk) {
-                $rows = $chunk->payload['rows'] ?? [];
-                foreach ($rows as $row) {
+                            $headerNoPesanan = $mapping['no_pesanan'] ?? 'No. Pesanan';
+                            $headerSKU       = $mapping['nomor_referensi_sku'] ?? 'Nomor Referensi SKU';
 
-                    $headerNoPesanan = $mapping['no_pesanan'] ?? 'No. Pesanan';
-                    $headerSKU       = $mapping['nomor_referensi_sku'] ?? 'Nomor Referensi SKU';
+                            $noPesanan = trim((string)($row[$headerNoPesanan] ?? ''));
+                            $skuValue  = trim((string)($row[$headerSKU] ?? ''));
 
-                    $noPesanan = trim((string)($row[$headerNoPesanan] ?? ''));
-                    $skuValue  = trim((string)($row[$headerSKU] ?? ''));
+                            if (empty($noPesanan)) continue;
 
-                    if (empty($noPesanan)) continue;
+                            $saveData = [
+                                'seller_id'       => $file->seller_id,
+                                'invoice_file_id' => $file->id,
+                                'nama_seller'     => $nama_seller,
+                                'divisi_id' => AuthDivisi::id()
+                            ];
 
-                    $saveData = [
-                        'seller_id'       => $file->seller_id,
-                        'invoice_file_id' => $file->id,
-                        'nama_seller'     => $nama_seller,
-                        'divisi_id' => AuthDivisi::id()
-                    ];
+                            foreach ($mapping as $dbColumn => $excelHeader) {
+                                if (empty($excelHeader)) continue;
 
-                    foreach ($mapping as $dbColumn => $excelHeader) {
-                        if (empty($excelHeader)) continue;
+                                $value = $row[$excelHeader] ?? null;
 
-                        $value = $row[$excelHeader] ?? null;
+                                if (in_array($dbColumn, $this->dateDatabaseColumns)) {
+                                    $saveData[$dbColumn] = $this->smartDateTimeValue($value);
+                                } elseif (in_array($dbColumn, $this->forceStringDatabaseColumns)) {
+                                    $saveData[$dbColumn] = trim((string)$value);
+                                } else {
+                                    $saveData[$dbColumn] = $this->smartValue($value);
+                                }
+                            }
 
-                        if (in_array($dbColumn, $this->dateDatabaseColumns)) {
-                            $saveData[$dbColumn] = $this->smartDateTimeValue($value);
-                        } elseif (in_array($dbColumn, $this->forceStringDatabaseColumns)) {
-                            $saveData[$dbColumn] = trim((string)$value);
-                        } else {
-                            $saveData[$dbColumn] = $this->smartValue($value);
+                            ShopeePesanan::updateOrCreate(
+                                [
+                                    'no_pesanan'          => $noPesanan,
+                                    'nomor_referensi_sku' => $skuValue
+                                ],
+                                $saveData
+                            );
                         }
                     }
-
-                    ShopeePesanan::updateOrCreate(
-                        [
-                            'no_pesanan'          => $noPesanan,
-                            'nomor_referensi_sku' => $skuValue
-                        ],
-                        $saveData
-                    );
-                }
-            }
+                });
 
             $file->update(['processed_at' => now()]);
             DB::commit();

@@ -178,7 +178,6 @@ class PendapatanController extends Controller
         ]);
     }
 
-
     public function process(Request $request)
     {
         ini_set('memory_limit', '1024M');
@@ -370,7 +369,6 @@ class PendapatanController extends Controller
         }
     }
 
-
     public function show(string $id)
     {
         $file = InvoiceFilePendapatan::with(['seller.platform', 'schema', 'chunks'])->findOrFail($id);
@@ -397,6 +395,7 @@ class PendapatanController extends Controller
                 'harga_modal',
                 'seller_id',
                 'invoice_file_id',
+                'divisi_id'
             ]))->values();
 
         return view('pages.modules.transaction.shopee.pendapatan.show', [
@@ -423,7 +422,6 @@ class PendapatanController extends Controller
             return back()->with('error', 'Mapping tidak valid');
         }
 
-        // SIMPAN / UPDATE SCHEMA
         $schema = InvoiceSchemaPendapatan::updateOrCreate(
             [
                 'header_hash' => $file->header_hash,
@@ -436,7 +434,6 @@ class PendapatanController extends Controller
 
         $file->update(['schema_id' => $schema->id]);
 
-        // AMBIL KOLOM DB VALID
         $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatan'))
             ->reject(fn($c) => in_array($c, [
                 'id',
@@ -447,15 +444,14 @@ class PendapatanController extends Controller
             ->values()
             ->toArray();
 
-        // 🔥 STREAM DATA PER CHUNK (NO SORT, NO GET)
         InvoiceDataPendapatan::where([
             'invoice_file_pendapatan_id' => $fileId,
-            'divisi_id' => $divisiId
+            'divisi_id' => AuthDivisi::id()
         ])
+            ->select(['id', 'payload'])
             ->chunkById(10, function ($chunks) use (
                 $mapping,
                 $dbColumns,
-                $divisiId,
                 $request
             ) {
 
@@ -475,7 +471,7 @@ class PendapatanController extends Controller
 
                         $data = [
                             'uuid'        => (string) Str::uuid(),
-                            'divisi_id'   => $divisiId,
+                            'divisi_id'   => AuthDivisi::id(),
                             'no_pesanan'  => $noPesanan,
                             'nama_seller' => $request->nama_seller,
                             'created_at'  => now(),
@@ -506,7 +502,6 @@ class PendapatanController extends Controller
                         );
                     }
 
-                    // FREE MEMORY
                     unset($batch);
                     gc_collect_cycles();
                 }
@@ -514,9 +509,10 @@ class PendapatanController extends Controller
 
         $file->update(['processed_at' => now()]);
 
-        return back()->with('success', 'Data berhasil diproses ke database');
+        return redirect()
+            ->to("/admin-panel/shopee-pendapatan/")
+            ->with('success', 'Data berhasil diproses ke database');
     }
-
 
     public function parseNumber($value)
     {

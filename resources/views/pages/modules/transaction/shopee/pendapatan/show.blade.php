@@ -1,9 +1,8 @@
 @extends('pages.layouts.app')
 
-@push('title_module', 'Detail Shopee Pendapatan')
+@push('title_module', 'Shopee Pendapatan')
 
 @push('css_style')
-    <link href="{{ asset('templating/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
     <style>
         .mapping-list {
             max-height: 60vh;
@@ -62,7 +61,9 @@
 
 @push('content_app')
 
-    <h1 class="h3 mb-4 text-gray-800">Detail Shopee Pendapatan</h1>
+    <h1 class="h3 mb-4 text-gray-800">
+        Detail Shopee Pendapatan
+    </h1>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -116,34 +117,6 @@
                         </form>
                     @endif
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Preview 20 Baris Pertama</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm" id="dataTable" width="100%" style="font-size: 10px;">
-                    <thead>
-                        <tr>
-                            @foreach (array_keys($rows->first() ?? []) as $h)
-                                <th class="bg-light">{{ $h }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($rows as $row)
-                            <tr>
-                                @foreach ($row as $v)
-                                    <td>{{ Str::limit($v, 20) }}</td>
-                                @endforeach
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

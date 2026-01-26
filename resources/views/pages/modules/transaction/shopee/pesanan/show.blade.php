@@ -1,6 +1,6 @@
 @extends('pages.layouts.app')
 
-@push('title_module', 'Tiktok Pesanan')
+@push('title_module', 'Shopee Pesanan')
 
 @push('css_style')
     <style>
@@ -61,7 +61,7 @@
 
 @push('content_app')
 
-    <h1 class="h3 mb-4 text-gray-800">Detail Tiktok Pesanan</h1>
+    <h1 class="h3 mb-4 text-gray-800">Detail Shopee Pesanan</h1>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -118,7 +118,7 @@
     <div class="modal fade" id="mappingModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <form method="POST" action="{{ url('/admin-panel/tiktok-pesanan/' . $file->id . '/process-database') }}">
+                <form method="POST" action="{{ url('/admin-panel/shopee-pesanan/' . $file->id . '/process-database') }}">
                     @csrf
                     <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">
                     <div class="modal-header bg-primary text-white">

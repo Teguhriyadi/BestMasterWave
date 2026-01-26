@@ -410,7 +410,7 @@ class PesananController extends Controller
             ]))
             ->values();
 
-        return view('pages.modules.transaction.shopee.pesanan.show', [
+        return view('pages.modules.transaction.tiktok.pesanan.show', [
             'file'           => $file,
             'rows'           => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
             'chunkCount'     => $file->chunks->count(),
