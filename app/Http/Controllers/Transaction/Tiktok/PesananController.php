@@ -25,6 +25,28 @@ class PesananController extends Controller
         protected SellerService $seller_service
     ) {}
 
+    protected array $forceIntegerColumns = [
+        'quantity',
+        'sku_quantity_of_return',
+        'sku_unit_original',
+        'sku_subtotal_before_discount',
+        'sku_platform_discount',
+        'sku_seller_discount',
+        'sku_subtotal_after_discount',
+        'shipping_fee_after_discount',
+        'original_shipping_fee',
+        'shipping_fee_seller_discount',
+        'shipping_fee_platform_discount',
+        'payment_platform_discount',
+        'buyer_service_fee',
+        'handling_fee',
+        'shipping_insurance',
+        'item_insurance',
+        'order_amount',
+        'order_refund_amount'
+    ];
+
+
     public function index()
     {
         try {
@@ -443,7 +465,7 @@ class PesananController extends Controller
                 'invoice_file_tiktok_pesanan_id' => $fileId,
                 'divisi_id' => $divisiId,
             ])
-                ->chunkById(10, function($chunks) use (
+                ->chunkById(10, function ($chunks) use (
                     $mapping,
                     $excelOrderIdHeader,
                     $file,
@@ -482,7 +504,13 @@ class PesananController extends Controller
 
                                 $value = $row[$excelHeader] ?? null;
 
-                                $saveData[$dbColumn] = $this->smartValue($value);
+                                if (in_array($dbColumn, $this->forceIntegerColumns, true)) {
+                                    $saveData[$dbColumn] = is_numeric($value)
+                                        ? (int) round($value)
+                                        : 0;
+                                } else {
+                                    $saveData[$dbColumn] = $this->smartValue($value);
+                                }
                             }
 
                             // ===== UPDATE / INSERT BY ORDER ID =====
