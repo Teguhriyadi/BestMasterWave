@@ -131,11 +131,11 @@
                         name: 'no_pesanan'
                     },
                     {
-                        data: 'sku_id',
+                        data: 'nomor_referensi_sku',
                         name: 'shopee_pesanan.nomor_referensi_sku'
                     },
                     {
-                        data: 'quantity',
+                        data: 'return_qty',
                         name: 'shopee_pesanan.return_qty'
                     },
                     {
