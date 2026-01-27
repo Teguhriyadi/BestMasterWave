@@ -73,6 +73,7 @@
                             <th>No. Pesanan</th>
                             <th>SKU</th>
                             <th>QTY</th>
+                            <th>Nama Kurir</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Ongkir Dibayar Pembeli</th>
                             <th class="text-center">Diskon Ongkir Ditanggung Jasa Kirim</th>
@@ -137,6 +138,10 @@
                     {
                         data: 'return_qty',
                         name: 'shopee_pesanan.return_qty'
+                    },
+                    {
+                        data: 'nama_kurir',
+                        name: 'nama_kurir'
                     },
                     {
                         data: 'total_all',
