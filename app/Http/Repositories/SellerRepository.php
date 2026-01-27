@@ -43,6 +43,28 @@ class SellerRepository
             ->get();
     }
 
+    public function list_seller_shopee()
+    {
+        $platform = Platform::where("nama", "Shopee")->where("status", "1")
+            ->first();
+
+        return Seller::where("platform_id", $platform["id"])
+            ->where("divisi_id", AuthDivisi::id())
+            ->where("status", "1")
+            ->get();
+    }
+
+    public function list_seller_tiktok()
+    {
+        $platform = Platform::where("nama", "Tiktok")->where("status", "1")
+            ->first();
+
+        return Seller::where("platform_id", $platform["id"])
+            ->where("divisi_id", AuthDivisi::id())
+            ->where("status", "1")
+            ->get();
+    }
+
     public function insert_data(array $data)
     {
         $supplier = Seller::create([

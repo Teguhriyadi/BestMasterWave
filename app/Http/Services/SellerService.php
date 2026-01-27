@@ -33,6 +33,20 @@ class SellerService
         return SellerMapper::toListOption($seller);
     }
 
+    public function list_seller_shopee_divisi()
+    {
+        $seller = $this->seller_repository->list_seller_shopee();
+
+        return SellerMapper::toListOption($seller);
+    }
+
+    public function list_seller_tiktok_divisi()
+    {
+        $seller = $this->seller_repository->list_seller_tiktok();
+
+        return SellerMapper::toListOption($seller);
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
