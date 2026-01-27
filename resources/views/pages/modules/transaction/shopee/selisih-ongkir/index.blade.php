@@ -49,7 +49,7 @@
                         @foreach ($shopee_pendapatan as $item)
                             <tr>
                                 <td class="text-center">{{ $nomer++ }}.</td>
-                                <td>{{ $item->nomor_referensi_sku }}</td>
+                                <td>{{ $item->no_pesanan }}</td>
                                 <td>{{ $item->nomor_referensi_sku }}</td>
                                 <td>{{ $item->return_qty }}</td>
                                 <td>{{ $item->nama_seller }}</td>
