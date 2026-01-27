@@ -145,7 +145,7 @@
             </div>
             <div class="card-footer">
                 <button type="reset" class="btn btn-danger btn-sm">
-                    <i class="fa fa-sign-in-alt"></i> BATAL
+                    <i class="fa fa-sign-in-alt"></i> RESET
                 </button>
                 <button type="submit" class="btn btn-success btn-sm">
                     <i class="fa fa-save"></i> SIMPAN
