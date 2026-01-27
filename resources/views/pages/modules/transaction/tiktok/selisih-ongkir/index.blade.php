@@ -33,6 +33,7 @@
                             <th>SKU</th>
                             <th>QTY</th>
                             <th>Nama Seller</th>
+                            <th class="text-center">Total</th>
                             <th class="text-center">Shipping Cost Passed</th>
                             <th class="text-center">Replacement Shipping Fee</th>
                             <th class="text-center">Exchange Shipping Fee</th>
@@ -54,6 +55,7 @@
                                 <td>{{ $item->sku_id }}</td>
                                 <td>{{ $item->quantity }}</td>
                                 <td>{{ $item->nama_seller }}</td>
+                                <td class="text-center">{{ $item->total_all }}</td>
                                 <td class="text-center">{{ $item->shipping_costs_passed }}</td>
                                 <td class="text-center">{{ $item->replacement_shipping_fee }}</td>
                                 <td class="text-center">{{ $item->exchange_shipping_fee }}</td>

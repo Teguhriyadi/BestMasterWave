@@ -33,6 +33,7 @@
                             <th>SKU</th>
                             <th>QTY</th>
                             <th>Nama Seller</th>
+                            <th class="text-center">Total</th>
                             <th class="text-center">Ongkir Dibayar Pembeli</th>
                             <th class="text-center">Diskon Ongkir Ditanggung Jasa Kirim</th>
                             <th class="text-center">Gratis Ongkir dari Shopee</th>
@@ -53,6 +54,7 @@
                                 <td>{{ $item->nomor_referensi_sku }}</td>
                                 <td>{{ $item->return_qty }}</td>
                                 <td>{{ $item->nama_seller }}</td>
+                                <td class="text-center">{{ $item->total_all }}</td>
                                 <td class="text-center">{{ $item->ongkir_dibayar }}</td>
                                 <td class="text-center">{{ $item->diskon_ongkir_ditanggung }}</td>
                                 <td class="text-center">{{ $item->gratis_ongkir_shopee }}</td>
