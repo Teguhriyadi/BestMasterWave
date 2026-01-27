@@ -29,10 +29,10 @@
                     <thead>
                         <tr>
                             <th class="text-center">No.</th>
+                            <th>Nama Seller</th>
                             <th>No. Pesanan</th>
                             <th>SKU</th>
                             <th>QTY</th>
-                            <th>Nama Seller</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Ongkir Dibayar Pembeli</th>
                             <th class="text-center">Diskon Ongkir Ditanggung Jasa Kirim</th>
@@ -50,10 +50,10 @@
                         @foreach ($shopee_pendapatan as $item)
                             <tr>
                                 <td class="text-center">{{ $nomer++ }}.</td>
+                                <td>{{ $item->nama_seller }}</td>
                                 <td>{{ $item->no_pesanan }}</td>
                                 <td>{{ $item->nomor_referensi_sku }}</td>
                                 <td>{{ $item->return_qty }}</td>
-                                <td>{{ $item->nama_seller }}</td>
                                 <td class="text-center">{{ $item->total_all }}</td>
                                 <td class="text-center">{{ $item->ongkir_dibayar }}</td>
                                 <td class="text-center">{{ $item->diskon_ongkir_ditanggung }}</td>
