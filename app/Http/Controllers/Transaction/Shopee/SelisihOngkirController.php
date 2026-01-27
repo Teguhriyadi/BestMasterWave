@@ -68,7 +68,7 @@ class SelisihOngkirController extends Controller
                     ->select(
                         'shopee_pendapatan.*',
                         'shopee_pesanan.nomor_referensi_sku',
-                        'shopee_pesanan.return_qty'
+                        'shopee_pesanan.sku_induk'
                     );
 
                 return DataTables::of($query)

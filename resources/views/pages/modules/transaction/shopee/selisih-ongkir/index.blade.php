@@ -132,12 +132,12 @@
                         name: 'no_pesanan'
                     },
                     {
-                        data: 'nomor_referensi_sku',
-                        name: 'shopee_pesanan.nomor_referensi_sku'
+                        data: 'sku_induk',
+                        name: 'shopee_pesanan.sku_induk'
                     },
                     {
-                        data: 'return_qty',
-                        name: 'shopee_pesanan.return_qty'
+                        data: 'nomor_referensi_sku',
+                        name: 'shopee_pesanan.nomor_referensi_sku'
                     },
                     {
                         data: 'nama_kurir',
