@@ -148,7 +148,7 @@
                         name: 'tiktok_pesanan.quantity'
                     },
                     {
-                        data: 'tiktok_pesanan.shipping_provider_name',
+                        data: 'shipping_provider_name',
                         name: 'tiktok_pesanan.shipping_provider_name'
                     },
                     {
