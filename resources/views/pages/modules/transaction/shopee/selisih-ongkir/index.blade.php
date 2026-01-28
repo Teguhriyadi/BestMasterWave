@@ -43,7 +43,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Dari</label>
-                            <input type="date" class="form-control" name="dari" id="dari" value="{{ now()->format('Y-m-d') }}">
+                            <input type="date" class="form-control" name="dari" id="dari" value="{{ now()->subDays(30)->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
