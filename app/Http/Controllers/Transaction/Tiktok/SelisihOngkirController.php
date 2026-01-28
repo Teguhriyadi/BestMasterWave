@@ -78,7 +78,7 @@ class SelisihOngkirController extends Controller
                         'tiktok_pendapatan.*',
                         'tiktok_pesanan.sku_id',
                         'tiktok_pesanan.quantity',
-                        'tiktok.shipping_provider_name'
+                        'tiktok_pesanan.shipping_provider_name'
                     );
 
                 return DataTables::of($query)
