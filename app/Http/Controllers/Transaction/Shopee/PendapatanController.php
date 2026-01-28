@@ -22,7 +22,6 @@ use OpenSpout\Reader\XLSX\Reader;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
-use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
 
 class PendapatanController extends Controller
 {
@@ -383,6 +382,23 @@ class PendapatanController extends Controller
 
         $firstChunk = $file->chunks->first();
 
+        $excludedColumns = collect([
+            'no',
+            'cek'
+        ]);
+
+        $rowsPayload = collect(data_get($firstChunk?->payload, 'rows', []));
+
+        $excelHeaders = collect(array_keys($rowsPayload->first() ?? []))
+            ->reject(function ($header) use ($excludedColumns) {
+                $normalized = Str::of($header)
+                    ->lower()
+                    ->replaceMatches('/[^a-z0-9]/', '');
+
+                return $excludedColumns->contains($normalized);
+            })
+            ->values();
+
         $needMapping = is_null($file->processed_at) && is_null($file->schema_id);
 
         $dbColumns = collect(DB::getSchemaBuilder()->getColumnListing('shopee_pendapatan'))
@@ -400,7 +416,7 @@ class PendapatanController extends Controller
 
         return view('pages.modules.transaction.shopee.pendapatan.show', [
             'file' => $file,
-            'rows' => collect(data_get($firstChunk?->payload, 'rows', []))->take(20),
+            'rows' => $excelHeaders,
             'chunkCount' => $file->chunks->count(),
             'dbColumns' => $dbColumns,
             'needMapping' => $needMapping,

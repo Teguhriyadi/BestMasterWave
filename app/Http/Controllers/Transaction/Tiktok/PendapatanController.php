@@ -385,81 +385,103 @@ class PendapatanController extends Controller
             ->values()
             ->toArray();
 
+        $updateColumns = array_values(
+            array_diff($dbColumns, ['order_or_adjustment_id'])
+        );
+
+        $now    = now();
+        $userId = Auth::id();
+        $seller = $request->nama_seller;
+
+        $normalizeNumber = function ($value) {
+            if ($value === null || $value === '') {
+                return 0;
+            }
+
+            if (is_numeric($value)) {
+                return (float) $value;
+            }
+
+            return (float) preg_replace('/[^0-9.-]/', '', $value);
+        };
+
         InvoiceDataTiktokPendapatan::where([
             'invoice_file_tiktok_pendapatan_id' => $fileId,
             'divisi_id' => $divisiId
-        ])
-            ->chunkById(10, function ($chunks) use (
-                $mapping,
-                $dbColumns,
-                $divisiId,
-                $request
-            ) {
+        ])->chunkById(300, function ($chunks) use (
+            $mapping,
+            $dbColumns,
+            $updateColumns,
+            $divisiId,
+            $now,
+            $userId,
+            $seller,
+            $normalizeNumber
+        ) {
 
-                foreach ($chunks as $chunk) {
+            foreach ($chunks as $chunk) {
 
-                    $batch = [];
+                $batch = [];
 
-                    foreach ($chunk->payload['rows'] as $row) {
+                foreach ($chunk->payload['rows'] as $row) {
 
-                        $noPesanan = strtoupper(trim(
-                            (string) ($row[$mapping['order_or_adjustment_id']] ?? '')
-                        ));
+                    $noPesanan = strtoupper(trim(
+                        (string) ($row[$mapping['order_or_adjustment_id']] ?? '')
+                    ));
 
-                        if ($noPesanan === '') {
+                    if ($noPesanan === '') {
+                        continue;
+                    }
+
+                    $data = [
+                        'uuid'        => (string) Str::uuid(),
+                        'divisi_id'   => $divisiId,
+                        'order_or_adjustment_id' => $noPesanan,
+                        'nama_seller' => $seller,
+                        'created_by'  => $userId,
+                        'created_at'  => $now,
+                        'updated_at'  => $now,
+                    ];
+
+                    foreach ($mapping as $dbColumn => $excelHeader) {
+
+                        if (
+                            $dbColumn === 'order_or_adjustment_id' ||
+                            empty($excelHeader) ||
+                            !isset($row[$excelHeader])
+                        ) {
                             continue;
                         }
 
-                        $data = [
-                            'uuid'        => (string) Str::uuid(),
-                            'divisi_id'   => $divisiId,
-                            'order_or_adjustment_id'  => $noPesanan,
-                            'nama_seller' => $request->nama_seller,
-                            'created_by'  => Auth::user()->id,
-                            'created_at'  => now(),
-                            'updated_at'  => now(),
-                        ];
+                        $value = $row[$excelHeader];
 
-                        foreach ($mapping as $dbColumn => $excelHeader) {
-
-                            if (
-                                $dbColumn === 'order_or_adjustment_id' ||
-                                empty($excelHeader) ||
-                                !in_array($dbColumn, $dbColumns)
-                            ) {
-                                continue;
-                            }
-
-                            $value = $row[$excelHeader] ?? null;
-
-                            // ===== CAST ANGKA =====
-                            if (is_numeric($value)) {
-                                $value = (float) $value;
-                            }
-
-                            // ===== CAST TANGGAL =====
-                            if ($value instanceof \DateTimeInterface) {
-                                $value = $value->format('Y-m-d H:i:s');
-                            }
-
-                            $data[$dbColumn] = $value;
+                        // angka
+                        if (is_string($value) || is_numeric($value)) {
+                            $value = $normalizeNumber($value);
                         }
 
-                        $batch[] = $data;
+                        // tanggal
+                        if ($value instanceof \DateTimeInterface) {
+                            $value = $value->format('Y-m-d H:i:s');
+                        }
+
+                        $data[$dbColumn] = $value;
                     }
 
-                    if (!empty($batch)) {
-                        TiktokPendapatan::upsert(
-                            $batch,
-                            ['divisi_id', 'order_or_adjustment_id'],
-                            array_values(array_diff($dbColumns, ['order_or_adjustment_id']))
-                        );
-                    }
-
-                    unset($batch);
-                    gc_collect_cycles();
+                    $batch[] = $data;
                 }
-            });
+
+                if ($batch) {
+                    TiktokPendapatan::upsert(
+                        $batch,
+                        ['divisi_id', 'order_or_adjustment_id'],
+                        $updateColumns
+                    );
+                }
+
+                unset($batch);
+            }
+        });
 
         $file->update(['processed_at' => now()]);
 
@@ -467,6 +489,7 @@ class PendapatanController extends Controller
             ->to("/admin-panel/tiktok-pendapatan")
             ->with('success', 'Data berhasil diproses ke database');
     }
+
 
     public function parseNumber($value)
     {

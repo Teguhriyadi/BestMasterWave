@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string("normal_or_preorder", 100)->nullable();
             $table->string("sku_id", 100)->nullable();
             $table->string("seller_sku", 150)->nullable();
-            $table->string("product_name", 150)->nullable();
+            $table->string("product_name", 255)->nullable();
             $table->string("variant", 100)->nullable();
             $table->bigInteger("quantity")->default(0);
             $table->bigInteger("sku_quantity_of_return")->default(0);
@@ -63,7 +63,7 @@ return new class extends Migration
             $table->string("regency_and_city", 100)->nullable();
             $table->string("districts", 100)->nullable();
             $table->string("villages", 150)->nullable();
-            $table->string("detail Address", 150)->nullable();
+            $table->text("detail_address")->nullable();
             $table->string("additional_address_information", 150)->nullable();
             $table->string("payment_method", 150)->nullable();
             $table->string("weight", 50)->nullable();

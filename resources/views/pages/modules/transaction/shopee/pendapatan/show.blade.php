@@ -139,7 +139,7 @@
                                 <input type="text" class="form-control form-control-sm mb-2"
                                     placeholder="Cari kolom Excel..." id="searchExcel">
                                 <div class="mapping-list" id="excelList">
-                                    @foreach (array_keys($rows->first() ?? []) as $key)
+                                    @foreach ($rows as $key)
                                         <div class="draggable" draggable="true" data-excel="{{ $key }}">
                                             {{ $key }}
                                         </div>

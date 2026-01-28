@@ -4,6 +4,6 @@ use App\Http\Controllers\Transaction\Tiktok\SelisihOngkirController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("tiktok-selisih-ongkir")->group(function() {
-    Route::get("/", [SelisihOngkirController::class, "index"])->middleware("permission:tiktok-selisih-ongkir.read");
+    Route::get("/", [SelisihOngkirController::class, "index"]);
     Route::get("/download", [SelisihOngkirController::class, "download"])->middleware("permission:tiktok-selisih-ongkir.read");
 });

@@ -100,7 +100,7 @@
                         <div class="alert alert-success">
                             <i class="fa fa-check-circle"></i> Struktur file dikenali. Tidak perlu mapping ulang.
                         </div>
-                        <form action="{{ url('/admin-panel/shopee-pesanan/' . $file->id . '/process-database') }}"
+                        <form action="{{ url('/admin-panel/tiktok-pesanan/' . $file->id . '/process-database') }}"
                             method="POST">
                             @csrf
                             <input type="hidden" name="nama_seller" value="{{ $file->seller->nama }}">

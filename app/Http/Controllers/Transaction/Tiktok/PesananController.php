@@ -46,6 +46,14 @@ class PesananController extends Controller
         'order_refund_amount'
     ];
 
+    protected array $dateTimeColumns = [
+        'created_time',
+        'paid_time',
+        'rts_time',
+        'shipped_time',
+        'delivered_time',
+        'cancelled_time',
+    ];
 
     public function index()
     {
@@ -414,7 +422,8 @@ class PesananController extends Controller
                 'created_at',
                 'updated_at',
                 'created_by',
-                'divisi_id'
+                'divisi_id',
+                'nama_seller'
             ]))
             ->values();
 
@@ -430,100 +439,119 @@ class PesananController extends Controller
 
     public function processDatabase(Request $request, $fileId)
     {
-        $file = InvoiceFileTiktokPesanan::with('schema')->findOrFail($fileId);
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
+
+        $file = InvoiceFileTiktokPesanan::with(['schema', 'seller'])
+            ->findOrFail($fileId);
+
         $divisiId = AuthDivisi::id();
 
-        $mapping = $request->input('mapping');
-
-        if (!$mapping && $file->schema_id) {
-            $mapping = $file->schema->columns_mapping;
-        }
+        $mapping = $request->input('mapping') ?? $file->schema?->columns_mapping;
 
         if (!$mapping || empty($mapping['order_id'])) {
-            return back()->with('error', 'Mapping tidak valid. Kolom Order ID wajib di-map.');
+            return back()->with(
+                'error',
+                'Mapping tidak valid. Kolom Order ID wajib di-map.'
+            );
         }
 
         $excelOrderIdHeader = $mapping['order_id'];
+
+        $schema = InvoiceSchemaTiktokPesanan::updateOrCreate(
+            [
+                'header_hash' => $file->header_hash,
+                'divisi_id'   => $divisiId,
+            ],
+            [
+                'columns_mapping' => $mapping,
+            ]
+        );
+
+        $file->update(['schema_id' => $schema->id]);
+
+        $now      = now();
+        $userId   = Auth::id();
+        $sellerNm = $file->seller->nama;
 
         DB::beginTransaction();
 
         try {
 
-            $schema = InvoiceSchemaTiktokPesanan::updateOrCreate(
-                [
-                    'header_hash' => $file->header_hash,
-                    'divisi_id'   => $divisiId,
-                ],
-                [
-                    'columns_mapping' => $mapping,
-                ]
-            );
-
-            $file->update(['schema_id' => $schema->id]);
-
             InvoiceDataTiktokPesanan::where([
                 'invoice_file_tiktok_pesanan_id' => $fileId,
                 'divisi_id' => $divisiId,
-            ])
-                ->chunkById(10, function ($chunks) use (
-                    $mapping,
-                    $excelOrderIdHeader,
-                    $file,
-                    $divisiId
-                ) {
+            ])->chunkById(300, function ($chunks) use (
+                $mapping,
+                $excelOrderIdHeader,
+                $divisiId,
+                $now,
+                $userId,
+                $sellerNm
+            ) {
 
-                    foreach ($chunks as $chunk) {
+                foreach ($chunks as $chunk) {
 
-                        $rows = $chunk->payload['rows'] ?? [];
+                    $rows = $chunk->payload['rows'] ?? [];
+                    $batch = [];
 
-                        foreach ($rows as $row) {
+                    foreach ($rows as $row) {
 
-                            $orderId = trim((string) ($row[$excelOrderIdHeader] ?? ''));
+                        $orderId = trim((string) ($row[$excelOrderIdHeader] ?? ''));
 
-                            if ($orderId === '') {
+                        if ($orderId === '') {
+                            continue;
+                        }
+
+                        $data = [
+                            'uuid'        => Str::uuid(),
+                            'order_id'    => $orderId,
+                            'nama_seller' => $sellerNm,
+                            'divisi_id'   => $divisiId,
+                            'created_by'  => $userId,
+                            'updated_at'  => $now,
+                        ];
+
+                        foreach ($mapping as $dbColumn => $excelHeader) {
+
+                            if (
+                                $dbColumn === 'order_id' ||
+                                empty($excelHeader) ||
+                                !isset($row[$excelHeader])
+                            ) {
                                 continue;
                             }
 
-                            $saveData = [
-                                'order_id'   => $orderId,
-                                'seller_id'  => $file->seller_id,
-                                'nama_seller' => $file->seller->nama,
-                                'divisi_id'  => $divisiId,
-                                'created_by' => Auth::user()->id,
-                                'updated_at' => now(),
-                            ];
+                            $value = $row[$excelHeader];
 
-                            foreach ($mapping as $dbColumn => $excelHeader) {
-
-                                if (
-                                    $dbColumn === 'order_id' ||
-                                    empty($excelHeader)
-                                ) {
-                                    continue;
-                                }
-
-                                $value = $row[$excelHeader] ?? null;
-
-                                if (in_array($dbColumn, $this->forceIntegerColumns, true)) {
-                                    $saveData[$dbColumn] = is_numeric($value)
-                                        ? (int) round($value)
-                                        : 0;
-                                } else {
-                                    $saveData[$dbColumn] = $this->smartValue($value);
-                                }
+                            if (in_array($dbColumn, $this->dateTimeColumns, true)) {
+                                $data[$dbColumn] = $this->parseExcelDate($value);
+                                continue;
                             }
 
-                            // ===== UPDATE / INSERT BY ORDER ID =====
-                            TiktokPesanan::updateOrCreate(
-                                [
-                                    'order_id' => $orderId,
-                                    'divisi_id' => $divisiId,
-                                ],
-                                $saveData
-                            );
+                            if (in_array($dbColumn, $this->forceIntegerColumns, true)) {
+                                $data[$dbColumn] = is_numeric($value)
+                                    ? (int) round($value)
+                                    : 0;
+                                continue;
+                            }
+
+                            $data[$dbColumn] = $this->smartValue($value);
+
                         }
+
+                        $batch[] = $data;
                     }
-                });
+
+                    if ($batch) {
+                        TiktokPesanan::upsert(
+                            $batch,
+                            ['order_id', 'divisi_id'],
+                            array_keys($batch[0])
+                        );
+                    }
+                }
+            });
 
             $file->update(['processed_at' => now()]);
             DB::commit();
@@ -610,5 +638,29 @@ class PesananController extends Controller
 
             return redirect()->to("/admin-panel/shopee-pesanan/data")->with("error", $e->getMessage());
         }
+    }
+
+    protected function parseExcelDate($value)
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        if (is_string($value)) {
+            try {
+                return \Carbon\Carbon::createFromFormat(
+                    'd/m/Y H:i:s',
+                    trim($value)
+                )->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }
