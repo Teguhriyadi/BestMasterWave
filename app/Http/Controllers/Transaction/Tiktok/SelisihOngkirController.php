@@ -174,7 +174,8 @@ class SelisihOngkirController extends Controller
             ->select(
                 'tiktok_pendapatan.*',
                 'tiktok_pesanan.sku_id',
-                'tiktok_pesanan.quantity'
+                'tiktok_pesanan.quantity',
+                'tiktok_pesanan.shipping_provider_name'
             )
             ->get()
             ->map(function ($row) use ($minusOrders) {
@@ -189,7 +190,7 @@ class SelisihOngkirController extends Controller
         $headers = [
             'Nama Toko',
             'No. Pesanan',
-            // 'Nama Kurir',
+            'Nama Kurir',
         ];
 
         $sheet->fromArray($headers, null, 'A1');
@@ -206,6 +207,12 @@ class SelisihOngkirController extends Controller
             $sheet->setCellValueExplicit(
                 'B' . $rowNum,
                 (string) $row->order_or_adjustment_id,
+                DataType::TYPE_STRING
+            );
+
+            $sheet->setCellValueExplicit(
+                'C' . $rowNum,
+                (string) $row->shipping_provider_name,
                 DataType::TYPE_STRING
             );
 
