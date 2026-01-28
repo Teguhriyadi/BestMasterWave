@@ -43,13 +43,13 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Dari</label>
-                            <input type="date" class="form-control" name="dari" id="dari">
+                            <input type="date" class="form-control" name="dari" id="dari" value="{{ now()->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Sampai</label>
-                            <input type="date" class="form-control" name="sampai" id="sampai">
+                            <input type="date" class="form-control" name="sampai" id="sampai" value="{{ now()->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -57,6 +57,14 @@
                             <label>&nbsp;</label>
                             <button type="submit" class="btn btn-primary btn-sm w-100">
                                 <i class="fa fa-search"></i> Filter Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" id="btn-download" class="btn btn-success btn-sm w-100">
+                                <i class="fa fa-download"></i> Download Data
                             </button>
                         </div>
                     </div>
@@ -183,6 +191,18 @@
                 e.preventDefault();
                 table.ajax.reload();
             });
+        });
+
+        $('#btn-download').on('click', function() {
+
+            let params = $.param({
+                nama_seller: $('#nama_seller').val(),
+                dari: $('#dari').val(),
+                sampai: $('#sampai').val()
+            });
+
+            window.location.href =
+                "{{ url('/admin-panel/shopee-selisih-ongkir/download') }}?" + params;
         });
     </script>
 @endpush
