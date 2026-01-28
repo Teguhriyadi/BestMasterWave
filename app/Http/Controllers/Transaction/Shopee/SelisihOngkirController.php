@@ -24,7 +24,7 @@ class SelisihOngkirController extends Controller
     {
         try {
 
-            $data["seller"] = $this->seller_service->list_seller_shopee_divisi();
+            $data["seller"] = $this->seller_service->list_seller();
 
             if ($request->ajax()) {
                 $dari = $request->dari

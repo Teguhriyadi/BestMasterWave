@@ -32,6 +32,16 @@ class SellerRepository
             ->get();
     }
 
+    public function list_data_seller_tiktok()
+    {
+        $platform = Platform::where("nama", "tiktok")->where("status", "1")
+            ->first();
+
+        return Seller::where("platform_id", $platform["id"])
+            ->where("status", "1")
+            ->get();
+    }
+
     public function list_data_seller_by_id()
     {
         $platform = Platform::where("nama", "Shopee")->where("status", "1")
