@@ -29,7 +29,8 @@ class SelisihOngkirController extends Controller
             if ($request->ajax()) {
                 $dari = $request->dari
                     ? Carbon::parse($request->dari)->startOfDay()
-                    : Carbon::today()->startOfDay();
+                    : Carbon::now()->subDays(30)->startOfDay();
+
 
                 $sampai = $request->sampai
                     ? Carbon::parse($request->sampai)->endOfDay()

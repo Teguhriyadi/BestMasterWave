@@ -81,6 +81,7 @@
                             <th>Order ID</th>
                             <th>SKU</th>
                             <th>QTY</th>
+                            <th>Nama Kurir</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Shipping Cost Passed</th>
                             <th class="text-center">Replacement Shipping Fee</th>
@@ -145,6 +146,10 @@
                     {
                         data: 'quantity',
                         name: 'tiktok_pesanan.quantity'
+                    },
+                    {
+                        data: 'tiktok_pesanan.shipping_provider_name',
+                        name: 'tiktok_pesanan.shipping_provider_name'
                     },
                     {
                         data: 'total_all',

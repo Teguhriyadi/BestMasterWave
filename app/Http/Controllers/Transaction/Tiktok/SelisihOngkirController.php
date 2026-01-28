@@ -30,7 +30,7 @@ class SelisihOngkirController extends Controller
 
                 $dari = $request->dari
                     ? Carbon::parse($request->dari)->startOfDay()
-                    : Carbon::today()->startOfDay();
+                    : Carbon::now()->subDays(30)->startOfDay();
 
                 $sampai = $request->sampai
                     ? Carbon::parse($request->sampai)->endOfDay()
@@ -77,7 +77,8 @@ class SelisihOngkirController extends Controller
                     ->select(
                         'tiktok_pendapatan.*',
                         'tiktok_pesanan.sku_id',
-                        'tiktok_pesanan.quantity'
+                        'tiktok_pesanan.quantity',
+                        'tiktok.shipping_provider_name'
                     );
 
                 return DataTables::of($query)
