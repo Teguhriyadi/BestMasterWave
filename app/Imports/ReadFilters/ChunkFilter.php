@@ -6,15 +6,17 @@ use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 
 class ChunkFilter implements IReadFilter
 {
-    private $startRow = 0;
-    private $endRow = 0;
-    public function setRows($startRow, $chunkSize) {
+    private int $startRow = 0;
+    private int $endRow = 0;
+
+    public function setRows(int $startRow, int $chunkSize)
+    {
         $this->startRow = $startRow;
-        $this->endRow   = $startRow + $chunkSize;
+        $this->endRow   = $startRow + $chunkSize - 1;
     }
-    public function readCell($columnAddress, $row, $worksheetName = '') {
-        // Kita butuh baris 6 (header) dan range data saat ini
-        if ($row == 6 || ($row >= $this->startRow && $row < $this->endRow)) return true;
-        return false;
+
+    public function readCell($column, $row, $worksheetName = '')
+    {
+        return $row >= $this->startRow && $row <= $this->endRow;
     }
 }

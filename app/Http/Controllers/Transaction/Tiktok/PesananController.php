@@ -79,39 +79,18 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls'
-        ]);
-
+        $request->validate(['file' => 'required|mimes:xlsx,xls']);
         $path = $request->file('file')->getPathname();
-
-        // ================= SAFE READER =================
-        try {
-            $reader = IOFactory::createReaderForFile($path);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'File Excel tidak valid atau rusak'
-            ], 422);
-        }
 
         $sheetName = 'OrderSKUList';
         $headerRow = 1;
 
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($path);
         $reader->setReadDataOnly(true);
         $reader->setLoadSheetsOnly([$sheetName]);
         $reader->setReadFilter(new HeaderOnlyFilter());
 
-        try {
-            $spreadsheet = $reader->load($path);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Gagal membaca file Excel (memory atau format bermasalah)'
-            ], 422);
-        }
-
-        // ================= GET SHEET =================
+        $spreadsheet = $reader->load($path);
         $sheet = $spreadsheet->getSheetByName($sheetName);
 
         if (!$sheet) {
@@ -121,18 +100,16 @@ class PesananController extends Controller
             ], 422);
         }
 
-        // ================= READ HEADER =================
         $headers = [];
-
         $highestColumn = $sheet->getHighestColumn();
-        $maxCol = Coordinate::columnIndexFromString($highestColumn);
+        $maxCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
 
         for ($i = 1; $i <= $maxCol; $i++) {
-            $col = Coordinate::stringFromColumnIndex($i);
-            $value = trim((string) $sheet->getCell($col . $headerRow)->getValue());
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+            $val = trim((string) $sheet->getCell($col . $headerRow)->getValue());
 
-            if ($value !== '') {
-                $headers[$col] = $value;
+            if ($val !== '') {
+                $headers[$col] = $val;
             }
         }
 
@@ -143,8 +120,7 @@ class PesananController extends Controller
             ], 422);
         }
 
-        $normalized = array_values($headers);
-        $headerHash = hash('sha256', json_encode($normalized));
+        $headerHash = hash('sha256', json_encode(array_values($headers)));
 
         $existingSchema = InvoiceSchemaTiktokPesanan::where([
             'header_hash' => $headerHash,
@@ -158,66 +134,6 @@ class PesananController extends Controller
             'schema_id'   => $existingSchema?->id
         ]);
     }
-    // public function store(Request $request)
-    // {
-    //     $request->validate(['file' => 'required|mimes:xlsx,xls']);
-    //     $path = $request->file('file')->getPathname();
-
-    //     $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($path);
-    //     $spreadsheet = $reader->load($path);
-
-    //     $headers = [];
-    //     $sheetName = null;
-    //     $headerRow = 1;
-
-    //     $sheetName = 'OrderSKUList';
-    //     $headerRow = 1;
-
-    //     $sheet = $spreadsheet->getSheetByName($sheetName);
-
-    //     if (!$sheet) {
-    //         return response()->json([
-    //             'status'  => false,
-    //             'message' => "Sheet '{$sheetName}' tidak ditemukan"
-    //         ], 422);
-    //     }
-
-    //     $headers = [];
-    //     $highestColumn = $sheet->getHighestColumn();
-    //     $maxCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
-
-    //     for ($i = 1; $i <= $maxCol; $i++) {
-    //         $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
-    //         $val = trim((string) $sheet->getCell($col . $headerRow)->getFormattedValue());
-
-    //         if ($val !== '') {
-    //             $headers[$col] = $val;
-    //         }
-    //     }
-
-    //     if (empty($headers)) {
-    //         return response()->json([
-    //             'status'  => false,
-    //             'message' => 'Header tidak ditemukan di baris 1'
-    //         ], 422);
-    //     }
-
-    //     // ================= HASH HEADER =================
-    //     $normalized = array_values($headers);
-    //     $headerHash = hash('sha256', json_encode($normalized));
-
-    //     $existingSchema = InvoiceSchemaTiktokPesanan::where([
-    //         'header_hash' => $headerHash,
-    //         'divisi_id'   => AuthDivisi::id(),
-    //     ])->first();
-
-    //     return response()->json([
-    //         'status'       => true,
-    //         'headers'      => $headers,
-    //         'header_hash'  => $headerHash,
-    //         'schema_id'    => $existingSchema ? $existingSchema->id : null
-    //     ]);
-    // }
 
     public function normalizeValue($value)
     {
@@ -620,7 +536,6 @@ class PesananController extends Controller
                             }
 
                             $data[$dbColumn] = $this->smartValue($value);
-
                         }
 
                         $batch[] = $data;

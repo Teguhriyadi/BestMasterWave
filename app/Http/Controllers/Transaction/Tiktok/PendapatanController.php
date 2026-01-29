@@ -95,6 +95,9 @@ class PendapatanController extends Controller
 
     public function store(Request $request)
     {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 300);
+
         try {
             $request->validate([
                 'file' => 'required|mimes:xlsx,xls'
@@ -104,60 +107,39 @@ class PendapatanController extends Controller
 
             $reader = IOFactory::createReaderForFile($path);
             $reader->setReadDataOnly(true);
-            $reader->setReadFilter(new HeadersFilter);
 
             $spreadsheet = $reader->load($path);
 
-            $sheetName = 'Order details';
-            $headerRow = 1;
-
-            $sheet = $spreadsheet->getSheetByName($sheetName);
+            $sheet = $spreadsheet->getSheetByName('Order details');
 
             if (!$sheet) {
                 return response()->json([
-                    'status'  => false,
-                    'message' => "Sheet '{$sheetName}' tidak ditemukan"
+                    'status' => false,
+                    'message' => 'Sheet tidak ditemukan'
                 ], 422);
             }
 
             $headers = [];
-            $maxCol  = Coordinate::columnIndexFromString($sheet->getHighestColumn());
+            $maxCol = Coordinate::columnIndexFromString($sheet->getHighestColumn());
 
             for ($i = 1; $i <= $maxCol; $i++) {
                 $col = Coordinate::stringFromColumnIndex($i);
-                $val = trim((string) $sheet->getCell($col . $headerRow)->getValue());
+                $val = trim((string) $sheet->getCell($col . '1')->getValue());
 
                 if ($val !== '') {
                     $headers[$col] = $val;
                 }
             }
 
-            if (empty($headers)) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Header tidak ditemukan'
-                ], 422);
-            }
-
-            $headerHash = hash('sha256', json_encode(array_values($headers)));
-            $divisiId   = AuthDivisi::id();
-
-            $existingSchema = InvoiceSchemaTiktokPendapatan::where([
-                'header_hash' => $headerHash,
-                'divisi_id'   => $divisiId,
-            ])->first();
-
             return response()->json([
-                'status'      => true,
-                'headers'     => $headers,
-                'header_hash' => $headerHash,
-                'schema_id'   => $existingSchema?->id
+                'status' => true,
+                'headers' => $headers,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Server error',
-                'debug'   => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
