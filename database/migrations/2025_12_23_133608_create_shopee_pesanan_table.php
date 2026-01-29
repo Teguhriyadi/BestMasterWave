@@ -64,6 +64,7 @@ return new class extends Migration
             $table->string("kota_kabupaten", 100)->nullable();
             $table->string("provinsi", 50)->nullable();
             $table->dateTime("waktu_pesanan_selesai")->nullable()->nullable();
+            $table->decimal("harga_modal", 20, 2)->default(0)->change();
             $table->timestamps();
         });
     }

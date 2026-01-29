@@ -21,4 +21,13 @@ class ShopeePendapatan extends Model
 
         });
     }
+
+    public function pesanan()
+    {
+        return $this->hasMany(
+            ShopeePesanan::class,
+            'no_pesanan',
+            'no_pesanan'
+        );
+    }
 }

@@ -11,7 +11,7 @@
 @push('content_app')
     <h1 class="h3 mb-4 text-gray-800">Data Pendapatan Tiktok</h1>
 
-    <a href="{{ url('/admin-panel/shopee-pendapatan') }}" class="btn btn-danger btn-sm mb-4">
+    <a href="{{ url('/admin-panel/tiktok-pendapatan') }}" class="btn btn-danger btn-sm mb-4">
         <i class="fa fa-sign-out-alt"></i> Kembali
     </a>
 
