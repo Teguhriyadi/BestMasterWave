@@ -95,68 +95,71 @@ class PendapatanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls'
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls'
+            ]);
 
-        $path = $request->file('file')->getPathname();
+            $path = $request->file('file')->getPathname();
 
-        $reader = IOFactory::createReaderForFile($path);
-        $reader->setReadDataOnly(true);
-        $reader->setReadFilter(new HeadersFilter);
+            $reader = IOFactory::createReaderForFile($path);
+            $reader->setReadDataOnly(true);
+            $reader->setReadFilter(new HeadersFilter);
 
-        $spreadsheet = $reader->load($path);
+            $spreadsheet = $reader->load($path);
 
-        $headers    = [];
-        $sheetName  = 'Order details';
-        $headerRow  = 1;
-        $dataStart  = 2;
+            $sheetName = 'Order details';
+            $headerRow = 1;
 
-        $sheet = $spreadsheet->getSheetByName($sheetName);
+            $sheet = $spreadsheet->getSheetByName($sheetName);
 
-        if (!$sheet) {
-            return response()->json([
-                'status'  => false,
-                'message' => "Sheet '{$sheetName}' tidak ditemukan"
-            ], 422);
-        }
-
-        $headers = [];
-
-        $maxCol  = Coordinate::columnIndexFromString($sheet->getHighestColumn());
-
-        for ($i = 1; $i <= $maxCol; $i++) {
-            $col = Coordinate::stringFromColumnIndex($i);
-            $val = trim((string) $sheet->getCell($col . $headerRow)->getValue());
-
-            if ($val !== '') {
-                $headers[$col] = $val;
+            if (!$sheet) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => "Sheet '{$sheetName}' tidak ditemukan"
+                ], 422);
             }
-        }
 
-        if (empty($headers)) {
+            $headers = [];
+            $maxCol  = Coordinate::columnIndexFromString($sheet->getHighestColumn());
+
+            for ($i = 1; $i <= $maxCol; $i++) {
+                $col = Coordinate::stringFromColumnIndex($i);
+                $val = trim((string) $sheet->getCell($col . $headerRow)->getValue());
+
+                if ($val !== '') {
+                    $headers[$col] = $val;
+                }
+            }
+
+            if (empty($headers)) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Header tidak ditemukan'
+                ], 422);
+            }
+
+            $headerHash = hash('sha256', json_encode(array_values($headers)));
+            $divisiId   = AuthDivisi::id();
+
+            $existingSchema = InvoiceSchemaTiktokPendapatan::where([
+                'header_hash' => $headerHash,
+                'divisi_id'   => $divisiId,
+            ])->first();
+
+            return response()->json([
+                'status'      => true,
+                'headers'     => $headers,
+                'header_hash' => $headerHash,
+                'schema_id'   => $existingSchema?->id
+            ]);
+        } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,
-                'message' => 'Header tidak ditemukan'
-            ], 422);
+                'message' => 'Server error',
+                'debug'   => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
-
-        $headerHash = hash('sha256', json_encode(array_values($headers)));
-        $divisiId   = AuthDivisi::id();
-
-        $existingSchema = InvoiceSchemaTiktokPendapatan::where([
-            'header_hash' => $headerHash,
-            'divisi_id'   => $divisiId,
-        ])->first();
-
-        $sheet = $spreadsheet->getSheetByName($sheetName);
-
-        return response()->json([
-            'status'        => true,
-            'headers'       => $headers,
-            'header_hash'   => $headerHash,
-            'schema_id'     => $existingSchema?->id
-        ]);
     }
 
     public function process(Request $request)
