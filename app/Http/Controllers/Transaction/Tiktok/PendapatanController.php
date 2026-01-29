@@ -150,7 +150,7 @@ class PendapatanController extends Controller
 
     public function process(Request $request)
     {
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '512M');
         set_time_limit(0);
 
         $request->validate([
@@ -161,11 +161,6 @@ class PendapatanController extends Controller
 
         $divisiId = AuthDivisi::id();
 
-        $schema = InvoiceSchemaTiktokPendapatan::where([
-            'header_hash' => $request->header_hash,
-            'divisi_id'   => $divisiId,
-        ])->first();
-
         $reader = ReaderEntityFactory::createXLSXReader();
         $reader->setShouldFormatDates(false);
         $reader->open($request->file('file')->getPathname());
@@ -175,20 +170,17 @@ class PendapatanController extends Controller
                 'id'          => (string) Str::uuid(),
                 'divisi_id'   => $divisiId,
                 'seller_id'   => $request->seller_id,
-                'schema_id'   => $schema?->id,
                 'header_hash' => $request->header_hash,
                 'uploaded_at' => now(),
                 'total_rows'  => 0,
             ]);
 
             $columnMap    = [];
-            $orderIdIndex = null;
             $headerParsed = false;
 
             $buffer   = [];
-            $orderIds = [];
             $chunkIdx = 0;
-            $totalNew = 0;
+            $total    = 0;
 
             foreach ($reader->getSheetIterator() as $sheet) {
 
@@ -196,7 +188,7 @@ class PendapatanController extends Controller
                     continue;
                 }
 
-                foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+                foreach ($sheet->getRowIterator() as $row) {
 
                     $cells = array_map(
                         fn($cell) => $cell->getValue(),
@@ -214,14 +206,6 @@ class PendapatanController extends Controller
                             $normalized = str_replace(['/', ' '], '_', $normalized);
 
                             $columnMap[$normalized] = $i;
-
-                            if ($normalized === 'order_adjustment_id') {
-                                $orderIdIndex = $i;
-                            }
-                        }
-
-                        if ($orderIdIndex === null) {
-                            throw new \Exception('Kolom Order/adjustment ID tidak ditemukan');
                         }
 
                         $headerParsed = true;
@@ -229,64 +213,44 @@ class PendapatanController extends Controller
                     }
 
                     /* ===== DATA ===== */
-                    $orderId = strtoupper(trim((string) ($cells[$orderIdIndex] ?? '')));
-                    if ($orderId === '') continue;
-
-                    $item = [];
+                    $rowData = [];
                     foreach ($columnMap as $key => $idx) {
-                        $item[$key] = $cells[$idx] ?? null;
+                        $rowData[$key] = $cells[$idx] ?? null;
                     }
 
-                    $buffer[]   = $item;
-                    $orderIds[] = $orderId;
+                    $buffer[] = $rowData;
+                    $total++;
 
                     /* ===== FLUSH ===== */
                     if (count($buffer) === 200) {
-
-                        $existing = TiktokPendapatan::where('divisi_id', $divisiId)
-                            ->whereIn('order_or_adjustment_id', $orderIds)
-                            ->pluck('order_or_adjustment_id')
-                            ->flip();
-
-                        $filtered = [];
-                        foreach ($buffer as $i => $row) {
-                            if (!isset($existing[$orderIds[$i]])) {
-                                $filtered[] = $row;
-                                $totalNew++;
-                            }
-                        }
-
-                        if ($filtered) {
-                            InvoiceDataTiktokPendapatan::create([
-                                'invoice_file_tiktok_pendapatan_id' => $file->id,
-                                'divisi_id'   => $divisiId,
-                                'chunk_index' => $chunkIdx,
-                                'payload'     => ['rows' => $filtered],
-                            ]);
-                            $chunkIdx++;
-                        }
-
-                        $buffer   = [];
-                        $orderIds = [];
+                        InvoiceDataTiktokPendapatan::create([
+                            'invoice_file_tiktok_pendapatan_id' => $file->id,
+                            'divisi_id'   => $divisiId,
+                            'chunk_index' => $chunkIdx++,
+                            'payload'     => ['rows' => $buffer],
+                        ]);
+                        $buffer = [];
                     }
                 }
                 break;
             }
 
-            $reader->close();
-
-            if ($totalNew === 0) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Tidak ada data baru'
-                ], 422);
+            if ($buffer) {
+                InvoiceDataTiktokPendapatan::create([
+                    'invoice_file_tiktok_pendapatan_id' => $file->id,
+                    'divisi_id'   => $divisiId,
+                    'chunk_index' => $chunkIdx,
+                    'payload'     => ['rows' => $buffer],
+                ]);
             }
 
-            $file->update(['total_rows' => $totalNew]);
+            $reader->close();
+
+            $file->update(['total_rows' => $total]);
 
             return response()->json([
                 'status'   => true,
-                'message'  => "Berhasil import {$totalNew} data",
+                'message'  => "Berhasil upload {$total} baris",
                 'redirect' => url("/admin-panel/tiktok-pendapatan/{$file->id}/show"),
             ]);
         } catch (\Throwable $e) {
