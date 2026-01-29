@@ -21,4 +21,13 @@ class TiktokPendapatan extends Model
 
         });
     }
+
+    public function pesanan()
+    {
+        return $this->hasMany(
+            TiktokPesanan::class,
+            'order_id',
+            'order_or_adjustment_id'
+        );
+    }
 }
