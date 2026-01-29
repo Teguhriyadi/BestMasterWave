@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Transaction\Tiktok;
 
-use App\Excel\HeaderOnlyFilter;
 use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Mapper\TiktokMapper;
 use App\Http\Services\SellerService;
-use App\Imports\ReadFilters\HeadersFilter;
 use App\Models\InvoiceDataTiktokPendapatan;
 use App\Models\InvoiceFileTiktokPendapatan;
-use App\Models\InvoiceFileTiktokPesanan;
 use App\Models\InvoiceSchemaTiktokPendapatan;
 use App\Models\Platform;
 use App\Models\Seller;
@@ -18,12 +15,10 @@ use App\Models\TiktokPendapatan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use OpenSpout\Reader\XLSX\Reader;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 
 class PendapatanController extends Controller
@@ -96,9 +91,6 @@ class PendapatanController extends Controller
 
     public function store(Request $request)
     {
-        ini_set('memory_limit', '-1');
-        ini_set('max_execution_time', 300);
-
         try {
             $request->validate([
                 'file' => 'required|mimes:xlsx,xls'
@@ -106,27 +98,40 @@ class PendapatanController extends Controller
 
             $path = $request->file('file')->getPathname();
 
-            $reader = IOFactory::createReaderForFile($path);
-            $reader->setReadDataOnly(true);
-
-            // 🔥 INI PENTING
-            $reader->setLoadSheetsOnly(['Order details']);
-            $reader->setReadFilter(new HeaderOnlyFilter());
-
-            $spreadsheet = $reader->load($path);
-
-            $sheet = $spreadsheet->getActiveSheet();
+            $reader = new Reader();
+            $reader->open($path);
 
             $headers = [];
-            $maxCol = Coordinate::columnIndexFromString($sheet->getHighestColumn());
+            $targetSheet = 'Order details';
 
-            for ($i = 1; $i <= $maxCol; $i++) {
-                $col = Coordinate::stringFromColumnIndex($i);
-                $val = trim((string) $sheet->getCell($col . '1')->getValue());
-
-                if ($val !== '') {
-                    $headers[$col] = $val;
+            foreach ($reader->getSheetIterator() as $sheet) {
+                if ($sheet->getName() !== $targetSheet) {
+                    continue;
                 }
+
+                foreach ($sheet->getRowIterator() as $rowIndex => $row) {
+                    if ($rowIndex !== 1) break;
+
+                    $values = $row->toArray();
+
+                    foreach ($values as $i => $value) {
+                        $value = trim((string) $value);
+                        if ($value !== '') {
+                            $headers[$i + 1] = $value;
+                        }
+                    }
+                }
+
+                break;
+            }
+
+            $reader->close();
+
+            if (empty($headers)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Header tidak ditemukan'
+                ], 422);
             }
 
             return response()->json([
@@ -141,7 +146,6 @@ class PendapatanController extends Controller
             ], 500);
         }
     }
-
 
     public function process(Request $request)
     {
