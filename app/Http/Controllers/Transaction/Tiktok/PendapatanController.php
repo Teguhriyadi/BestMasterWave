@@ -12,6 +12,7 @@ use App\Models\InvoiceSchemaTiktokPendapatan;
 use App\Models\Platform;
 use App\Models\Seller;
 use App\Models\TiktokPendapatan;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -89,54 +90,59 @@ class PendapatanController extends Controller
             'file' => 'required|mimes:xlsx,xls'
         ]);
 
-        ini_set('memory_limit', '512M');
-        set_time_limit(0);
-
-        $reader = new Reader();
-        $reader->open($request->file('file')->getPathname());
-
+        $targetSheet = 'Order details';
         $headers = [];
-        $targetSheet = 'order details';
 
         try {
+            $reader = ReaderEntityFactory::createXLSXReader();
+
+            // ini penting: optimasi memory
+            $reader->setShouldFormatDates(false);
+
+            $reader->open($request->file('file')->getPathname());
+
             foreach ($reader->getSheetIterator() as $sheet) {
 
-                if (strtolower(trim($sheet->getName())) !== $targetSheet) {
+                // skip semua sheet yang tidak perlu
+                if (strtolower($sheet->getName()) !== strtolower($targetSheet)) {
                     continue;
                 }
 
-                foreach ($sheet->getRowIterator() as $row) {
-                    $values = $row->toArray();
+                foreach ($sheet->getRowIterator() as $rowIndex => $row) {
 
-                    foreach ($values as $i => $value) {
-                        $value = trim((string) $value);
+                    // hanya baca baris pertama (header)
+                    if ($rowIndex !== 1) {
+                        break;
+                    }
+
+                    foreach ($row->getCells() as $i => $cell) {
+                        $value = trim((string) $cell->getValue());
                         if ($value !== '') {
-                            $headers[$i + 1] = $value;
+                            $headers[$i] = $value;
                         }
                     }
 
-                    break;
+                    break; // STOP setelah header
                 }
 
-                break;
+                break; // STOP setelah ketemu sheet
             }
 
             $reader->close();
 
-            if (!$headers) {
+            if (empty($headers)) {
                 return response()->json([
                     'status'  => false,
-                    'message' => 'Header tidak ditemukan'
+                    'message' => 'Header tidak ditemukan pada sheet Order details'
                 ], 422);
             }
 
             return response()->json([
-                'status'  => true,
-                'headers' => $headers
+                'status'      => true,
+                'headers'     => $headers,
+                'header_hash' => md5(json_encode($headers))
             ]);
         } catch (\Throwable $e) {
-            $reader->close();
-
             return response()->json([
                 'status'  => false,
                 'message' => 'Server error',
