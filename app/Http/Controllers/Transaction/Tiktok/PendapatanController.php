@@ -172,7 +172,6 @@ class PendapatanController extends Controller
         DB::beginTransaction();
 
         try {
-
             $file = InvoiceFileTiktokPendapatan::create([
                 'id'          => (string) Str::uuid(),
                 'divisi_id'   => $divisiId,
@@ -182,6 +181,9 @@ class PendapatanController extends Controller
                 'uploaded_at' => now(),
                 'total_rows'  => 0,
             ]);
+
+            $columnMap = [];
+            $headerParsed = false;
 
             $existing = TiktokPendapatan::where('divisi_id', $divisiId)
                 ->pluck('order_or_adjustment_id')
@@ -199,46 +201,42 @@ class PendapatanController extends Controller
                     continue;
                 }
 
-
                 foreach ($sheet->getRowIterator() as $rowIndex => $row) {
 
-                    if ($rowIndex === 1) {
+                    $cells = array_values($row->toArray());
+
+                    // 🔥 HEADER ROW
+                    if (!$headerParsed) {
+                        foreach ($cells as $idx => $label) {
+                            $label = trim((string) $label);
+                            if ($label !== '') {
+                                $columnMap[$label] = $idx;
+                            }
+                        }
+
+                        if (!isset($columnMap['Order/adjustment ID'])) {
+                            throw new \Exception('Kolom "Order/adjustment ID" tidak ditemukan');
+                        }
+
+                        $orderIdIndex = $columnMap['Order/adjustment ID'];
+                        $headerParsed = true;
                         continue;
                     }
 
-                    $cells = $row->toArray();
-
-                    $noPesananIndex = null;
-
-                    foreach ($request->columns as $colLetter => $label) {
-                        if ($label === 'Order/adjustment ID') {
-                            $noPesananIndex = $this->excelColToIndex($colLetter);
-                            break;
-                        }
+                    // 🔥 DATA ROW
+                    if (!isset($cells[$orderIdIndex])) {
+                        continue;
                     }
 
-                    if ($noPesananIndex === null) {
-                        throw new \Exception('Kolom "Order/adjustment ID" tidak ditemukan');
-                    }
-
-
-                    $noPesanan = strtoupper(trim((string) ($cells[$noPesananIndex] ?? '')));
+                    $noPesanan = strtoupper(trim((string) $cells[$orderIdIndex]));
                     if ($noPesanan === '' || isset($existing[$noPesanan])) {
                         continue;
                     }
 
                     $item = [];
-
-                    foreach ($request->columns as $colLetter => $label) {
-
-                        $colIndex = $this->excelColToIndex($colLetter);
-                        $val = $cells[$colIndex] ?? null;
-
-                        $item[$label] = $val instanceof \DateTimeInterface
-                            ? $val->format('Y-m-d H:i:s')
-                            : (string) $val;
+                    foreach ($columnMap as $label => $idx) {
+                        $item[$label] = $cells[$idx] ?? '';
                     }
-
 
                     $buffer[] = $item;
                     $existing[$noPesanan] = true;
@@ -261,7 +259,7 @@ class PendapatanController extends Controller
                     'invoice_file_tiktok_pendapatan_id' => $file->id,
                     'divisi_id'   => $divisiId,
                     'chunk_index' => $chunkIdx,
-                    'payload'    => ['rows' => $buffer],
+                    'payload'     => ['rows' => $buffer],
                 ]);
             }
 
@@ -279,12 +277,11 @@ class PendapatanController extends Controller
             $reader->close();
 
             return response()->json([
-                'status'  => true,
-                'message' => "Berhasil import {$totalNew} data",
+                'status'   => true,
+                'message'  => "Berhasil import {$totalNew} data",
                 'redirect' => url("/admin-panel/tiktok-pendapatan/{$file->id}/show"),
             ]);
         } catch (\Throwable $e) {
-
             DB::rollBack();
             $reader->close();
 
