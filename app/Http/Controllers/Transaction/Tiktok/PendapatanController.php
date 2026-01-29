@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use OpenSpout\Reader\XLSX\Reader;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Yajra\DataTables\Facades\DataTables;
 
 class PendapatanController extends Controller
@@ -84,34 +83,29 @@ class PendapatanController extends Controller
         return ! empty($dateColumns) ? $dateColumns : $headers;
     }
 
-    private function excelColToIndex(string $col): int
-    {
-        return Coordinate::columnIndexFromString($col) - 1;
-    }
-
     public function store(Request $request)
     {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        ini_set('memory_limit', '512M');
+        set_time_limit(0);
+
+        $reader = new Reader();
+        $reader->open($request->file('file')->getPathname());
+
+        $headers = [];
+        $targetSheet = 'order details';
+
         try {
-            $request->validate([
-                'file' => 'required|mimes:xlsx,xls'
-            ]);
-
-            $path = $request->file('file')->getPathname();
-
-            $reader = new Reader();
-            $reader->open($path);
-
-            $headers = [];
-            $targetSheet = 'Order details';
-
             foreach ($reader->getSheetIterator() as $sheet) {
-                if ($sheet->getName() !== $targetSheet) {
+
+                if (strtolower(trim($sheet->getName())) !== $targetSheet) {
                     continue;
                 }
 
-                foreach ($sheet->getRowIterator() as $rowIndex => $row) {
-                    if ($rowIndex !== 1) break;
-
+                foreach ($sheet->getRowIterator() as $row) {
                     $values = $row->toArray();
 
                     foreach ($values as $i => $value) {
@@ -120,6 +114,8 @@ class PendapatanController extends Controller
                             $headers[$i + 1] = $value;
                         }
                     }
+
+                    break;
                 }
 
                 break;
@@ -127,22 +123,24 @@ class PendapatanController extends Controller
 
             $reader->close();
 
-            if (empty($headers)) {
+            if (!$headers) {
                 return response()->json([
-                    'status' => false,
+                    'status'  => false,
                     'message' => 'Header tidak ditemukan'
                 ], 422);
             }
 
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'headers' => $headers
             ]);
         } catch (\Throwable $e) {
+            $reader->close();
+
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => 'Server error',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error'   => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
