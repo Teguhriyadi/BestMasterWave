@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction\Tiktok;
 
+use App\Excel\HeaderOnlyFilter;
 use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Mapper\TiktokMapper;
@@ -108,16 +109,13 @@ class PendapatanController extends Controller
             $reader = IOFactory::createReaderForFile($path);
             $reader->setReadDataOnly(true);
 
+            // 🔥 INI PENTING
+            $reader->setLoadSheetsOnly(['Order details']);
+            $reader->setReadFilter(new HeaderOnlyFilter());
+
             $spreadsheet = $reader->load($path);
 
-            $sheet = $spreadsheet->getSheetByName('Order details');
-
-            if (!$sheet) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Sheet tidak ditemukan'
-                ], 422);
-            }
+            $sheet = $spreadsheet->getActiveSheet();
 
             $headers = [];
             $maxCol = Coordinate::columnIndexFromString($sheet->getHighestColumn());
@@ -133,7 +131,7 @@ class PendapatanController extends Controller
 
             return response()->json([
                 'status' => true,
-                'headers' => $headers,
+                'headers' => $headers
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -143,6 +141,7 @@ class PendapatanController extends Controller
             ], 500);
         }
     }
+
 
     public function process(Request $request)
     {
