@@ -170,13 +170,16 @@
                     body: fd
                 })
                 .then(async res => {
-                    const contentType = res.headers.get('content-type') || '';
-                    if (!contentType.includes('application/json')) {
-                        throw {
-                            message: 'Response bukan JSON'
-                        };
+                    const text = await res.text();
+
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        console.error('RAW RESPONSE:', text);
+                        throw { message: 'Response server tidak valid (bukan JSON)' };
                     }
-                    const data = await res.json();
+
                     if (!res.ok) throw data;
                     return data;
                 })
