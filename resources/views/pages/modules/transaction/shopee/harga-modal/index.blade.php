@@ -2,6 +2,12 @@
 
 @push('title_module', 'Shopee Harga Modal')
 
+@push('css_style')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css"
+        rel="stylesheet">
+@endpush
+
 @push('content_app')
 
     <h1 class="h3 mb-4 text-gray-800">
@@ -40,6 +46,34 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label for="sku_barang" class="form-label font-weight-bold">
+                                        SKU Barang
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <select name="sku_barang" class="form-control" id="sku_barang">
+                                        @foreach ($barang as $item)
+                                            <option value=""></option>
+                                            <option value="{{ $item['id'] }}">
+                                                {{ $item['sku_barang'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="seller_id" class="form-label font-weight-bold">
+                                        Harga Modal
+                                        <small class="text-danger">*</small>
+                                    </label>
+                                    <input type="text" class="form-control" name="harga_modal" id="harga_modal"
+                                        placeholder="0" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label for="dari" class="form-label font-weight-bold">
                                         Dari Tanggal
                                         <small class="text-danger">*</small>
@@ -56,14 +90,6 @@
                                     <input type="date" class="form-control" name="sampai" id="sampai">
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="seller_id" class="form-label font-weight-bold">
-                                Harga Modal
-                                <small class="text-danger">*</small>
-                            </label>
-                            <input type="text" class="form-control" name="harga_modal" id="harga_modal" placeholder="0"
-                                min="1">
                         </div>
                     </div>
                     <div class="card-footer">
@@ -83,7 +109,43 @@
 @endpush
 
 @push('js_style')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <script type="text/javascript">
+        $('#sku_barang').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Pilih Barang',
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#sku_barang').on('change', function() {
+            const skuId = $(this).val();
+
+            if (!skuId) {
+                $('#harga_modal').val('');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url('/admin-panel/shopee-harga-modal/get-harga') }}",
+                type: "GET",
+                data: {
+                    sku_id: skuId
+                },
+                success: function(res) {
+                    if (res.status) {
+                        $('#harga_modal').val(formatRupiah(res.harga_modal.toString()));
+                    } else {
+                        $('#harga_modal').val('');
+                    }
+                },
+                error: function() {
+                    alert('Gagal mengambil harga modal');
+                    $('#harga_modal').val('');
+                }
+            });
+        });
+
         const hargaInput = document.getElementById('harga_modal');
 
         function formatRupiah(value) {
