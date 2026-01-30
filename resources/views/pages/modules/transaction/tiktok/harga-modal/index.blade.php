@@ -52,15 +52,17 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="seller_id" class="form-label font-weight-bold">Harga Modal</label>
-                            <input type="number" class="form-control" name="harga_modal" id="harga_modal" placeholder="0" min="1">
+                            <label for="harga_modal" class="form-label font-weight-bold">Harga Modal</label>
+                            <input type="text" class="form-control" name="harga_modal" id="harga_modal" placeholder="0"
+                                min="1">
                         </div>
                     </div>
                     <div class="card-footer">
                         <button type="reset" class="btn btn-danger btn-sm">
                             <i class="fa fa-times"></i> RESET
                         </button>
-                        <button onclick="return confirm('Apakah Anda Yakin Ingin Mengubah Harga Modal?')" type="submit" class="btn btn-success btn-sm">
+                        <button onclick="return confirm('Apakah Anda Yakin Ingin Mengubah Harga Modal?')" type="submit"
+                            class="btn btn-success btn-sm">
                             <i class="fa fa-save"></i> SIMPAN
                         </button>
                     </div>
@@ -72,20 +74,30 @@
 @endpush
 
 @push('js_style')
-    <script>
+    <script type="text/javascript">
         const hargaInput = document.getElementById('harga_modal');
 
+        function formatRupiah(value) {
+            value = value.replace(/\D/g, '');
+            return value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
         hargaInput.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, '');
+            const cursorPos = this.selectionStart;
+            const oldLength = this.value.length;
 
-            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            this.value = formatRupiah(this.value);
 
-            this.value = formatted;
+            const newLength = this.value.length;
+            const diff = newLength - oldLength;
+            this.selectionStart = this.selectionEnd = cursorPos + diff;
         });
 
         const form = hargaInput.closest('form');
-        form.addEventListener('submit', function() {
-            hargaInput.value = hargaInput.value.replace(/\./g, '');
-        });
+        if (form) {
+            form.addEventListener('submit', function() {
+                hargaInput.value = hargaInput.value.replace(/\./g, '');
+            });
+        }
     </script>
 @endpush
