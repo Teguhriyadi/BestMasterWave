@@ -26,6 +26,13 @@ class SellerService
         return SellerMapper::toListOption($seller);
     }
 
+    public function list_seller_all()
+    {
+        $seller = $this->seller_repository->list_data_seller_all();
+
+        return SellerMapper::toListOption($seller);
+    }
+
     public function list_seller_tiktok()
     {
         $seller = $this->seller_repository->list_data_seller_tiktok();

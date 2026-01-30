@@ -573,7 +573,7 @@ class PesananController extends Controller
 
     public function kelola(Request $request)
     {
-        $data['seller'] = $this->seller_service->list_seller();
+        $data['seller'] = $this->seller_service->list_seller_all();
 
         if ($request->ajax()) {
             $query = TiktokPesanan::query();

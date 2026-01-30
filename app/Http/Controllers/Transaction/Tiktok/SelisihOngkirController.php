@@ -24,7 +24,7 @@ class SelisihOngkirController extends Controller
     {
         try {
 
-            $data["seller"] = $this->seller_service->list_seller_tiktok();
+            $data["seller"] = $this->seller_service->list_seller_all();
 
             if ($request->ajax()) {
 

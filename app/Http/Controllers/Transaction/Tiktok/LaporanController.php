@@ -17,7 +17,7 @@ class LaporanController extends Controller
 
     public function index(Request $request)
     {
-        $data['seller'] = $this->seller_service->list_seller();
+        $data['seller'] = $this->seller_service->list_seller_all();
 
         if ($request->ajax()) {
             $filterBy = $request->filter_by ?? 'order_settled_time';
