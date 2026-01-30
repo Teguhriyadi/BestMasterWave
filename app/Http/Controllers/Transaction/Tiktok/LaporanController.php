@@ -106,7 +106,7 @@ class LaporanController extends Controller
                     $harga_modal = $row->total_settlement_amount - $totalModal;
                     return 'Rp ' . number_format($harga_modal, 0, ',', '.');
                 })
-                ->rawColumns(['sku_id', 'quantity', 'harga_modal'])
+                ->rawColumns(['seller_sku', 'quantity', 'harga_modal'])
                 ->make(true);
         }
 
