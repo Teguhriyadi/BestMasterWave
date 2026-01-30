@@ -43,13 +43,15 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Dari</label>
-                            <input type="date" class="form-control" name="dari" id="dari" value="{{ now()->subDays(30)->format('Y-m-d') }}">
+                            <input type="date" class="form-control" name="dari" id="dari"
+                                value="{{ now()->subDays(30)->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Sampai</label>
-                            <input type="date" class="form-control" name="sampai" id="sampai" value="{{ now()->format('Y-m-d') }}">
+                            <input type="date" class="form-control" name="sampai" id="sampai"
+                                value="{{ now()->format('Y-m-d') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -65,29 +67,27 @@
 
             <hr>
 
-            <div class="table-responsive">
-                <table class="table table-bordered" id="serverSideTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th class="text-center">No.</th>
-                            <th>Order/Adjustment ID</th>
-                            <th class="text-center">SKU</th>
-                            <th class="text-center">QTY</th>
-                            <th class="tect-center">Modal</th>
-                            <th class="text-center">Laba/Rugi</th>
-                            <th class="text-center">Order Created Time(UTC)</th>
-                            <th class="text-center">Order Settled Time(UTC)</th>
-                            <th class="text-center">Total Settlement Amount</th>
-                            <th class="text-center">Total Revenue</th>
-                            <th class="text-center">Fee</th>
-                            <th class="text-center">Ongkir</th>
-                            <th class="text-center">Ongkir Refund</th>
-                            <th class="text-center">Affiliate</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <table class="table table-bordered" id="serverSideTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th>Order/Adjustment ID</th>
+                        <th class="text-center">SKU</th>
+                        <th class="text-center">QTY</th>
+                        <th class="tect-center">Modal</th>
+                        <th class="text-center">Laba/Rugi</th>
+                        <th class="text-center">Order Created Time(UTC)</th>
+                        <th class="text-center">Order Settled Time(UTC)</th>
+                        <th class="text-center">Total Settlement Amount</th>
+                        <th class="text-center">Total Revenue</th>
+                        <th class="text-center">Fee</th>
+                        <th class="text-center">Ongkir</th>
+                        <th class="text-center">Ongkir Refund</th>
+                        <th class="text-center">Affiliate</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 @endpush
@@ -107,7 +107,8 @@
             let table = $('#serverSideTable').DataTable({
                 processing: true,
                 serverSide: true,
-                deferRender: true,
+                scrollX: true,
+                pageLength: 25,
                 ajax: {
                     url: "{{ url()->current() }}",
                     data: function(d) {

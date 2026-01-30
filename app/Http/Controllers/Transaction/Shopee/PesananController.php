@@ -475,7 +475,7 @@ class PesananController extends Controller
 
             return redirect()
                 ->to("/admin-panel/shopee-pesanan")
-                ->with('success', 'Data pesanan berhasil di-import/update.');
+                ->with('success', 'Data pesanan berhasil diproses berdasarkan Order ID.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal memproses database: ' . $e->getMessage());
