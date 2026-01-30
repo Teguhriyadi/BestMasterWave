@@ -31,7 +31,7 @@ class LaporanController extends Controller
                 : Carbon::now();
 
             $query = TiktokPendapatan::with([
-                'pesanan:id,order_id,sku_id,quantity,harga_modal'
+                'pesanan:id,order_id,seller_sku,quantity,harga_modal'
             ]);
 
             if ($request->nama_seller) {
@@ -46,10 +46,10 @@ class LaporanController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('sku_id', function ($row) {
+                ->addColumn('seller_sku', function ($row) {
                     return $row->pesanan
-                        ->pluck('sku_id')
-                        ->map(fn ($sku_id) => "<span class='badge badge-info mr-1'>{$sku_id}</span>")
+                        ->pluck('seller_sku')
+                        ->map(fn ($seller_sku) => "<span class='badge badge-info mr-1'>{$seller_sku}</span>")
                         ->implode(' ');
                 })
                 ->addColumn('quantity', function ($row) {
