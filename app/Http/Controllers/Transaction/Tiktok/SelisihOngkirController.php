@@ -76,7 +76,7 @@ class SelisihOngkirController extends Controller
                     )
                     ->select(
                         'tiktok_pendapatan.*',
-                        'tiktok_pesanan.sku_id',
+                        'tiktok_pesanan.seller_sku',
                         'tiktok_pesanan.quantity',
                         'tiktok_pesanan.shipping_provider_name'
                     );

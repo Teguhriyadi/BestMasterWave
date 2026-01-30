@@ -140,8 +140,8 @@
                         name: 'order_or_adjustment_id'
                     },
                     {
-                        data: 'sku_id',
-                        name: 'tiktok_pesanan.sku_id'
+                        data: 'seller_sku',
+                        name: 'tiktok_pesanan.seller_sku'
                     },
                     {
                         data: 'quantity',
