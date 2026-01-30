@@ -62,7 +62,10 @@ class LaporanController extends Controller
                 ->addColumn('harga_modal', function ($row) {
                     return $row->pesanan
                         ->pluck('harga_modal')
-                        ->map(fn ($harga_modal) => "<span class='badge badge-info mr-1'>{$harga_modal}</span>")
+                        ->map(function ($harga_modal) {
+                            $formatted = number_format((float) $harga_modal, 0, ',', '.');
+                            return "<span class='badge badge-info mr-1'>{$formatted}</span>";
+                        })
                         ->implode(' ');
                 })
                 ->editColumn('waktu_pesanan', function ($row) {

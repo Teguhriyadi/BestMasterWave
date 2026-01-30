@@ -54,6 +54,8 @@ return Application::configure(basePath: dirname(__DIR__))
                     require __DIR__ . '/../routes/transaction/tiktok/selisih-ongkir.php';
                     require __DIR__ . '/../routes/transaction/shopee/laporan.php';
                     require __DIR__ . '/../routes/transaction/tiktok/laporan.php';
+                    require __DIR__ . '/../routes/transaction/shopee/harga-modal.php';
+                    require __DIR__ . '/../routes/transaction/tiktok/harga-modal.php';
                 });
             });
         },

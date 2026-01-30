@@ -518,8 +518,9 @@ class PesananController extends Controller
                     return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
                 })
                 ->editColumn('harga_modal', function ($row) {
-                        return number_format($row->harga_modal ?? 0, 0, ',', '.');
-                    })
+                    $harga = $row->harga_modal ?? 0;
+                    return number_format((float) $harga, 0, ',', '.');
+                })
                 ->addColumn('action', function ($row) {
                     return '
                         <a href="' . url('/admin-panel/shopee-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
@@ -583,10 +584,6 @@ class PesananController extends Controller
                 "status_sku" => $request->status_sku,
                 "created_by" => Auth::user()->id,
                 "nama_seller" => empty($request->nama_seller) ? null : $request->nama_seller
-            ]);
-
-            ShopeePesanan::where("sku_induk", $request->sku)->update([
-                "harga_modal" => $request->harga_modal * $request->qty
             ]);
 
             DB::commit();

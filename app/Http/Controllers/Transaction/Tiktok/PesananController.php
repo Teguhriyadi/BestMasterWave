@@ -600,6 +600,10 @@ class PesananController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
+                ->editColumn('harga_modal', function ($row) {
+                    $harga = $row->harga_modal ?? 0;
+                    return number_format((float) $harga, 0, ',', '.');
+                })
                 ->editColumn('waktu_pesanan_dibuat', function ($row) {
                     return $row->waktu_pesanan_dibuat ? \Carbon\Carbon::parse($row->waktu_pesanan_dibuat)->translatedFormat('d F Y H:i:s') : '-';
                 })
@@ -685,7 +689,7 @@ class PesananController extends Controller
 
             DB::beginTransaction();
 
-            $harga_modal = HargaModal::create([
+            HargaModal::create([
                 "sku_barang" => $request->sku,
                 "harga_modal" => $request->harga_modal,
                 "harga_pembelian_terakhir" => $request->harga_pembelian_terakhir,
@@ -693,10 +697,6 @@ class PesananController extends Controller
                 "status_sku" => $request->status_sku,
                 "created_by" => Auth::user()->id,
                 "nama_seller" => empty($request->nama_seller) ? null : $request->nama_seller
-            ]);
-
-            TiktokPesanan::where("sku_induk", $request->sku)->update([
-                "harga_modal" => $request->harga_modal
             ]);
 
             DB::commit();
