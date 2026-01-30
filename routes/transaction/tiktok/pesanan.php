@@ -14,4 +14,7 @@ Route::prefix("tiktok-pesanan")->group(function() {
         Route::get("/", [PesananController::class, "kelola"])->middleware("permission:tiktok-pesanan.read");
         Route::get("/{uuid}/detail", [PesananController::class, "detail"])->middleware("permission:tiktok-pesanan.show");
     });
+
+    Route::get("/{sku}/harga-modal", [PesananController::class, "harga_modal"]);
+    Route::post("/harga-modal/tambah", [PesananController::class, "post_harga_modal"]);
 });

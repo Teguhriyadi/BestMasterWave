@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Transaction\Shopee;
 use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Services\SellerService;
+use App\Models\Barang;
+use App\Models\HargaModal;
 use App\Models\InvoiceDataPesanan;
 use App\Models\InvoiceFilePesanan;
 use App\Models\InvoiceSchemaPesanan;
@@ -61,7 +63,6 @@ class PesananController extends Controller
                 ->get();
 
             return view('pages.modules.transaction.shopee.pesanan.upload', $data);
-
         } catch (\Exception $e) {
             abort(500, $e->getMessage());
         }
@@ -425,7 +426,7 @@ class PesananController extends Controller
             InvoiceDataPesanan::where('invoice_file_pesanan_id', $fileId)
                 ->orderBy('chunk_index', 'asc')
                 ->select(['id', 'payload'])
-                ->chunk(10, function($chunks) use ($mapping, $file, $nama_seller) {
+                ->chunk(10, function ($chunks) use ($mapping, $file, $nama_seller) {
                     foreach ($chunks as $chunk) {
                         $rows = $chunk->payload['rows'] ?? [];
                         foreach ($rows as $row) {
@@ -517,10 +518,20 @@ class PesananController extends Controller
                 ->editColumn('waktu_pembayaran_dilakukan', function ($row) {
                     return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
                 })
+                ->editColumn('harga_modal', function ($row) {
+                        return number_format($row->harga_modal ?? 0, 0, ',', '.');
+                    })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/shopee-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                    return '
+                        <a href="' . url('/admin-panel/shopee-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
                             <i class="fa fa-search"></i> Detail
-                        </a>';
+                        </a>
+                        <button
+                            data-sku="' . $row->sku_induk . '"
+                            class="btn btn-warning btn-sm btn-modal-harga">
+                            <i class="fa fa-edit"></i> Harga Modal
+                        </button>
+                    ';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -547,6 +558,49 @@ class PesananController extends Controller
             DB::rollBack();
 
             return redirect()->to("/admin-panel/shopee-pesanan/data")->with("error", $e->getMessage());
+        }
+    }
+
+    public function harga_modal($sku)
+    {
+        $data["barang"] = Barang::where('sku_barang', $sku)->firstOrFail();
+
+        return view('pages.modules.harga-modal.index', $data);
+    }
+
+    public function post_harga_modal(Request $request)
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $harga_modal = HargaModal::create([
+                "sku_barang" => $request->sku,
+                "harga_modal" => $request->harga_modal,
+                "harga_pembelian_terakhir" => $request->harga_pembelian_terakhir,
+                "tanggal_pembelian_terakhir" => $request->tanggal_pembelian_terakhir,
+                "status_sku" => $request->status_sku,
+                "created_by" => Auth::user()->id,
+                "nama_seller" => empty($request->nama_seller) ? null : $request->nama_seller
+            ]);
+
+            ShopeePesanan::where("sku_induk", $request->sku)->update([
+                "harga_modal" => $request->harga_modal
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Data Berhasil di Simpan"
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage()
+            ]);
         }
     }
 }

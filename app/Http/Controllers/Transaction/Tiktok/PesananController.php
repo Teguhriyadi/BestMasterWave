@@ -7,6 +7,8 @@ use App\Helpers\AuthDivisi;
 use App\Http\Controllers\Controller;
 use App\Http\Mapper\TiktokMapper;
 use App\Http\Services\SellerService;
+use App\Models\Barang;
+use App\Models\HargaModal;
 use App\Models\InvoiceDataTiktokPesanan;
 use App\Models\InvoiceFileTiktokPesanan;
 use App\Models\InvoiceSchemaTiktokPesanan;
@@ -422,7 +424,8 @@ class PesananController extends Controller
                 'updated_at',
                 'created_by',
                 'divisi_id',
-                'nama_seller'
+                'nama_seller',
+                'harga_modal'
             ]))
             ->values();
 
@@ -604,9 +607,16 @@ class PesananController extends Controller
                     return $row->waktu_pembayaran_dilakukan ? \Carbon\Carbon::parse($row->waktu_pembayaran_dilakukan)->translatedFormat('d F Y H:i:s') : '-';
                 })
                 ->addColumn('action', function ($row) {
-                    return '<a href="' . url('/admin-panel/tiktok-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
+                    return '
+                        <a href="' . url('/admin-panel/tiktok-pesanan/data/' . $row->uuid . '/detail') . '" class="btn btn-info btn-sm">
                             <i class="fa fa-search"></i> Detail
-                        </a>';
+                        </a>
+                        <button
+                            data-sku="' . $row->sku_id . '"
+                            class="btn btn-warning btn-sm btn-modal-harga">
+                            <i class="fa fa-edit"></i> Harga Modal
+                        </button>
+                    ';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -660,5 +670,48 @@ class PesananController extends Controller
         }
 
         return null;
+    }
+
+    public function harga_modal($sku)
+    {
+        $data["barang"] = Barang::where('sku_barang', $sku)->firstOrFail();
+
+        return view('pages.modules.harga-modal-tiktok.index', $data);
+    }
+
+    public function post_harga_modal(Request $request)
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $harga_modal = HargaModal::create([
+                "sku_barang" => $request->sku,
+                "harga_modal" => $request->harga_modal,
+                "harga_pembelian_terakhir" => $request->harga_pembelian_terakhir,
+                "tanggal_pembelian_terakhir" => $request->tanggal_pembelian_terakhir,
+                "status_sku" => $request->status_sku,
+                "created_by" => Auth::user()->id,
+                "nama_seller" => empty($request->nama_seller) ? null : $request->nama_seller
+            ]);
+
+            TiktokPesanan::where("sku_induk", $request->sku)->update([
+                "harga_modal" => $request->harga_modal
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Data Berhasil di Simpan"
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage()
+            ]);
+        }
     }
 }

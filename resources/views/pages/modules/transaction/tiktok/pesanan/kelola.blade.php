@@ -87,6 +87,41 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalHargaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="formHargaModal">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fa fa-edit"></i> Ubah Harga Modal
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="hidden" name="sku" id="sku">
+
+                        <div id="harga-modal-content">
+                            <div class="text-center text-muted">
+                                <i class="fa fa-spinner fa-spin"></i> Memuat data...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger btn-sm">
+                            <i class="fa fa-times"></i> RESET
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa fa-save"></i> SIMPAN
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endpush
 
 @push('js_style')
@@ -158,6 +193,60 @@
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
                 table.draw();
+            });
+
+            $(document).on('click', '.btn-modal-harga', function() {
+                let sku = $(this).data('sku');
+
+                $('#sku').val(sku);
+                $('#modalHargaModal').modal('show');
+
+                $('#harga-modal-content').html(`
+                    <div class="text-center text-muted">
+                        <i class="fa fa-spinner fa-spin"></i> Memuat data...
+                    </div>
+                `);
+
+                $.get(`{{ url('/admin-panel/tiktok-pesanan/${sku}/harga-modal') }}`, function(res) {
+                    $('#harga-modal-content').html(res);
+                });
+            });
+
+            $('#formHargaModal').on('submit', function(e) {
+                e.preventDefault();
+
+                let sku = $('#sku').val();
+                let harga_modal = $('#harga_modal').val();
+                let harga_pembelian_terakhir = $('#harga_pembelian_terakhir').val();
+                let status_sku = $('#status_sku').val();
+                let tanggal_pembelian_terakhir = $('#tanggal_pembelian_terakhir').val();
+
+                let msg = `
+    SKU: ${sku}
+    Harga Modal: ${harga_modal}
+    Harga Pembelian Terakhir: ${harga_pembelian_terakhir}
+    Status SKU: ${status_sku}
+    Tanggal Pembelian Terakhir: ${tanggal_pembelian_terakhir}
+
+    Apakah Anda yakin ingin menyimpan perubahan ini?
+        `;
+
+                if (confirm(msg)) {
+                    $.ajax({
+                        url: "{{ url('/admin-panel/tiktok-pesanan/harga-modal/tambah') }}",
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function(res) {
+                            alert(res.message);
+                            $('#modalHargaModal').modal('hide');
+                        },
+                        error: function(err) {
+                            alert(err.responseJSON?.message || 'Terjadi kesalahan');
+                        }
+                    });
+                } else {
+                    return false;
+                }
             });
         });
     </script>
