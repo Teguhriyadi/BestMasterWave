@@ -33,7 +33,7 @@
                         <div class="alert alert-warning">
                             <strong>Catatan:</strong> Filter Ke Kolom :
                             <strong>
-                                Waktu Pesanan Dibuat
+                                Created Time
                             </strong>
                         </div>
                         <hr>
