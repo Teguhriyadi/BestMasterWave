@@ -144,8 +144,8 @@
                         name: 'shopee_pesanan.sku_induk'
                     },
                     {
-                        data: 'nomor_referensi_sku',
-                        name: 'shopee_pesanan.nomor_referensi_sku'
+                        data: 'jumlah',
+                        name: 'shopee_pesanan.jumlah'
                     },
                     {
                         data: 'nama_kurir',
