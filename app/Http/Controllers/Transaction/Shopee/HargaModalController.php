@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Transaction\Shopee;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Shopee\HargaModal\CreateRequest;
 use App\Models\ShopeePesanan;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class HargaModalController extends Controller
@@ -14,7 +14,7 @@ class HargaModalController extends Controller
         return view("pages.modules.transaction.shopee.harga-modal.index");
     }
 
-    public function update(Request $request)
+    public function update(CreateRequest $request)
     {
         try {
 

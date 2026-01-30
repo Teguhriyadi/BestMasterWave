@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Transaction\Tiktok;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tiktok\HargaModal\CreateRequest;
 use App\Models\TiktokPesanan;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class HargaModalController extends Controller
@@ -14,7 +14,7 @@ class HargaModalController extends Controller
         return view("pages.modules.transaction.tiktok.harga-modal.index");
     }
 
-    public function update(Request $request)
+    public function update(CreateRequest $request)
     {
         try {
 

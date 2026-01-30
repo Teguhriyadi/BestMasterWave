@@ -40,27 +40,38 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dari" class="form-label font-weight-bold">Dari Tanggal</label>
+                                    <label for="dari" class="form-label font-weight-bold">
+                                        Dari Tanggal
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="date" class="form-control" name="dari" id="dari">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="sampai" class="form-label font-weight-bold">Sampai Tanggal</label>
+                                    <label for="sampai" class="form-label font-weight-bold">
+                                        Sampai Tanggal
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="date" class="form-control" name="sampai" id="sampai">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="seller_id" class="form-label font-weight-bold">Harga Modal</label>
-                            <input type="number" class="form-control" name="harga_modal" id="harga_modal" placeholder="0" min="1">
+                            <label for="seller_id" class="form-label font-weight-bold">
+                                Harga Modal
+                                <small class="text-danger">*</small>
+                            </label>
+                            <input type="number" class="form-control" name="harga_modal" id="harga_modal" placeholder="0"
+                                min="1">
                         </div>
                     </div>
                     <div class="card-footer">
                         <button type="reset" class="btn btn-danger btn-sm">
                             <i class="fa fa-times"></i> RESET
                         </button>
-                        <button onclick="return confirm('Apakah Anda Yakin Ingin Mengubah Harga Modal?')" type="submit" class="btn btn-success btn-sm">
+                        <button onclick="return confirm('Apakah Anda Yakin Ingin Mengubah Harga Modal?')" type="submit"
+                            class="btn btn-success btn-sm">
                             <i class="fa fa-save"></i> SIMPAN
                         </button>
                     </div>
@@ -69,4 +80,23 @@
         </div>
     </div>
 
+@endpush
+
+@push('js_style')
+    <script>
+        const hargaInput = document.getElementById('harga_modal');
+
+        hargaInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+
+            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            this.value = formatted;
+        });
+
+        const form = hargaInput.closest('form');
+        form.addEventListener('submit', function() {
+            hargaInput.value = hargaInput.value.replace(/\./g, '');
+        });
+    </script>
 @endpush

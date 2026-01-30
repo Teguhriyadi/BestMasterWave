@@ -70,3 +70,22 @@
     </div>
 
 @endpush
+
+@push('js_style')
+    <script>
+        const hargaInput = document.getElementById('harga_modal');
+
+        hargaInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+
+            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            this.value = formatted;
+        });
+
+        const form = hargaInput.closest('form');
+        form.addEventListener('submit', function() {
+            hargaInput.value = hargaInput.value.replace(/\./g, '');
+        });
+    </script>
+@endpush
