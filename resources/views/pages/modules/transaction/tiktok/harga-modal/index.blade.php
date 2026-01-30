@@ -40,19 +40,28 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dari" class="form-label font-weight-bold">Dari Tanggal</label>
+                                    <label for="dari" class="form-label font-weight-bold">
+                                        Dari Tanggal
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="date" class="form-control" name="dari" id="dari">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="sampai" class="form-label font-weight-bold">Sampai Tanggal</label>
+                                    <label for="sampai" class="form-label font-weight-bold">
+                                        Sampai Tanggal
+                                        <small class="text-danger">*</small>
+                                    </label>
                                     <input type="date" class="form-control" name="sampai" id="sampai">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="harga_modal" class="form-label font-weight-bold">Harga Modal</label>
+                            <label for="harga_modal" class="form-label font-weight-bold">
+                                Harga Modal
+                                <small class="text-danger">*</small>
+                            </label>
                             <input type="text" class="form-control" name="harga_modal" id="harga_modal" placeholder="0"
                                 min="1">
                         </div>
