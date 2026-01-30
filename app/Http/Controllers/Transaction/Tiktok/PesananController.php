@@ -69,8 +69,8 @@ class PesananController extends Controller
 
             $platform = Platform::where("slug", "tiktok")->firstOrFail();
             $data["seller"] = Seller::where("status", "1")
-                ->where("divisi_id", AuthDivisi::id())
-                ->where("platform_id", $platform->id)
+                // ->where("divisi_id", AuthDivisi::id())
+                // ->where("platform_id", $platform->id)
                 ->get();
 
             return view('pages.modules.transaction.tiktok.pesanan.upload', $data);

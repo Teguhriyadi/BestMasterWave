@@ -39,7 +39,8 @@ class PendapatanController extends Controller
 
             $platform = Platform::where('slug', 'tiktok')->first();
             $data['seller'] = Seller::where('status', '1')
-                ->where('platform_id', $platform->id)->get();
+                // ->where('platform_id', $platform->id)
+                ->get();
 
             DB::commit();
 

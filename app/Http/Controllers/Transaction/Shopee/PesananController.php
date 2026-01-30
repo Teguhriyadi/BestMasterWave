@@ -58,8 +58,8 @@ class PesananController extends Controller
 
             $platform = Platform::where("slug", "shopee")->firstOrFail();
             $data["seller"] = Seller::where("status", "1")
-                ->where("divisi_id", AuthDivisi::id())
-                ->where("platform_id", $platform->id)
+                // ->where("divisi_id", AuthDivisi::id())
+                // ->where("platform_id", $platform->id)
                 ->get();
 
             return view('pages.modules.transaction.shopee.pesanan.upload', $data);
@@ -67,7 +67,6 @@ class PesananController extends Controller
             abort(500, $e->getMessage());
         }
     }
-
 
     public function store(Request $request)
     {
