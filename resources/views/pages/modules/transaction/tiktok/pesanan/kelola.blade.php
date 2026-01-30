@@ -79,6 +79,7 @@
                             <th>Nama Produk</th>
                             <th>Variant</th>
                             <th class="text-center">QTY</th>
+                            <th class="text-center">Harga Modal</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -178,6 +179,11 @@
                     {
                         data: 'quantity',
                         name: 'quantity',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'harga_modal',
+                        name: 'harga_modal',
                         className: 'text-center'
                     },
                     {
