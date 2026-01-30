@@ -71,15 +71,16 @@
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        <th>Nama Toko</th>
                         <th>Order/Adjustment ID</th>
                         <th class="text-center">SKU</th>
                         <th class="text-center">QTY</th>
-                        <th class="tect-center">Modal</th>
+                        <th class="tect-center">Harga Modal</th>
+                        <th class="text-center">Total Revenue</th>
                         <th class="text-center">Laba/Rugi</th>
                         <th class="text-center">Order Created Time(UTC)</th>
                         <th class="text-center">Order Settled Time(UTC)</th>
                         <th class="text-center">Total Settlement Amount</th>
-                        <th class="text-center">Total Revenue</th>
                         <th class="text-center">Fee</th>
                         <th class="text-center">Ongkir</th>
                         <th class="text-center">Ongkir Refund</th>
@@ -126,6 +127,10 @@
                         className: 'text-center'
                     },
                     {
+                        data: 'nama_seller',
+                        name: 'nama_seller'
+                    },
+                    {
                         data: 'order_or_adjustment_id',
                         name: 'order_or_adjustment_id'
                     },
@@ -140,6 +145,11 @@
                     {
                         data: 'harga_modal',
                         name: 'harga_modal',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'total_revenue',
+                        name: 'total_revenue',
                         className: 'text-center'
                     },
                     {
@@ -160,11 +170,6 @@
                     {
                         data: 'total_settlement_amount',
                         name: 'total_settlement_amount',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total_revenue',
-                        name: 'total_revenue',
                         className: 'text-center'
                     },
                     {

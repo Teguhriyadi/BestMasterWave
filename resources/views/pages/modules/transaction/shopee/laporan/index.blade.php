@@ -71,10 +71,12 @@
                 <thead>
                     <tr>
                         <th class="text-center">No.</th>
+                        <th>Nama Seller</th>
                         <th>No. Pesanan</th>
                         <th>Nomor SKU</th>
                         <th class="text-center">Jumlah</th>
                         <th class="text-center">Harga Modal</th>
+                        <th class="text-center">Total Penghasilan</th>
                         <th class="text-center">Laba/Rugi</th>
                         <th>Waktu Pesanan Dibuat</th>
                         <th class="text-center">Metode Pembayaran</th>
@@ -85,7 +87,6 @@
                         <th class="text-center">Diskon</th>
                         <th class="text-center">Ongkir</th>
                         <th class="text-center">Biaya</th>
-                        <th class="text-center">Total Penghasilan</th>
                         <th class="text-center">Kompensasi</th>
                         <th class="text-center">Jasa Kirim</th>
                         <th class="text-center">Nama Kurir</th>
@@ -133,6 +134,10 @@
                         className: 'text-center'
                     },
                     {
+                        data: 'nama_seller',
+                        name: 'nama_seller'
+                    },
+                    {
                         data: 'no_pesanan',
                         name: 'no_pesanan'
                     },
@@ -147,6 +152,11 @@
                     {
                         data: 'harga_modal',
                         name: 'harga_modal'
+                    },
+                    {
+                        data: 'total_penghasilan',
+                        name: 'total_penghasilan',
+                        className: 'text-center'
                     },
                     {
                         data: 'laba_rugi',
@@ -195,11 +205,6 @@
                     {
                         data: 'biaya',
                         name: 'biaya',
-                        className: 'text-center'
-                    },
-                    {
-                        data: 'total_penghasilan',
-                        name: 'total_penghasilan',
                         className: 'text-center'
                     },
                     {
