@@ -103,6 +103,7 @@
                     </div>
 
                     <div class="modal-body">
+                        <input type="hidden" name="jumlah" id="jumlah">
                         <input type="hidden" name="sku" id="sku">
 
                         <div id="harga-modal-content">
@@ -209,7 +210,9 @@
 
         $(document).on('click', '.btn-modal-harga', function() {
             let sku = $(this).data('sku');
+            let jumlah = $(this).data('jumlah');
 
+            $('#jumlah').val(jumlah)
             $('#sku').val(sku);
             $('#modalHargaModal').modal('show');
 
@@ -219,7 +222,7 @@
                 </div>
             `);
 
-            $.get(`{{ url('/admin-panel/shopee-pesanan/${sku}/harga-modal') }}`, function(res) {
+            $.get(`{{ url('/admin-panel/shopee-pesanan/${jumlah}/${sku}/harga-modal') }}`, function(res) {
                 $('#harga-modal-content').html(res);
             });
         });

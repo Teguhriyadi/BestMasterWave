@@ -15,6 +15,6 @@ Route::prefix("shopee-pesanan")->group(function() {
         Route::get("/", [PesananController::class, "kelola"])->middleware("permission:shopee-pesanan.read");
         Route::get("/{uuid}/detail", [PesananController::class, "detail"])->middleware("permission:shopee-pesanan.show");
     });
-    Route::get("/{sku}/harga-modal", [PesananController::class, "harga_modal"]);
+    Route::get("/{jumlah}/{sku}/harga-modal", [PesananController::class, "harga_modal"]);
     Route::post("/harga-modal/tambah", [PesananController::class, "post_harga_modal"]);
 });

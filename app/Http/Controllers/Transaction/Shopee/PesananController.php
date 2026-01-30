@@ -526,6 +526,7 @@ class PesananController extends Controller
                             <i class="fa fa-search"></i> Detail
                         </a>
                         <button
+                            data-jumlah="' . $row->jumlah . '"
                             data-sku="' . $row->sku_induk . '"
                             class="btn btn-warning btn-sm btn-modal-harga">
                             <i class="fa fa-edit"></i> Harga Modal
@@ -560,8 +561,9 @@ class PesananController extends Controller
         }
     }
 
-    public function harga_modal($sku)
+    public function harga_modal($jumlah, $sku)
     {
+        $data["jumlah"] = $jumlah;
         $data["barang"] = Barang::where('sku_barang', $sku)->firstOrFail();
 
         return view('pages.modules.harga-modal.index', $data);
@@ -575,7 +577,7 @@ class PesananController extends Controller
 
             $harga_modal = HargaModal::create([
                 "sku_barang" => $request->sku,
-                "harga_modal" => $request->harga_modal,
+                "harga_modal" => $request->harga_modal * $request->qty,
                 "harga_pembelian_terakhir" => $request->harga_pembelian_terakhir,
                 "tanggal_pembelian_terakhir" => $request->tanggal_pembelian_terakhir,
                 "status_sku" => $request->status_sku,
@@ -584,7 +586,7 @@ class PesananController extends Controller
             ]);
 
             ShopeePesanan::where("sku_induk", $request->sku)->update([
-                "harga_modal" => $request->harga_modal
+                "harga_modal" => $request->harga_modal * $request->qty
             ]);
 
             DB::commit();
